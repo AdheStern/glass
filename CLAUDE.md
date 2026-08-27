@@ -50,17 +50,31 @@ son lo mismo.
 
 ## Estructura
 
+Los módulos se separan **por feature** (§3.1): `src/features/<feature>/` con sus
+`queries.ts`, `actions.ts` ("use server"), `schemas.ts` (zod) y `components/`.
+
 ```
-src/app/(shop)    público    · SSR estático, presupuesto estricto
-src/app/(admin)   panel      · cliente, sin obsesión por el peso
-src/app/(pos)     caja       · local primero, cola de sincronización
-src/domain        lógica pura compartida
-src/theme         tokens OKLCH y presets
-src/db            Prisma
-src/auth          Supabase (panel) + dispositivo/PIN (POS)
-src/storage       Supabase Storage
-prisma            esquema, migraciones, siembra
+src/app/(shop)    público    · SSR con Cache Components, presupuesto estricto
+src/app/(admin)   panel      · /entrar + /panel/*, gateado por rol, `instant = false`
+src/app/(pos)     caja       · local primero (fases 5-6)
+src/features/     catalog · auth · panel · products · categories · discounts · media · import
+src/components/ui shadcn/ui (radix-nova) — base de todos los componentes; fuera del lint
+src/components/   compartido no-feature (json-ld, breadcrumbs, skeletons)
+src/domain        lógica pura compartida servidor ↔ POS
+src/theme         tokens OKLCH + presets de tema y de tarjeta
+src/db            cliente Prisma + getSiteSettings() cacheado
+src/storage       Supabase Storage (bucket product-images)
+prisma            esquema, migraciones, prisma/sql/*.sql (triggers, búsqueda)
 ```
+
+## Reglas de Fase 2
+
+- Componentes nuevos: `shadcn add <x>` primero; no reinventar primitivas.
+- Toda server action: `requireRole(...)` + zod + `revalidateTag(tag, "max")` (Next 16
+  exige el 2º argumento).
+- Objetos de dominio/imágenes/SQL raro que Prisma no expresa → `prisma/sql/` + migración
+  con `migrate resolve --applied` para no chocar con la deriva.
+- Nada se borra: `archivedAt`. El panel usa tokens neutros de shadcn; la tienda `.shop-surface`.
 
 ## Comandos — desarrollo en el host con pnpm
 
