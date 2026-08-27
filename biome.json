@@ -90,7 +90,7 @@
       }
     },
     {
-      "includes": ["src/app/(shop)/**", "src/components/**"],
+      "includes": ["src/app/(shop)/**", "src/features/catalog/**", "src/components/**"],
       "linter": {
         "rules": {
           "style": {

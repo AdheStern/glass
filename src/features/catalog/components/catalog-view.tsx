@@ -1,12 +1,12 @@
 // Glass — shell del catálogo (estático) + resultados en <Suspense> (dinámico).
 import { Suspense } from "react";
-import type { SearchParams } from "@/catalog/params";
-import { getCategoryTree } from "@/catalog/queries";
+import { GridSkeleton } from "@/components/skeletons";
 import { getSiteSettings } from "@/db/settings";
+import type { SearchParams } from "@/features/catalog/params";
+import { getCategoryTree } from "@/features/catalog/queries";
 import { resolveCardPresetName } from "@/theme/card-presets";
 import { CatalogResults } from "./catalog-results";
 import { CategoryNav } from "./category-nav";
-import { GridSkeleton } from "./skeletons";
 
 export async function CatalogView({
   heading,

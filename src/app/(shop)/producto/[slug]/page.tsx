@@ -3,21 +3,21 @@ import Image from "next/image";
 import { notFound, permanentRedirect } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
-import { getDisplayPrice } from "@/catalog/pricing-view";
+import { Breadcrumbs } from "@/components/breadcrumbs";
+import { JsonLd } from "@/components/json-ld";
+import { BadgeSkeleton, PriceSkeleton } from "@/components/skeletons";
+import { getSiteSettings } from "@/db/settings";
+import { formatBob } from "@/domain/money";
+import { PriceTag } from "@/features/catalog/components/price-tag";
+import { StockBadge } from "@/features/catalog/components/stock-badge";
+import { getDisplayPrice } from "@/features/catalog/pricing-view";
 import {
   getProductBySlug,
   getStaticProductSlugs,
   resolveSlugRedirect,
-} from "@/catalog/queries";
-import { getStockView } from "@/catalog/stock-view";
-import type { ProductDetail } from "@/catalog/types";
-import { Breadcrumbs } from "@/components/breadcrumbs";
-import { JsonLd } from "@/components/json-ld";
-import { PriceTag } from "@/components/price-tag";
-import { BadgeSkeleton, PriceSkeleton } from "@/components/skeletons";
-import { StockBadge } from "@/components/stock-badge";
-import { getSiteSettings } from "@/db/settings";
-import { formatBob } from "@/domain/money";
+} from "@/features/catalog/queries";
+import { getStockView } from "@/features/catalog/stock-view";
+import type { ProductDetail } from "@/features/catalog/types";
 
 type Params = { slug: string };
 

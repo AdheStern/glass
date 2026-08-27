@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import type { SearchParams } from "@/catalog/params";
-import { CatalogView } from "@/components/catalog-view";
+import { CatalogView } from "@/features/catalog/components/catalog-view";
+import type { SearchParams } from "@/features/catalog/params";
 
 export const metadata: Metadata = {
   title: "Catálogo",

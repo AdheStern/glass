@@ -1,6 +1,6 @@
 // Glass — insignia de disponibilidad (§7.2). Dinámica, dentro de <Suspense>.
 import { connection } from "next/server";
-import { getStockView, type StockKind } from "@/catalog/stock-view";
+import { getStockView, type StockKind } from "@/features/catalog/stock-view";
 
 const STYLE: Record<StockKind, string> = {
   in: "bg-emerald-50 text-emerald-700",

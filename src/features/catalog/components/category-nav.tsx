@@ -1,6 +1,6 @@
 // Glass — navegación por categorías (§7). Server Component, sin JS.
 import Link from "next/link";
-import type { CategoryNode } from "@/catalog/types";
+import type { CategoryNode } from "@/features/catalog/types";
 
 export function CategoryNav({
   tree,

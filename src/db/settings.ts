@@ -2,8 +2,8 @@
 // `settings` (§10.2). Se invalida con `revalidateTag("settings")` desde el panel.
 import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
-import type { StockDisplay } from "@/catalog/stock-label";
 import type { RoundingMode as DomainRoundingMode } from "@/domain/sale";
+import type { StockDisplay } from "@/features/catalog/stock-label";
 import { prisma } from "./client";
 
 export type { StockDisplay };

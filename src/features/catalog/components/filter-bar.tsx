@@ -1,6 +1,6 @@
 // Glass — filtros y orden (§7.3). <form method="get">: cero JS, estado en la URL.
 import Link from "next/link";
-import type { ParsedCatalogParams } from "@/catalog/params";
+import type { ParsedCatalogParams } from "@/features/catalog/params";
 
 const SORT_LABELS: Record<string, string> = {
   featured: "Destacados",

@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { parseCatalogParams, type SearchParams } from "@/catalog/params";
-import { CatalogView } from "@/components/catalog-view";
 import { GridSkeleton } from "@/components/skeletons";
+import { CatalogView } from "@/features/catalog/components/catalog-view";
+import {
+  parseCatalogParams,
+  type SearchParams,
+} from "@/features/catalog/params";
 
 export const metadata: Metadata = { title: "Buscar", robots: { index: false } };
 

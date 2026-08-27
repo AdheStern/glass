@@ -1,8 +1,11 @@
 // Glass — parte dinámica del catálogo: lee searchParams y consulta. Se monta
 // dentro de <Suspense> para que el shell (cabecera, categorías) prerenderice y
 // la grilla llegue en streaming (Cache Components / §7.1).
-import { parseCatalogParams, type SearchParams } from "@/catalog/params";
-import { getCatalogPage, getSearchResults } from "@/catalog/queries";
+import {
+  parseCatalogParams,
+  type SearchParams,
+} from "@/features/catalog/params";
+import { getCatalogPage, getSearchResults } from "@/features/catalog/queries";
 import type { CardPresetName } from "@/theme/card-presets";
 import { FilterBar } from "./filter-bar";
 import { Pagination } from "./pagination";

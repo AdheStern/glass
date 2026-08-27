@@ -1,5 +1,5 @@
 // Glass — grilla UNIFORME del catálogo (§8.1: el catálogo no es bento).
-import type { ProductCardData } from "@/catalog/types";
+import type { ProductCardData } from "@/features/catalog/types";
 import type { CardPresetName } from "@/theme/card-presets";
 import { ProductCard } from "./product-card";
 

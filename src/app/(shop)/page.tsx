@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { getCategoryTree, getFeatured } from "@/catalog/queries";
-import { CategoryNav } from "@/components/category-nav";
-import { ProductGrid } from "@/components/product-grid";
 import { getSiteSettings } from "@/db/settings";
+import { CategoryNav } from "@/features/catalog/components/category-nav";
+import { ProductGrid } from "@/features/catalog/components/product-grid";
+import { getCategoryTree, getFeatured } from "@/features/catalog/queries";
 import { resolveCardPresetName } from "@/theme/card-presets";
 
 export default async function HomePage() {

@@ -1,8 +1,8 @@
 // Glass — precio efectivo. Server Component dinámico: se monta dentro de
 // <Suspense> y se lee en cada petición (§7.1).
 import { connection } from "next/server";
-import { getDisplayPrice } from "@/catalog/pricing-view";
 import { formatBob } from "@/domain/money";
+import { getDisplayPrice } from "@/features/catalog/pricing-view";
 
 export async function PriceTag({
   productId,

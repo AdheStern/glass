@@ -1,6 +1,6 @@
 // Glass — paginación por enlaces (§24.2 regla 2: toda lista pública tiene tope).
 import Link from "next/link";
-import type { SearchParams } from "@/catalog/params";
+import type { SearchParams } from "@/features/catalog/params";
 
 function hrefFor(base: string, current: SearchParams, page: number): string {
   const out = new URLSearchParams();

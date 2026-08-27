@@ -3,8 +3,8 @@
 // separación fina estático/dinámico vive en la ficha de producto.
 import Image from "next/image";
 import Link from "next/link";
-import type { ProductCardData } from "@/catalog/types";
 import { formatBob } from "@/domain/money";
+import type { ProductCardData } from "@/features/catalog/types";
 import {
   CARD_PRESETS,
   type CardPreset,

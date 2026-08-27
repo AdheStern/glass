@@ -1,7 +1,7 @@
 // Glass — intercambio del código OAuth de Supabase (Google) por sesión.
 import { NextResponse } from "next/server";
-import { ensureProfile } from "@/auth/owner";
-import { createSupabaseServerClient } from "@/auth/supabase-server";
+import { ensureProfile } from "@/features/auth/owner";
+import { createSupabaseServerClient } from "@/features/auth/supabase-server";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);

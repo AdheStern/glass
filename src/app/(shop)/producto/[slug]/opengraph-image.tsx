@@ -1,9 +1,9 @@
 // Glass — imagen para compartir (§20.2). Es lo que se ve al pegar el enlace en
 // WhatsApp: importa más que cualquier otra optimización de SEO.
 import { ImageResponse } from "next/og";
-import { getProductBySlug } from "@/catalog/queries";
 import { getSiteSettings } from "@/db/settings";
 import { formatBob } from "@/domain/money";
+import { getProductBySlug } from "@/features/catalog/queries";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";

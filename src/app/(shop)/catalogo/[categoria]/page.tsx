@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import type { SearchParams } from "@/catalog/params";
-import { getCategoryTree } from "@/catalog/queries";
-import { CatalogView } from "@/components/catalog-view";
+import { CatalogView } from "@/features/catalog/components/catalog-view";
+import type { SearchParams } from "@/features/catalog/params";
+import { getCategoryTree } from "@/features/catalog/queries";
 
 type Params = { categoria: string };
 
