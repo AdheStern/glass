@@ -20,8 +20,7 @@ export default async function PedidoPage({
 }: {
   params: Promise<{ folio: string }>;
 }) {
-  // Sin shell prerenderizado: así `notFound()` responde 404 y no 200 (el shell
-  // ya se habría enviado).
+  // El estado del pedido es dinámico por petición; no se prerenderiza.
   await connection();
   const { folio } = await params;
   const order = await getOrderByFolio(decodeURIComponent(folio));

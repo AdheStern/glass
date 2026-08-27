@@ -17,8 +17,9 @@ test("recorrido: catálogo → categoría → ficha con precio y disponibilidad"
     "Herramientas",
   );
 
-  // Abrir la primera ficha de producto
-  const firstCard = page.locator('a[href^="/producto/"]').first();
+  // Abrir la primera ficha de producto visible
+  const firstCard = page.locator('a[href^="/producto/"]:visible').first();
+  await firstCard.scrollIntoViewIfNeeded();
   await firstCard.click();
   await expect(page).toHaveURL(/\/producto\//);
 
