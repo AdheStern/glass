@@ -1,0 +1,22 @@
+{
+  "name": "CANON-01 · Dinero y descuentos",
+  "source": "docs/plan-maestro.html — Apéndice B",
+  "input": {
+    "roundingMode": "NEAREST_10",
+    "globalDiscountPercent": 3,
+    "lines": [
+      { "variantId": "taladro", "qty": 2, "baseUnitPriceBob": 31000, "discount": { "percent": 10 } },
+      { "variantId": "broca-6mm", "qty": 1, "baseUnitPriceBob": 4500, "discount": { "amountBob": 500 } }
+    ]
+  },
+  "expected": {
+    "subtotalBob": 59800,
+    "discountBob": 1794,
+    "roundingBob": 4,
+    "totalBob": 58010,
+    "lines": [
+      { "variantId": "taladro", "unitPriceBob": 27900, "lineTotalBob": 55800 },
+      { "variantId": "broca-6mm", "unitPriceBob": 4000, "lineTotalBob": 4000 }
+    ]
+  }
+}

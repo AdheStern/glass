@@ -1,0 +1,16 @@
+# Glass — normalización de fin de línea. El código corre en contenedores Linux.
+* text=auto eol=lf
+
+# Scripts y ficheros que DEBEN llevar LF (los rompe CRLF dentro del contenedor)
+*.sh            text eol=lf
+*.mjs           text eol=lf
+Dockerfile      text eol=lf
+Makefile        text eol=lf
+*.yml           text eol=lf
+*.yaml          text eol=lf
+
+# Binarios
+*.png           binary
+*.jpg           binary
+*.ico           binary
+*.svg           text eol=lf

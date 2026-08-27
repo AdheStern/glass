@@ -7,7 +7,17 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!node_modules", "!.next", "!dist", "!build"]
+    "includes": [
+      "**",
+      "!node_modules",
+      "!.next",
+      "!dist",
+      "!build",
+      "!src/generated",
+      "!prisma/migrations",
+      "!playwright-report",
+      "!test-results"
+    ]
   },
   "formatter": {
     "enabled": true,
@@ -35,5 +45,45 @@
         "organizeImports": "on"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["src/domain/**"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noNodejsModules": "error"
+          },
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "@prisma/client": "El dominio es puro (§24.2 regla 1): sin Prisma.",
+                  "@/db/client": "El dominio es puro: sin acceso a datos.",
+                  "react": "El dominio es puro: sin React.",
+                  "react-dom": "El dominio es puro: sin React.",
+                  "next": "El dominio es puro: sin Next.",
+                  "server-only": "El dominio es puro: no distingue servidor de cliente.",
+                  "@supabase/supabase-js": "El dominio es puro: sin Supabase.",
+                  "@supabase/ssr": "El dominio es puro: sin Supabase.",
+                  "culori": "El dominio no maneja color; eso es packages/theme."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/*.test.ts", "prisma/seed/**", "tests/**"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noNodejsModules": "off"
+          }
+        }
+      }
+    }
+  ]
 }

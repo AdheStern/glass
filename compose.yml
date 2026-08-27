@@ -1,0 +1,17 @@
+# Glass — base común. Se combina siempre con compose.dev.yml o compose.test.yml.
+name: glass
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+volumes:
+  node_modules:
+  next_cache:

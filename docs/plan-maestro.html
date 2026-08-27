@@ -1,0 +1,1936 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VITRINA DIMA · Plan Maestro v1.0 — Catálogo, POS e inventario</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<style>
+  :root{
+    --ink:#1a1420; --ink-soft:#4c4155; --ink-mute:#847a90;
+    --paper:#faf8f7; --paper-raise:#ffffff;
+    --line:#e5e0e6; --line-soft:#f0ecf1;
+    --d0:#ff7a59; --d1:#e0457b; --d2:#7c3aed; --d3:#2b1b4d;
+    --brass:#b4762a;
+    --accent:#7c3aed; --accent-ink:#5b21b6;
+    --ok:#1f8a70; --warn:#b4762a; --err:#c0392b;
+    --code-bg:#1b1226; --code-ink:#e4dcec;
+    --radius:10px;
+    --depth:linear-gradient(90deg,var(--d0) 0%,var(--d1) 34%,var(--d2) 68%,var(--d3) 100%);
+    --font-display:'Bricolage Grotesque',system-ui,-apple-system,sans-serif;
+    --font-body:'Source Sans 3',system-ui,-apple-system,'Segoe UI',sans-serif;
+    --font-mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;scroll-padding-top:24px}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} *{animation:none!important;transition:none!important} }
+  body{background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:16.5px;line-height:1.65;-webkit-font-smoothing:antialiased}
+
+  .shell{display:grid;grid-template-columns:300px minmax(0,1fr);min-height:100vh}
+  @media (max-width:980px){ .shell{grid-template-columns:1fr} .toc{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line)} }
+
+  .toc{position:sticky;top:0;height:100vh;overflow-y:auto;border-right:1px solid var(--line);background:var(--paper-raise);padding:26px 18px 60px}
+  .toc .brand{font-family:var(--font-display);font-weight:800;font-size:21px;letter-spacing:-.3px}
+  .toc .brand small{display:block;font-family:var(--font-mono);font-weight:400;font-size:10.5px;color:var(--ink-mute);letter-spacing:1.5px;margin-top:3px;text-transform:uppercase}
+  .toc .depthbar{height:5px;border-radius:3px;background:var(--depth);margin:14px 0 16px}
+  .toc nav a{display:block;color:var(--ink-soft);text-decoration:none;font-size:13.2px;padding:4px 8px;border-radius:6px;border-left:2px solid transparent}
+  .toc nav a:hover{background:var(--line-soft);color:var(--ink)}
+  .toc nav a .n{font-family:var(--font-mono);font-size:11px;color:var(--ink-mute);margin-right:7px}
+  .toc nav a:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+  .toc .grp{font-family:var(--font-mono);font-size:9.5px;letter-spacing:1.8px;text-transform:uppercase;color:var(--ink-mute);margin:16px 0 5px 8px;padding-top:8px;border-top:1px solid var(--line-soft)}
+
+  main{padding:0 clamp(22px,5vw,72px) 120px;max-width:1040px}
+
+  .hero{padding:60px 0 40px;border-bottom:1px solid var(--line)}
+  .hero .kicker{font-family:var(--font-mono);font-size:12px;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink-mute)}
+  .hero h1{font-family:var(--font-display);font-weight:800;font-size:clamp(36px,5.4vw,58px);line-height:1.03;margin:14px 0 8px;letter-spacing:-1.2px}
+  .hero h1 .grad{background:var(--depth);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p.lede{font-size:19px;color:var(--ink-soft);max-width:66ch;margin-top:14px}
+  .hero .meta{display:flex;gap:26px;flex-wrap:wrap;margin-top:26px;font-family:var(--font-mono);font-size:12px;color:var(--ink-mute)}
+  .hero .meta b{display:block;color:var(--ink);font-size:13px;font-weight:600}
+  .sounding{margin-top:32px;width:100%;height:86px;display:block}
+
+  section{padding-top:56px}
+  h2{font-family:var(--font-display);font-weight:800;font-size:31px;letter-spacing:-.6px;scroll-margin-top:20px}
+  h2 .num{font-family:var(--font-mono);font-size:13px;font-weight:500;color:var(--ink-mute);display:block;letter-spacing:2px;margin-bottom:6px}
+  h2::after{content:"";display:block;width:92px;height:4px;border-radius:2px;background:var(--depth);margin-top:12px}
+  h3{font-family:var(--font-display);font-weight:700;font-size:20.5px;margin:34px 0 10px;scroll-margin-top:20px;letter-spacing:-.2px}
+  h4{font-family:var(--font-display);font-weight:700;font-size:16.5px;margin:24px 0 8px}
+  p{margin:12px 0;max-width:76ch}
+  ul,ol{margin:12px 0 12px 24px;max-width:74ch}
+  li{margin:6px 0}
+  li::marker{color:var(--d2)}
+  a{color:var(--accent-ink)}
+  .lead{font-size:18px;color:var(--ink-soft)}
+
+  .partbar{margin:70px 0 0;padding:22px 26px;border-radius:var(--radius);background:var(--d3);color:#efe9f5}
+  .partbar .p{font-family:var(--font-mono);font-size:11px;letter-spacing:2.4px;text-transform:uppercase;color:#c9a7ff}
+  .partbar h2{color:#fff;font-size:27px;margin-top:6px}
+  .partbar h2::after{display:none}
+  .partbar p{color:#c8bcd8;margin:8px 0 0;font-size:15px}
+
+  .card{background:var(--paper-raise);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;margin:18px 0}
+  .card h4{margin-top:0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media (max-width:800px){ .grid2,.grid3{grid-template-columns:1fr} }
+
+  .callout{border-left:4px solid var(--d2);background:var(--paper-raise);border-radius:0 var(--radius) var(--radius) 0;padding:14px 18px;margin:18px 0}
+  .callout.warn{border-color:var(--brass)} .callout.err{border-color:var(--err)} .callout.ok{border-color:var(--ok)}
+  .callout .tag{font-family:var(--font-mono);font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:var(--ink-mute)}
+  .callout p{margin:6px 0 0}
+
+  .formula{font-family:var(--font-mono);background:var(--paper-raise);border:1px dashed var(--line);border-radius:var(--radius);padding:14px 18px;margin:14px 0;font-size:14px;overflow-x:auto;line-height:1.8}
+  .formula .lbl{display:block;font-size:10.5px;letter-spacing:1.6px;text-transform:uppercase;color:var(--ink-mute);margin-bottom:6px;font-family:var(--font-body)}
+
+  pre{background:var(--code-bg);color:var(--code-ink);font-family:var(--font-mono);font-size:12.6px;line-height:1.55;padding:18px 20px;border-radius:var(--radius);overflow-x:auto;margin:16px 0}
+  pre .cm{color:#8b7ba0} pre .k{color:#c4a2ff} pre .s{color:#9fd39a} pre .t{color:#f0a97c}
+  code:not(pre code){font-family:var(--font-mono);font-size:.86em;background:var(--line-soft);border:1px solid var(--line);border-radius:5px;padding:1px 6px;white-space:nowrap}
+
+  table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14.3px;background:var(--paper-raise);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  th{font-family:var(--font-display);font-weight:700;text-align:left;font-size:12.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--ink-soft);background:var(--line-soft);padding:10px 12px;border-bottom:1px solid var(--line)}
+  td{padding:10px 12px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  td code{white-space:normal}
+  .num-col{font-family:var(--font-mono);text-align:right;white-space:nowrap}
+
+  .pill{display:inline-block;font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:.8px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);white-space:nowrap}
+  .pill.opus{background:#20182f;color:#e0d3ff;border-color:#20182f}
+  .pill.sonnet{background:#2b1b4d;color:#dcd0f1;border-color:#2b1b4d}
+  .pill.ok{background:#e2f4ef;color:#146152;border-color:#bde3d8}
+  .pill.warn{background:#f8f0dc;color:#77570d;border-color:#ead9a6}
+  .pill.err{background:#fae5e0;color:#8b3320;border-color:#f0c3b7}
+  .pill.neutral{background:var(--line-soft);color:var(--ink-soft)}
+
+  .mermaid{background:var(--paper-raise);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin:18px 0;display:flex;justify-content:center;overflow-x:auto}
+
+  .filetree{font-family:var(--font-mono);font-size:12.4px;line-height:1.7;background:var(--paper-raise);border:1px solid var(--line);border-radius:var(--radius);padding:18px 22px;margin:16px 0;overflow-x:auto;white-space:pre}
+  .filetree b{color:var(--accent-ink)}
+  .filetree i{color:var(--ink-mute);font-style:normal}
+
+  .phase{border:1px solid var(--line);border-radius:var(--radius);background:var(--paper-raise);margin:20px 0;overflow:hidden}
+  .phase header{display:flex;align-items:baseline;gap:14px;padding:14px 20px;border-bottom:1px solid var(--line-soft);background:var(--line-soft)}
+  .phase header .fnum{font-family:var(--font-mono);font-weight:600;font-size:12px;color:var(--ink-mute);letter-spacing:1.5px}
+  .phase header h4{margin:0;font-size:17px}
+  .phase header .dur{margin-left:auto;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-mute)}
+  .phase .body{padding:6px 20px 16px}
+  .phase table{border:none;margin:10px 0 4px}
+
+  .stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin:20px 0}
+  .stat div{background:var(--paper-raise);padding:16px 18px}
+  .stat b{display:block;font-family:var(--font-display);font-weight:800;font-size:26px;letter-spacing:-1px;line-height:1.1}
+  .stat span{display:block;font-family:var(--font-mono);font-size:10.5px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-mute);margin-top:5px}
+
+  .footer{margin-top:90px;border-top:1px solid var(--line);padding-top:22px;font-size:13px;color:var(--ink-mute);font-family:var(--font-mono)}
+  .footer .depthbar{height:4px;border-radius:2px;background:var(--depth);margin-bottom:16px;max-width:220px}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<aside class="toc">
+  <div class="brand">VITRINA<small>DIMA · Plan maestro v1.0</small></div>
+  <div class="depthbar"></div>
+  <nav>
+    <div class="grp">Producto</div>
+    <a href="#s1"><span class="n">01</span>Visión, alcance y principios</a>
+    <a href="#s2"><span class="n">02</span>El mercado y la diferencia</a>
+    <a href="#s3"><span class="n">03</span>Decisiones de arquitectura</a>
+    <a href="#s4"><span class="n">04</span>Despliegue sobre Coolify</a>
+    <a href="#s5"><span class="n">05</span>Modelo de dominio</a>
+    <a href="#s6"><span class="n">06</span>Identidad, roles y caja</a>
+    <div class="grp">Superficie compradora</div>
+    <a href="#s7"><span class="n">07</span>Catálogo público</a>
+    <a href="#s8"><span class="n">08</span>Bento y sistema visual</a>
+    <a href="#s9"><span class="n">09</span>Carrito y pedido por WhatsApp</a>
+    <a href="#s10"><span class="n">10</span>Motor de personalización</a>
+    <a href="#s11"><span class="n">11</span>CMS de páginas y blog</a>
+    <a href="#s12"><span class="n">12</span>Imágenes y medios</a>
+    <div class="grp">Superficie operativa</div>
+    <a href="#s13"><span class="n">13</span>Precios, descuentos y dinero</a>
+    <a href="#s14"><span class="n">14</span>Inventario y movimientos</a>
+    <a href="#s15"><span class="n">15</span>Escaneo de códigos</a>
+    <a href="#s16"><span class="n">16</span>Punto de venta</a>
+    <a href="#s17"><span class="n">17</span>El POS sin conexión</a>
+    <a href="#s18"><span class="n">18</span>Reportes y tablero</a>
+    <a href="#s19"><span class="n">19</span>Carga inicial e importación</a>
+    <div class="grp">Transversal</div>
+    <a href="#s20"><span class="n">20</span>Rendimiento y SEO</a>
+    <a href="#s21"><span class="n">21</span>Seguridad</a>
+    <a href="#s22"><span class="n">22</span>Entornos y DevOps</a>
+    <a href="#s23"><span class="n">23</span>Testing</a>
+    <a href="#s24"><span class="n">24</span>Reglas de codificación</a>
+    <a href="#s25"><span class="n">25</span>Roadmap</a>
+    <a href="#s26"><span class="n">26</span>Trabajar con Claude</a>
+    <a href="#s27"><span class="n">27</span>Empaquetado comercial</a>
+    <a href="#s28"><span class="n">28</span>Riesgos y decisiones abiertas</a>
+    <div class="grp">Apéndices</div>
+    <a href="#a1"><span class="n">A</span>Esquema de datos</a>
+    <a href="#a2"><span class="n">B</span>Casos canónicos</a>
+    <a href="#a3"><span class="n">C</span>CLAUDE.md</a>
+    <a href="#a4"><span class="n">D</span>Alta de un cliente</a>
+    <a href="#a5"><span class="n">E</span>Glosario</a>
+  </nav>
+</aside>
+
+<main>
+
+<div class="hero">
+  <div class="kicker">DIMA LTDA · Paquete comercial 02 · Revisión 1.0</div>
+  <h1><span class="grad">VITRINA</span><br>Catálogo, punto de venta e inventario</h1>
+  <p class="lede">Un paquete que un comercio pequeño compra una vez y estrena el mismo día: su catálogo en línea con pedidos por WhatsApp, su landing, su blog, y detrás una caja que sigue vendiendo cuando se cae el internet. Una instancia por cliente, en contenedores, sobre Coolify.</p>
+  <div class="meta">
+    <div><b>Next.js 15 · React 19</b>Stack heredado de Kraken</div>
+    <div><b>≈12 semanas</b>Un desarrollador con Claude Code</div>
+    <div><b>Coolify / VPS</b>Una instancia por cliente</div>
+    <div><b>Tablet y celular</b>Dispositivo objetivo</div>
+  </div>
+  <svg class="sounding" viewBox="0 0 1000 86" preserveAspectRatio="none" aria-hidden="true">
+    <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#ff7a59"/><stop offset=".34" stop-color="#e0457b"/><stop offset=".68" stop-color="#7c3aed"/><stop offset="1" stop-color="#2b1b4d"/></linearGradient></defs>
+    <rect x="0" y="66" width="1000" height="4" fill="url(#g)" rx="2"/>
+    <g fill="url(#g)" opacity=".85">
+      <rect x="30" y="30" width="120" height="34" rx="6"/><rect x="164" y="14" width="76" height="50" rx="6"/>
+      <rect x="254" y="38" width="76" height="26" rx="6"/><rect x="344" y="20" width="164" height="44" rx="6"/>
+      <rect x="522" y="34" width="76" height="30" rx="6"/><rect x="612" y="10" width="120" height="54" rx="6"/>
+      <rect x="746" y="40" width="76" height="24" rx="6"/><rect x="836" y="24" width="134" height="40" rx="6"/>
+    </g>
+  </svg>
+</div>
+
+<section id="s1">
+  <h2><span class="num">SECCIÓN 01</span>Visión, alcance y principios</h2>
+  <p class="lead">Kraken es software que DIMA usa. Vitrina es software que DIMA <strong>vende</strong>. Esa diferencia gobierna cada decisión de este documento: aquí el usuario no está capacitado, no tiene soporte interno, no tolera una pantalla fea y no perdona que la caja se trabe un sábado a mediodía.</p>
+
+  <h3>1.1 · La tesis</h3>
+  <p>Una tienda de barrio, una boutique, una ferretería o un restaurante en Bolivia tiene hoy tres herramientas desconectadas: un cuaderno para el stock, un catálogo en fotos de WhatsApp que nadie actualiza, y una caja que es una calculadora. Las plataformas que existen resuelven la vitrina y abandonan la caja. Vitrina resuelve las dos con <strong>un solo dato de producto</strong>: lo que el cliente ve en el catálogo y lo que el cajero cobra son la misma fila de la misma tabla.</p>
+
+  <table>
+    <tr><th>Dimensión</th><th>Lo que hace la competencia</th><th>Lo que hace Vitrina</th></tr>
+    <tr><td>Catálogo</td><td>Sí, con plantillas iguales para todos</td><td>Sí, con <strong>identidad visual real</strong> por cliente: tokens, bento, formas de tarjeta</td></tr>
+    <tr><td>Pedido</td><td>WhatsApp o pago en línea</td><td>WhatsApp con <strong>folio persistido</strong>: el pedido existe en la base antes de abrir el chat</td></tr>
+    <tr><td>Caja</td><td>No existe, o es un módulo aparte</td><td>POS integrado que descuenta del mismo inventario</td></tr>
+    <tr><td>Sin internet</td><td>La tienda deja de funcionar</td><td><strong>La caja sigue vendiendo.</strong> Es el diferenciador central</td></tr>
+    <tr><td>Contenido</td><td>Editor de bloques, sin blog o con blog externo</td><td>Landing por bloques + blog en la misma base y el mismo panel</td></tr>
+    <tr><td>Modelo</td><td>Suscripción SaaS, datos en servidor ajeno</td><td>Instancia propia, dominio propio, base propia, respaldo entregable</td></tr>
+    <tr><td>Dispositivo</td><td>Panel pensado para escritorio</td><td><strong>Tablet y celular primero</strong>: cámara, táctil, una mano</td></tr>
+  </table>
+
+  <h3>1.2 · Los seis principios</h3>
+
+  <div class="card">
+    <h4>1 · Un producto, una verdad</h4>
+    <p>El precio que ve el comprador, el que cobra el cajero y el que aparece en el reporte salen del mismo registro. No hay sincronización entre catálogo y caja porque no hay dos sistemas.</p>
+  </div>
+  <div class="card">
+    <h4>2 · El stock se deriva, nunca se guarda</h4>
+    <p>Igual que en Kraken (§14 del plan maestro de Kraken): las existencias son la suma de un libro de movimientos inmutables. Una venta, una compra, un ajuste y una merma son asientos. Corregir un error es agregar un asiento, no sobrescribir un número. Sin esto, la sincronización sin conexión de §17 es imposible de auditar.</p>
+  </div>
+  <div class="card">
+    <h4>3 · La venta cobrada siempre gana</h4>
+    <p>Si el dispositivo estuvo sin conexión y vendió tres unidades que el sistema creía tener dos, el servidor <strong>acepta la venta</strong> y levanta una alerta de existencia negativa. Nunca se rechaza una operación por la que un cliente ya pagó. Rechazarla no devuelve el producto al estante: solo destruye el registro.</p>
+  </div>
+  <div class="card">
+    <h4>4 · La superficie compradora es rápida antes que bonita</h4>
+    <p>El comprador entra desde un Android de gama media con datos móviles. Toda la animación cara vive en la landing, que le vende el paquete al dueño. El catálogo, que es donde se convierte, tiene presupuesto de rendimiento y se lo respeta (§20).</p>
+  </div>
+  <div class="card">
+    <h4>5 · Personalización acotada, resultado siempre digno</h4>
+    <p>El cliente elige entre opciones curadas, no edita CSS. Un editor libre produce catálogos feos y soporte infinito. Se le da un color, un tema, una forma de tarjeta y una tipografía de una lista corta; el sistema deriva el resto (§10).</p>
+  </div>
+  <div class="card">
+    <h4>6 · Cero configuración escrita en el código</h4>
+    <p>La aplicación es de un solo comercio por instancia, pero el código <strong>no sabe cuál</strong>. Todo lo que distingue a un cliente vive en <code>site_settings</code> y en variables de entorno. Ninguna rama <code>if (cliente === "…")</code>. Es lo que permite que el despliegue número doce cueste una hora y no una semana.</p>
+  </div>
+
+  <h3>1.3 · Alcance de la v1</h3>
+  <p>Lo que entra, decidido explícitamente:</p>
+  <table>
+    <tr><th>Entra en v1</th><th>Queda fuera de v1</th></tr>
+    <tr><td>Catálogo público con categorías, variantes, descuentos y existencias visibles</td><td>Pagos en línea (QR Simple, tarjeta) — <span class="pill neutral">v2</span></td></tr>
+    <tr><td>Carrito y pedido por WhatsApp con folio y seguimiento</td><td>Facturación fiscal SIAT — <span class="pill neutral">v2, es un proyecto propio</span></td></tr>
+    <tr><td>Panel de administración completo en tablet</td><td>Multi-sucursal con traspasos entre almacenes — <span class="pill neutral">v2</span></td></tr>
+    <tr><td>Inventario con libro de movimientos y escaneo</td><td>Envíos, zonas y costos de reparto — <span class="pill neutral">v2</span></td></tr>
+    <tr><td><strong>POS con ventas sin conexión</strong> y sincronización</td><td>Aplicación nativa (se resuelve con PWA)</td></tr>
+    <tr><td>Turnos de caja y arqueo</td><td>Cuentas por cobrar / ventas a crédito</td></tr>
+    <tr><td><strong>CMS de páginas por bloques y blog</strong></td><td>Multi-idioma (estructura preparada, no expuesta)</td></tr>
+    <tr><td>Personalización visual: temas, color, formas, tipografías</td><td>Impresión térmica ESC/POS — <span class="pill warn">decisión abierta §28</span></td></tr>
+    <tr><td>Landing comercial del negocio</td><td>Programa de fidelidad, cupones por cliente</td></tr>
+  </table>
+
+  <div class="stat">
+    <div><b>1</b><span>Comercio por instancia</span></div>
+    <div><b>8</b><span>Fases de entrega</span></div>
+    <div><b>≈12</b><span>Semanas estimadas</span></div>
+    <div><b>2</b><span>Superficies: compradora y operativa</span></div>
+    <div><b>0</b><span>Ramas por cliente en el código</span></div>
+  </div>
+</section>
+
+<section id="s2">
+  <h2><span class="num">SECCIÓN 02</span>El mercado y la diferencia</h2>
+  <p class="lead">Antes de diseñar conviene saber contra qué se compite, porque el catálogo digital para pymes es una categoría poblada. La conclusión: no se gana en «catálogo bonito», se gana en la caja y en la propiedad del despliegue.</p>
+
+  <h3>2.1 · La referencia</h3>
+  <p>Marea Alcalina es el referente citado y es un buen espejo: plataforma sin código, catálogo con subdominio o dominio propio, pedidos por WhatsApp, importación por CSV, asistencia de IA para descripciones, multi-sucursal, marcado de agotados y editor visual por bloques, todo vendido por suscripción a pymes de México y Latinoamérica. Hace bien la vitrina.</p>
+  <p>Lo que <strong>no</strong> hace, y es exactamente donde vive el valor de Vitrina:</p>
+  <ul>
+    <li><strong>No hay caja.</strong> El comerciante sigue cobrando en una calculadora y anotando en un cuaderno; el catálogo es un folleto en línea, no el sistema del negocio.</li>
+    <li><strong>No hay inventario real.</strong> Marcar «agotado» con un clic no es descontar existencias por cada venta del mostrador.</li>
+    <li><strong>No funciona sin internet.</strong> Es una aplicación web alojada; sin conexión no hay nada.</li>
+    <li><strong>Los datos no son del comercio.</strong> Cuando deja de pagar, pierde el catálogo.</li>
+  </ul>
+
+  <h3>2.2 · Dónde compite Vitrina y dónde no</h3>
+  <table>
+    <tr><th>Competidor</th><th>Su fuerza</th><th>Cómo se compite</th></tr>
+    <tr><td>Catálogos SaaS (Marea y similares)</td><td>Precio bajo, alta en minutos, marca conocida</td><td>No se compite en precio. Se compite con <strong>caja + inventario + instancia propia</strong>. Vitrina es un sistema, no un folleto</td></tr>
+    <tr><td>Shopify / Tiendanube</td><td>Ecosistema, pagos, envíos</td><td>Se cede el comercio electrónico serio. Vitrina es para quien vende <strong>por WhatsApp y en mostrador</strong>, que es el 90% del comercio boliviano</td></tr>
+    <tr><td>Sistemas POS locales de escritorio</td><td>Cobran bien, el contador los conoce</td><td>Son de escritorio, feos, sin catálogo, sin nube y sin respaldo. Vitrina llega a la tablet y trae la vitrina puesta</td></tr>
+    <tr><td>WordPress + WooCommerce (el paquete 01 de DIMA)</td><td>Ya está en el catálogo de DIMA</td><td><strong>No se canibaliza.</strong> WordPress es para quien quiere un sitio con contenido; Vitrina es para quien quiere vender y controlar existencias. Comercialmente son dos cajas distintas</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <span class="tag">Riesgo comercial detectado temprano</span>
+    <p>El diferenciador «funciona sin internet» es invisible en una demostración con buen wifi. Hay que <strong>demostrarlo activamente</strong>: en la presentación se pone la tablet en modo avión, se cobran tres ventas, se reconecta y se muestra la sincronización. Ese momento es el argumento de venta del paquete y debe ensayarse (§27).</p>
+  </div>
+
+  <h3>2.3 · El comprador y el usuario no son la misma persona</h3>
+  <table>
+    <tr><th>Persona</th><th>Qué le importa</th><th>Qué superficie toca</th></tr>
+    <tr><td><strong>El dueño</strong> (compra)</td><td>Que se vea profesional, que le llegue el pedido, que sepa cuánto vendió hoy</td><td>Landing comercial, tablero, reportes, personalización</td></tr>
+    <tr><td><strong>El cajero</strong> (usa 8 horas)</td><td>Que sea rápido, que no se trabe, que el escaneo funcione a la primera</td><td>POS, escáner, arqueo</td></tr>
+    <tr><td><strong>El que repone</strong></td><td>Cargar 200 productos sin morir</td><td>Escaneo continuo, importación CSV, alta rápida</td></tr>
+    <tr><td><strong>El comprador final</strong></td><td>Ver precio y si hay stock, sin preguntar</td><td>Catálogo público, carrito, WhatsApp</td></tr>
+  </table>
+  <p>El error clásico es diseñar solo para el primero, porque es quien firma. Si el cajero odia el POS, el paquete se desinstala en un mes y no hay renovación de soporte.</p>
+</section>
+
+<section id="s3">
+  <h2><span class="num">SECCIÓN 03</span>Decisiones de arquitectura</h2>
+  <p class="lead">Cada ADR registra la decisión, su justificación y lo que se descartó. Cambiar una obliga a revisar este documento antes que el código.</p>
+
+  <table>
+    <tr><th>#</th><th>Decisión</th><th>Justificación y alternativa descartada</th></tr>
+    <tr><td>ADR-01</td><td><strong>Next.js 15 (App Router) + React 19, una sola aplicación, un solo repositorio.</strong></td><td>Reusa íntegro el conocimiento de Kraken: Prisma, zod, server actions, convenciones de nomenclatura, patrones de prueba. Las bibliotecas visuales previstas —React Bits, Magic UI, Aceternity, Cult UI— son React + Tailwind + Framer Motion y funcionan de fábrica. <strong>Descartado:</strong> Astro + Svelte. Habría exigido dos ecosistemas para un solo desarrollador y habría dejado inservible toda la biblioteca visual elegida; el argumento a favor era el peso del paquete, que se resuelve con el presupuesto de rendimiento de §20.</td></tr>
+    <tr><td>ADR-02</td><td><strong>Una instancia por cliente</strong>, desplegada como conjunto de contenedores en Coolify sobre un VPS.</td><td>Aísla datos, permite dominio propio, hace del respaldo un archivo entregable y convierte cada venta en un despliegue reproducible. Es además el modelo mental que DIMA ya tiene con el paquete 01. <strong>Descartado:</strong> SaaS multi-inquilino con <code>tenant_id</code> en cada tabla — multiplica la superficie de fuga entre comercios, complica cada consulta y solo se paga si hay cientos de clientes, que no es el escenario del primer año.</td></tr>
+    <tr><td>ADR-03</td><td><strong>Un solo servicio Postgres en el VPS, una base y un rol por cliente.</strong></td><td>Un contenedor Postgres por cliente consume entre 80 y 120 MB en reposo sin hacer nada; doce clientes serían más de un giga desperdiciado. Una instancia con doce bases separadas por rol da el mismo aislamiento lógico a una fracción del costo. <strong>Descartado:</strong> Postgres por contenedor (caro) y esquema compartido (sin aislamiento).</td></tr>
+    <tr><td>ADR-04</td><td><strong>Better Auth</strong> con proveedor Google y correo/contraseña para el panel; <strong>sesión de dispositivo + PIN de operador</strong> para el POS.</td><td>El dueño entra con Google desde donde sea. El cajero no puede depender de OAuth cada mañana ni de que haya internet para abrir la caja: el dispositivo se registra una vez y a partir de ahí el operador se identifica con un PIN de 4 dígitos validado localmente contra un hash. <strong>Descartado:</strong> OAuth para todos (rompe el modo sin conexión) y cuenta compartida en la tablet (imposible atribuir un arqueo).</td></tr>
+    <tr><td>ADR-05</td><td><strong>Las existencias se derivan de <code>stock_movement</code></strong>, con una vista materializada refrescada por disparador para la lectura del catálogo.</td><td>Auditable, corregible, y única forma sensata de absorber ventas que llegan tarde desde un dispositivo sin conexión. El costo —una lectura no puede sumar un millón de asientos— se paga con la materialización, que es un detalle de rendimiento y no de modelo. <strong>Descartado:</strong> columna <code>stock</code> mutable.</td></tr>
+    <tr><td>ADR-06</td><td><strong>El pedido se persiste antes de abrir WhatsApp.</strong> Enlace <code>wa.me</code> con resumen y folio.</td><td>Si el flujo fuera solo abrir el chat, el negocio no tendría reporte de pedidos, ni conversión, ni forma de que el POS levante el pedido y lo cobre. El folio es el hilo entre el catálogo y la caja. <strong>Descartado:</strong> WhatsApp Cloud API en v1 — exige Meta Business verificado, plantillas aprobadas y cobra por conversación; entra en v2 solo para notificar cambios de estado.</td></tr>
+    <tr><td>ADR-07</td><td><strong>El POS es una aplicación local que sincroniza</strong>, no una pantalla que consulta al servidor. Dexie sobre IndexedDB, cola de comandos idempotentes.</td><td>Es el diferenciador del producto (§17). La consecuencia asumida: el POS tiene su propia lógica de precios y descuentos ejecutándose en el cliente, y esa lógica debe ser <strong>código compartido y puro</strong> con el servidor, en <code>packages/domain</code>, o divergirá. <strong>Descartado:</strong> POS en línea con «modo degradado» — degradado siempre significa «no funciona» el día que hace falta.</td></tr>
+    <tr><td>ADR-08</td><td><strong>Solo el POS trabaja sin conexión.</strong> El catálogo público y el panel exigen red.</td><td>Igual que en Kraken §16.2, el trabajo sin conexión se concede donde se justifica y en ningún otro lugar. Hacer el panel completo offline triplicaría el trabajo para un caso que no ocurre: nadie carga productos en un sótano.</td></tr>
+    <tr><td>ADR-09</td><td><strong>Las imágenes se redimensionan en el navegador antes de subir</strong>; almacenamiento S3-compatible (MinIO en el VPS o Cloudflare R2).</td><td>Un dueño sube fotos de 5 MB desde el celular. Procesarlas con <code>sharp</code> en un VPS compartido por doce clientes es la forma más rápida de tumbar el nodo. El navegador ya tiene el decodificador y la GPU. <strong>Descartado:</strong> procesamiento íntegro en servidor; queda solo la generación de variantes AVIF en segundo plano.</td></tr>
+    <tr><td>ADR-10</td><td><strong>CMS propio en la misma base</strong>, por bloques tipados, sin sistema externo.</td><td>El cliente no va a tocar Git ni markdown, así que Keystatic y compañía quedan fuera. Un CMS embebido comparte sesión, permisos, medios y despliegue con el resto. <strong>Descartado:</strong> Payload como paquete (arrastra su propio panel y duplica la identidad) y Strapi/Directus (otro contenedor por cliente).</td></tr>
+    <tr><td>ADR-11</td><td><strong>El dinero es entero en centavos</strong> y lleva sufijo de moneda en el identificador.</td><td>Herencia directa del motor de dinero de Kraken §11: nunca coma flotante. <code>unitPriceBob</code> es un <code>Int</code> de centavos. La moneda es del sitio, configurable, con bolivianos por defecto.</td></tr>
+    <tr><td>ADR-12</td><td><strong>Tres zonas de renderizado</strong> con presupuestos distintos: pública estática, panel cliente, POS local.</td><td>El catálogo se renderiza en el servidor con revalidación por etiqueta; el panel es una zona cliente sin obsesión por el peso; el POS es prácticamente una SPA instalable. Mezclarlas produce o un catálogo lento o un panel anémico.</td></tr>
+    <tr><td>ADR-13</td><td><strong>La biblioteca de animación se carga solo en la landing</strong>, mediante <code>next/dynamic</code> y observador de intersección.</td><td>Framer Motion y los efectos de Aceternity pesan y se notan en gama media. Se los quiere para impresionar al dueño en la portada; no se los deja entrar a la grilla de productos, que es donde se convierte.</td></tr>
+    <tr><td>ADR-14</td><td><strong>PWA instalable, con Tauri descartado.</strong></td><td>El POS necesita pantalla completa, cámara e instalación desde el navegador; eso lo da una PWA. Un envoltorio de escritorio no aporta nada en tablets, que son el objetivo declarado.</td></tr>
+    <tr><td>ADR-15</td><td><strong>El ciclo completo corre en contenedores</strong>, no solo el despliegue. Un único <code>Dockerfile</code> multietapa sirve a desarrollo, pruebas, construcción y producción.</td><td>Coolify es el destino, no el alcance de la contenerización. Con doce instancias en un nodo, la diferencia entre «funciona en mi máquina» y «funciona en producción» deja de ser una molestia y pasa a ser un incidente con clientes vendiendo. Además, el anfitrión de desarrollo es una VM Ubuntu con Docker sin privilegios de root, y el equipo diario es Windows: sin contenedores habría dos toolchains que mantener. <strong>Descartado:</strong> Node y Postgres instalados en el anfitrión con Docker solo para el despliegue — es el arreglo que produce migraciones que corren distinto y binarios nativos que no coinciden. Detalle completo en §22.</td></tr>
+  </table>
+
+  <h3>3.1 · Estructura del repositorio</h3>
+  <div class="filetree"><b>vitrina/</b>
+├── <b>apps/web/</b>                 <i>la aplicación Next.js</i>
+│   ├── app/
+│   │   ├── (shop)/               <i>zona pública: catálogo, producto, carrito, páginas, blog</i>
+│   │   ├── (admin)/              <i>panel: productos, inventario, pedidos, contenido, ajustes</i>
+│   │   ├── (pos)/                <i>caja: pantalla de venta, arqueo, escáner</i>
+│   │   └── api/                  <i>sincronización, webhooks, sitemap, OG dinámico</i>
+│   ├── features/                 <i>un directorio por caso de uso (§24)</i>
+│   ├── components/ui/            <i>primitivas compartidas</i>
+│   └── public/
+├── <b>packages/domain/</b>           <i>lógica pura compartida servidor ↔ POS local</i>
+│   ├── money.ts                  <i>centavos, redondeo, descuentos</i>
+│   ├── pricing.ts                <i>resolución de precio efectivo</i>
+│   ├── stock.ts                  <i>proyección de existencias desde movimientos</i>
+│   └── sale.ts                   <i>construcción y validación de una venta</i>
+├── <b>packages/db/</b>               <i>Prisma: esquema, migraciones, semillas</i>
+├── <b>packages/theme/</b>            <i>tokens, presets, derivación OKLCH</i>
+├── <b>docker/</b>                    <i>Dockerfile multietapa · entrypoints · Makefile</i>
+├── <b>compose.yml</b>                <i>base común</i>
+├── <b>compose.dev.yml</b>            <i>desarrollo: montaje del código, Mailpit, MinIO</i>
+├── <b>compose.test.yml</b>           <i>pruebas: Postgres en tmpfs, contenedor de Playwright</i>
+├── <b>deploy/</b>                    <i>plantilla de Coolify, variables de ejemplo, respaldos</i>
+└── <b>docs/</b>                      <i>este plan, CLAUDE.md, manual del cliente</i></div>
+
+  <div class="callout ok">
+    <span class="tag">La regla que sostiene todo</span>
+    <p><code>packages/domain</code> no importa Prisma, no importa React, no toca la red y no conoce el reloj. Recibe datos y devuelve datos. Es lo que permite que el mismo cálculo de un descuento corra en el servidor al confirmar un pedido y en la tablet sin conexión al cobrar una venta, y dé exactamente el mismo centavo.</p>
+  </div>
+</section>
+
+<section id="s4">
+  <h2><span class="num">SECCIÓN 04</span>Despliegue sobre Coolify</h2>
+  <p class="lead">El paquete se entrega como un conjunto de contenedores que Coolify orquesta en un VPS. El objetivo operativo: dar de alta a un cliente nuevo debe tomar menos de una hora y no debe requerir tocar el código.</p>
+
+  <h3>4.1 · Topología del nodo</h3>
+  <div class="mermaid">
+flowchart TB
+  I[Internet] --> T["Traefik de Coolify · TLS automático"]
+  T --> A1["vitrina-app · cliente A<br/>Next.js standalone"]
+  T --> A2["vitrina-app · cliente B"]
+  T --> A3["vitrina-app · cliente C"]
+  T --> M["MinIO · S3 compartido<br/>un bucket por cliente"]
+  A1 --> PG[("Postgres compartido<br/>una base por cliente")]
+  A2 --> PG
+  A3 --> PG
+  A1 --> M
+  A2 --> M
+  A3 --> M
+  PG --> B["Respaldo nocturno<br/>pg_dump → almacenamiento externo"]
+  </div>
+
+  <table>
+    <tr><th>Servicio</th><th>Alcance</th><th>Notas</th></tr>
+    <tr><td><code>vitrina-app-{cliente}</code></td><td>Uno por cliente</td><td>Imagen Next.js en modo <code>standalone</code>. Entre 300 y 500 MB de RAM según tráfico. Es lo único que se replica por cliente</td></tr>
+    <tr><td><code>vitrina-postgres</code></td><td>Compartido</td><td>Una base y un rol por cliente. <code>REVOKE CONNECT</code> cruzado: el rol de A no puede conectarse a la base de B (§21)</td></tr>
+    <tr><td><code>vitrina-minio</code></td><td>Compartido</td><td>Un bucket por cliente con política propia. Alternativa: Cloudflare R2, que saca el tráfico de imágenes del VPS y en el plan gratuito suele alcanzar</td></tr>
+    <tr><td>Traefik</td><td>Del propio Coolify</td><td>TLS por Let's Encrypt, ya resuelto por Coolify. Sin puertos publicados por la aplicación</td></tr>
+    <tr><td>Respaldos</td><td>Tarea programada</td><td><code>pg_dump</code> por base + sincronización del bucket, cifrado y enviado fuera del VPS. Retención 30 días</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <span class="tag">Lo que no se hace nunca</span>
+    <p><strong>No se compila Next.js en el VPS.</strong> Una compilación de producción pide más de 2 GB y va a matar las instancias de los otros clientes que están vendiendo en ese momento. La imagen se construye en GitHub Actions, se publica en el registro y Coolify solo la descarga y la levanta. Coolify permite exactamente este flujo y es la única forma segura de operar varios clientes en un nodo.</p>
+  </div>
+
+  <h3>4.2 · Dimensionamiento</h3>
+  <table>
+    <tr><th>VPS</th><th>Clientes cómodos</th><th>Reparto</th></tr>
+    <tr><td>4 GB / 2 vCPU</td><td class="num-col">4 – 5</td><td>Postgres 1 GB · MinIO 0,5 GB · sistema 0,5 GB · aplicaciones ~0,4 GB c/u</td></tr>
+    <tr><td>8 GB / 4 vCPU</td><td class="num-col">10 – 12</td><td>Punto dulce del primer año</td></tr>
+    <tr><td>16 GB / 8 vCPU</td><td class="num-col">24 – 28</td><td>A partir de aquí conviene separar Postgres a su propio nodo</td></tr>
+  </table>
+  <p>El indicador que dispara la migración a un nodo nuevo no es la RAM sino la <strong>latencia de la ruta del catálogo en el percentil 95</strong>: si pasa de 400 ms sostenidos, se parte el nodo antes de que los clientes lo noten.</p>
+
+  <h3>4.3 · Variables por instancia</h3>
+  <pre><span class="cm"># identidad del despliegue — lo único que distingue a un cliente</span>
+<span class="k">SITE_SLUG</span>=ferreteria-lopez
+<span class="k">SITE_URL</span>=https://ferreterialopez.com
+<span class="k">DATABASE_URL</span>=postgresql://vit_ferrelopez:···@vitrina-postgres:5432/vit_ferrelopez
+<span class="k">S3_BUCKET</span>=vit-ferrelopez
+<span class="k">S3_ENDPOINT</span>=https://s3.dima.bo
+<span class="k">BETTER_AUTH_SECRET</span>=···            <span class="cm"># distinto por instancia, generado en el alta</span>
+<span class="k">GOOGLE_CLIENT_ID</span>=···               <span class="cm"># credencial de DIMA, con URI de retorno por dominio</span>
+<span class="k">OWNER_EMAIL</span>=lopez@gmail.com         <span class="cm"># se siembra como PROPIETARIO al primer arranque</span>
+<span class="k">DEFAULT_CURRENCY</span>=BOB
+<span class="k">DEFAULT_LOCALE</span>=es-BO
+<span class="k">TZ</span>=America/La_Paz</pre>
+  <p>Todo lo demás —logo, colores, teléfonos de WhatsApp, horarios, redes, textos— vive en la base y lo edita el cliente. Si algo necesita un despliegue para cambiar, está en el lugar equivocado.</p>
+
+  <h3>4.4 · Ciclo de vida de una versión</h3>
+  <ol>
+    <li>Se etiqueta <code>v1.4.0</code> en el repositorio; GitHub Actions construye la imagen y corre las pruebas.</li>
+    <li>Se despliega primero en <strong>la instancia interna de demostración</strong> de DIMA, que es también la que se usa para vender.</li>
+    <li>Se observan 48 horas. Después se actualiza por tandas de clientes, empezando por el más tolerante.</li>
+    <li>Las migraciones de Prisma corren en el arranque del contenedor y deben ser <strong>compatibles hacia atrás</strong> durante un ciclo: nunca se borra una columna en la misma versión que deja de usarse, porque revertir se vuelve imposible con la caja llena de gente.</li>
+  </ol>
+</section>
+
+<section id="s5">
+  <h2><span class="num">SECCIÓN 05</span>Modelo de dominio</h2>
+  <p class="lead">Cinco agregados: catálogo, contenido, inventario, pedido y venta. Se relacionan por identificador, nunca por acoplamiento de reglas.</p>
+
+  <div class="mermaid">
+classDiagram
+  class Product { id · slug · name · description · isActive · trackStock }
+  class Variant { id · sku · barcode · attributes · basePriceBob }
+  class Category { id · slug · name · parentId · position }
+  class ProductImage { id · path · position · alt }
+  class Discount { id · scope · percent · amountBob · startsAt · endsAt }
+  class StockMovement { id · variantId · kind · qty · occurredAt · sourceType · sourceId }
+  class Order { id · folio · channel · status · customerPhone · totalBob }
+  class OrderItem { id · variantId · qty · unitPriceBob · discountBob }
+  class Sale { id · folio · clientSaleId · deviceId · operatorId · totalBob · occurredAtDevice }
+  class SaleItem { id · variantId · qty · unitPriceBob · discountBob }
+  class Payment { id · method · amountBob }
+  class CashSession { id · operatorId · openedAt · closedAt · openingBob · countedBob }
+  Product "1" --> "*" Variant
+  Product "*" --> "*" Category
+  Product "1" --> "*" ProductImage
+  Discount "*" --> "*" Product
+  Variant "1" --> "*" StockMovement
+  Order "1" --> "*" OrderItem
+  Sale "1" --> "*" SaleItem
+  Sale "1" --> "*" Payment
+  CashSession "1" --> "*" Sale
+  Order ..> Sale : se convierte
+  </div>
+
+  <h3>5.1 · Las cuatro decisiones estructurales</h3>
+
+  <h4>Producto y variante siempre están separados</h4>
+  <p>Incluso cuando el comercio no tiene variantes. Una camiseta tiene talla y color; un tornillo no tiene ninguna. Modelarlos distinto obligaría a reescribir el POS el día que el primer cliente venda ropa. La solución: <strong>todo producto tiene al menos una variante</strong>, creada automáticamente y oculta en la interfaz cuando es la única. El código de barras, el precio y las existencias viven siempre en la variante; el nombre, las fotos y la descripción viven en el producto.</p>
+
+  <h4>El pedido y la venta son documentos distintos</h4>
+  <p>Un pedido de WhatsApp es una <strong>intención</strong>: no descuenta existencias, no es dinero, puede evaporarse. Una venta es un <strong>hecho</strong>: hubo cobro, hubo entrega, descuenta existencias y entra al arqueo. Un pedido puede convertirse en venta —el cajero lo busca por folio y lo cobra— y en ese momento nace el asiento de inventario. Fusionarlos parece elegante hasta que hay que explicar por qué el reporte de ventas incluye ocho pedidos que nunca se recogieron.</p>
+
+  <h4>La venta trae su identidad desde el dispositivo</h4>
+  <p><code>clientSaleId</code> es un UUID v7 generado en la tablet, no en el servidor. Es la clave de idempotencia que hace segura la sincronización: si la tablet reenvía el mismo lote tres veces porque la red se cortó a mitad de la respuesta, el servidor inserta una sola vez. Sin esto no hay modo sin conexión posible, solo duplicados.</p>
+
+  <h4>Los movimientos de inventario apuntan a su origen</h4>
+  <p><code>sourceType</code> + <code>sourceId</code> dicen de dónde vino cada asiento: venta, pedido confirmado, compra, ajuste manual, toma de inventario, merma o devolución. Es lo que permite responder «¿por qué tengo tres menos?» sin adivinar, y lo que hace que una anulación sea trazable en lugar de silenciosa.</p>
+
+  <h3>5.2 · Estados</h3>
+  <div class="mermaid">
+stateDiagram-v2
+  [*] --> NUEVO : el comprador envía el carrito
+  NUEVO --> CONFIRMADO : el comercio responde y acuerda
+  NUEVO --> CANCELADO : no responde / se arrepiente
+  CONFIRMADO --> PREPARADO : está listo para entregar
+  CONFIRMADO --> CANCELADO
+  PREPARADO --> ENTREGADO : se cobra · nace la Venta
+  PREPARADO --> CANCELADO
+  ENTREGADO --> [*]
+  CANCELADO --> [*]
+  </div>
+  <p>Solo la transición a <code>ENTREGADO</code> genera movimientos de inventario, y solo si el pedido no fue cobrado ya en la caja. Los estados intermedios existen porque el dueño necesita una bandeja de «qué tengo pendiente hoy», que es la pantalla que más va a mirar.</p>
+
+  <h3>5.3 · Catálogos de configuración</h3>
+  <table>
+    <tr><th>Tabla</th><th>Contenido</th><th>Quién la edita</th></tr>
+    <tr><td><code>site_settings</code></td><td>Fila única: nombre, logo, tema, color, tipografía, moneda, teléfonos de WhatsApp, redes, dirección, horarios, mensajes</td><td>Propietario y administrador</td></tr>
+    <tr><td><code>category</code></td><td>Árbol de dos niveles como máximo. Más profundidad nadie la navega en celular</td><td>Administrador</td></tr>
+    <tr><td><code>payment_method</code></td><td>Efectivo, QR, transferencia, tarjeta. Solo etiquetas para el arqueo; en v1 no hay integración</td><td>Administrador</td></tr>
+    <tr><td><code>device</code></td><td>Tablets y celulares autorizados para la caja, con su última sincronización</td><td>Propietario</td></tr>
+    <tr><td><code>operator</code></td><td>Personas que cobran, con PIN y turno. Puede o no tener cuenta de usuario</td><td>Propietario</td></tr>
+  </table>
+</section>
+
+<section id="s6">
+  <h2><span class="num">SECCIÓN 06</span>Identidad, roles y caja</h2>
+  <p class="lead">Dos mecanismos de autenticación conviviendo, cada uno resolviendo un problema distinto: el panel necesita seguridad de cuenta, la caja necesita velocidad y funcionar sin red.</p>
+
+  <h3>6.1 · Los dos caminos</h3>
+  <table>
+    <tr><th></th><th>Panel de administración</th><th>Punto de venta</th></tr>
+    <tr><td>Mecanismo</td><td>Better Auth · Google + correo/contraseña</td><td>Sesión de dispositivo de larga duración + PIN de operador</td></tr>
+    <tr><td>Duración</td><td>30 días, renovable</td><td>El dispositivo se registra una vez; el PIN se pide al abrir turno y tras 5 minutos de inactividad</td></tr>
+    <tr><td>Sin conexión</td><td>No funciona, ni falta</td><td>Funciona: el PIN se valida contra un hash almacenado localmente</td></tr>
+    <tr><td>Revocación</td><td>Inmediata desde el panel</td><td>Al reconectar: el servidor marca el dispositivo como revocado y la aplicación se bloquea y purga la caché</td></tr>
+  </table>
+
+  <h3>6.2 · Alta de un dispositivo de caja</h3>
+  <ol>
+    <li>El propietario entra al panel desde cualquier lado y genera un <strong>código de emparejamiento</strong> de seis dígitos, válido 10 minutos.</li>
+    <li>En la tablet abre <code>/pos</code>, escribe el código y le pone un nombre («Caja mostrador»).</li>
+    <li>El servidor emite un <strong>token de dispositivo</strong> de larga duración, ligado a ese <code>deviceId</code>, y devuelve el paquete inicial: catálogo, precios, descuentos vigentes, existencias de referencia y hashes de PIN de los operadores activos.</li>
+    <li>La tablet instala la PWA y queda operativa. A partir de ahí no vuelve a necesitar el panel.</li>
+  </ol>
+
+  <div class="callout">
+    <span class="tag">Por qué el PIN se valida localmente</span>
+    <p>Porque si validarlo exigiera red, el argumento de venta entero se cae en la primera pantalla. Se guarda un <code>argon2id</code> del PIN por operador, sincronizado con el paquete inicial. La consecuencia asumida y documentada: quien tenga acceso físico y prolongado a una tablet desbloqueada podría atacar por fuerza bruta un PIN de cuatro dígitos. Se mitiga con bloqueo progresivo tras cinco intentos, y con la aceptación de que <strong>el PIN identifica, no autoriza</strong>: sirve para saber quién cobró, no para proteger secretos. Los datos sensibles —costos, márgenes, reportes— no están en la tablet.</p>
+  </div>
+
+  <h3>6.3 · Roles</h3>
+  <table>
+    <tr><th>Rol</th><th>Puede</th><th>No puede</th></tr>
+    <tr><td><strong>PROPIETARIO</strong></td><td>Todo, incluidos costos, márgenes, personalización, alta de usuarios y dispositivos</td><td>—</td></tr>
+    <tr><td><strong>ADMINISTRADOR</strong></td><td>Productos, precios, inventario, pedidos, contenido, reportes de venta</td><td>Ver costos y márgenes, dar de alta usuarios, cambiar el tema</td></tr>
+    <tr><td><strong>EDITOR</strong></td><td>Páginas, blog, fotos, descripciones</td><td>Precios, existencias, caja</td></tr>
+    <tr><td><strong>CAJERO</strong></td><td>Vender, cobrar, abrir y cerrar su turno, consultar existencias</td><td>Cambiar precios, anular ventas de turnos cerrados, ver reportes globales</td></tr>
+    <tr><td><strong>ALMACÉN</strong></td><td>Ingresos, ajustes, mermas, toma de inventario, escaneo continuo</td><td>Vender, ver dinero</td></tr>
+  </table>
+  <p>Cinco roles fijos, sin editor de permisos. Un comercio de seis personas no necesita una matriz configurable, y ofrecérsela garantiza que alguien se deje encerrado fuera de su propio sistema un domingo.</p>
+
+  <h3>6.4 · Anulaciones y autorización del jefe</h3>
+  <p>Anular una venta ya cobrada, aplicar un descuento fuera de lo permitido o sacar dinero de la caja requiere <strong>PIN de un rol superior</strong>, ingresado en la misma pantalla. Funciona sin conexión —el hash del propietario también viaja en el paquete— y queda registrado en la venta como <code>authorizedByOperatorId</code>. Es el patrón de cualquier caja física y el cajero lo entiende sin capacitación.</p>
+</section>
+
+<div class="partbar">
+  <div class="p">Parte II</div>
+  <h2>Superficie compradora</h2>
+  <p>Lo que ve el cliente del comercio: catálogo, carrito, contenido, marca. Es lo que se demuestra en la venta del paquete y donde se decide si el producto parece caro o barato.</p>
+</div>
+
+<section id="s7">
+  <h2><span class="num">SECCIÓN 07</span>Catálogo público</h2>
+  <p class="lead">La pantalla más visitada del producto y la más fácil de arruinar. Cada decisión aquí se toma contra un Android de gama media con datos móviles, no contra el monitor del desarrollador.</p>
+
+  <h3>7.1 · Las rutas</h3>
+  <table>
+    <tr><th>Ruta</th><th>Renderizado</th><th>Revalidación</th></tr>
+    <tr><td><code>/</code> · portada</td><td>Servidor, estática</td><td>Por etiqueta <code>settings</code>, <code>featured</code></td></tr>
+    <tr><td><code>/catalogo</code> y <code>/catalogo/[categoria]</code></td><td>Servidor, estática con filtros en la URL</td><td>Etiqueta <code>catalog</code></td></tr>
+    <tr><td><code>/producto/[slug]</code></td><td>Servidor, estática</td><td>Etiqueta <code>product:{id}</code></td></tr>
+    <tr><td>Existencias y precio</td><td><strong>Segmento dinámico</strong> dentro de la página estática</td><td>Sin caché</td></tr>
+    <tr><td><code>/carrito</code></td><td>Cliente</td><td>—</td></tr>
+    <tr><td><code>/pedido/[folio]</code></td><td>Servidor, dinámico</td><td>Sin caché</td></tr>
+    <tr><td><code>/blog</code>, <code>/blog/[slug]</code>, <code>/[pagina]</code></td><td>Servidor, estática</td><td>Etiqueta <code>content</code></td></tr>
+  </table>
+
+  <div class="callout ok">
+    <span class="tag">El truco que sostiene el rendimiento</span>
+    <p>La ficha de producto se sirve estática y cacheada —fotos, nombre, descripción, categoría—, pero <strong>el precio y la disponibilidad se transmiten aparte</strong> en un envoltorio dinámico. Así la página aparece instantáneamente y el dato volátil llega medio segundo después, sin invalidar toda la caché cada vez que alguien vende un tornillo. Sin esta separación, cada venta del POS invalidaría el catálogo entero.</p>
+  </div>
+
+  <h3>7.2 · Qué se muestra de las existencias</h3>
+  <p>Mostrar «quedan 3» genera urgencia y vende; mostrar «quedan 147» hace que el comercio parezca un depósito y revela información a la competencia. Configurable en tres modos:</p>
+  <table>
+    <tr><th>Modo</th><th>Qué ve el comprador</th><th>Para quién</th></tr>
+    <tr><td><code>EXACTO</code></td><td>«Quedan 7»</td><td>Comercios con poco stock por artículo: boutiques, artesanía</td></tr>
+    <tr><td><code>UMBRAL</code> <span class="pill ok">predeterminado</span></td><td>«Disponible» / «Últimas unidades» bajo un umbral configurable / «Agotado»</td><td>Casi todos</td></tr>
+    <tr><td><code>OCULTO</code></td><td>Solo «Disponible» o «Agotado»</td><td>Servicios, pedidos por encargo</td></tr>
+  </table>
+  <p>Los agotados no desaparecen: se muestran atenuados, sin botón de agregar y con un enlace de «avísame», porque un catálogo que encoge parece un negocio que cierra. Configurable, eso sí, para quien prefiera esconderlos.</p>
+
+  <h3>7.3 · Búsqueda y filtros</h3>
+  <ul>
+    <li><strong>Búsqueda:</strong> índice de texto de Postgres con configuración en español y <code>unaccent</code>, más búsqueda por trigramas para tolerar errores de tipeo. Un cliente que escribe «zapatila» tiene que encontrar la zapatilla. No hace falta Meilisearch para dos mil productos.</li>
+    <li><strong>Filtros:</strong> categoría, rango de precio, disponibilidad, con descuento. Todos en la URL para que sean compartibles por WhatsApp, que es como circulan.</li>
+    <li><strong>Orden:</strong> destacados, precio, novedad. El orden por defecto lo elige el comercio en los ajustes.</li>
+    <li><strong>Escaneo también aquí:</strong> el comprador puede escanear el código de barras de un producto físico para encontrarlo en el catálogo. Es barato de implementar —ya está el lector para el POS— y sorprende en una demostración.</li>
+  </ul>
+</section>
+
+<section id="s8">
+  <h2><span class="num">SECCIÓN 08</span>Bento y sistema visual</h2>
+  <p class="lead">«Bento» sin reglas es un collage. Aquí se define como un sistema con piezas de tamaños fijos y una curaduría que el comercio controla, para que el resultado sea deliberado y no un acordeón de recuadros.</p>
+
+  <h3>8.1 · La retícula</h3>
+  <p>Doce columnas en escritorio, cuatro en tablet, dos en celular. Cada pieza declara cuántas columnas y filas ocupa, con cuatro tamaños permitidos:</p>
+  <table>
+    <tr><th>Pieza</th><th>Escritorio</th><th>Celular</th><th>Uso</th></tr>
+    <tr><td><code>S</code></td><td>3 × 1</td><td>1 × 1</td><td>Producto normal</td></tr>
+    <tr><td><code>M</code></td><td>6 × 1</td><td>2 × 1</td><td>Producto con descuento, categoría</td></tr>
+    <tr><td><code>L</code></td><td>6 × 2</td><td>2 × 2</td><td>Destacado del mes, producto con foto fuerte</td></tr>
+    <tr><td><code>XL</code></td><td>12 × 2</td><td>2 × 2</td><td>Banner, promoción, contenido editorial</td></tr>
+  </table>
+  <p>El administrador arrastra piezas en una vista de curaduría para armar la portada. La grilla del catálogo, en cambio, <strong>no es bento</strong>: es una grilla uniforme. Un listado de cien productos con tamaños mezclados es imposible de escanear con la vista y hace daño a la conversión. El bento vive en la portada y en las páginas de contenido, donde su trabajo es impresionar; el catálogo trabaja.</p>
+
+  <h3>8.2 · Formas de tarjeta</h3>
+  <table>
+    <tr><th>Preset</th><th>Imagen</th><th>Rasgos</th><th>Encaja con</th></tr>
+    <tr><td><code>NITIDA</code></td><td>1:1</td><td>Radio 0, borde fino, precio en negrita, sin sombra</td><td>Ferretería, repuestos, insumos</td></tr>
+    <tr><td><code>SUAVE</code> <span class="pill ok">predeterminado</span></td><td>4:5</td><td>Radio 16, sombra baja, nombre en dos líneas</td><td>Casi todo</td></tr>
+    <tr><td><code>EDITORIAL</code></td><td>4:5 sangrada</td><td>Sin recuadro, texto bajo la imagen, mucho aire</td><td>Ropa, joyería, decoración</td></tr>
+    <tr><td><code>COMPACTA</code></td><td>1:1 pequeña</td><td>Fila horizontal con imagen a la izquierda</td><td>Restaurantes, abarrotes, catálogos largos</td></tr>
+  </table>
+
+  <h3>8.3 · El presupuesto visual</h3>
+  <p>Regla dura, verificada en integración continua (§20):</p>
+  <table>
+    <tr><th>Superficie</th><th>Se permite</th><th>Se prohíbe</th></tr>
+    <tr><td>Landing comercial (portada del negocio)</td><td>Magic UI, Aceternity, Cult UI, React Bits, Framer Motion, canvas, gradientes animados — todo con carga diferida</td><td>Nada, es la vidriera</td></tr>
+    <tr><td>Catálogo y ficha de producto</td><td>Transiciones CSS, <code>view-transition</code>, <code>content-visibility</code></td><td><strong>Framer Motion, blur de fondo, canvas, animaciones en scroll</strong></td></tr>
+    <tr><td>Panel y POS</td><td>Lo que haga falta para la usabilidad</td><td>Decoración que retrase un toque</td></tr>
+  </table>
+  <div class="callout warn">
+    <span class="tag">La tentación que hay que resistir</span>
+    <p>Va a haber un momento en que la grilla de productos «quedaría increíble» con una animación de entrada escalonada. Cuesta 40 KB de JavaScript y 200 ms de retraso en el primer dibujo, en el dispositivo del comprador, en la pantalla donde se decide la compra. La respuesta es no. La demostración se hace en la landing.</p>
+  </div>
+</section>
+
+<section id="s9">
+  <h2><span class="num">SECCIÓN 09</span>Carrito y pedido por WhatsApp</h2>
+  <p class="lead">El corazón comercial del producto. Un carrito que solo abre un chat es un folleto; uno que persiste el pedido convierte al catálogo en el primer eslabón del sistema de ventas.</p>
+
+  <h3>9.1 · El flujo completo</h3>
+  <div class="mermaid">
+sequenceDiagram
+  participant C as Comprador
+  participant W as Catálogo
+  participant S as Servidor
+  participant WA as WhatsApp
+  participant P as POS / Panel
+  C->>W: Agrega productos (carrito local)
+  C->>W: «Pedir por WhatsApp»
+  W->>S: POST /api/orders  {items, teléfono opcional}
+  S->>S: Valida precios y descuentos vigentes
+  S->>S: Crea Order con folio · estado NUEVO
+  S-->>W: {folio, textoResumen, urlWa}
+  W->>WA: Abre wa.me con el resumen y el folio
+  C->>WA: Envía el mensaje al comercio
+  P->>S: El pedido aparece en la bandeja «Nuevos»
+  P->>S: Confirma · prepara · cobra en caja por folio
+  S->>S: Genera Sale y movimientos de inventario
+  </div>
+
+  <h3>9.2 · Reglas del carrito</h3>
+  <table>
+    <tr><th>Regla</th><th>Decisión</th></tr>
+    <tr><td>Persistencia</td><td>En el navegador del comprador, sin cuenta ni registro. Pedirle a alguien que se registre para preguntar un precio por WhatsApp mata el pedido</td></tr>
+    <tr><td>Existencias</td><td>El carrito <strong>no reserva</strong>. Se valida disponibilidad al crear el pedido y se avisa si algo se agotó, sin bloquear: el comercio decide</td></tr>
+    <tr><td>Precio</td><td>Se congela en el pedido al momento de crearlo, con el descuento vigente en ese instante. Si el precio sube mañana, se respeta el del pedido</td></tr>
+    <tr><td>Teléfono del comprador</td><td>Opcional, un solo campo. Si lo da, el pedido queda vinculado y el comercio puede escribirle. Si no, el hilo es el propio chat de WhatsApp</td></tr>
+    <tr><td>Mínimo</td><td>Configurable, con mensaje propio. Muchos comercios no atienden pedidos bajo cierto monto</td></tr>
+    <tr><td>Notas</td><td>Un campo libre por producto —«talla M, sin cebolla»— y uno general. Es lo que la gente escribe igual en el chat</td></tr>
+  </table>
+
+  <h3>9.3 · El mensaje</h3>
+  <div class="formula">
+    <span class="lbl">Plantilla del resumen · configurable en ajustes</span>
+Hola {nombreComercio}! Quiero hacer este pedido:<br>
+<br>
+• 2× Taladro Bosch GSB 550 — Bs 620,00<br>
+• 1× Broca 6mm (juego) — Bs 45,00  <span class="cm">← con descuento −15%</span><br>
+<br>
+Total: Bs 665,00<br>
+Pedido N.º <b>P-000184</b><br>
+Ver detalle: {sitio}/pedido/P-000184
+  </div>
+  <table>
+    <tr><th>Detalle técnico</th><th>Tratamiento</th></tr>
+    <tr><td>Longitud de la URL</td><td>Los navegadores móviles se rompen cerca de los 2 000 caracteres. Por encima de <strong>15 líneas</strong> el mensaje se corta a un resumen y el enlace al pedido lleva el detalle completo</td></tr>
+    <tr><td>Escritorio</td><td><code>wa.me</code> abre WhatsApp Web; funciona pero exige sesión iniciada. Se detecta y se ofrece además «copiar mensaje»</td></tr>
+    <tr><td>Varios números</td><td>El comercio puede cargar varios teléfonos con rotación por turno o por categoría. Si hay más de uno, el comprador elige a quién escribir con una etiqueta que el comercio define («Ventas», «Repuestos»)</td></tr>
+    <tr><td>Fuera de horario</td><td>Si el horario configurado está cerrado, se avisa antes de abrir el chat y se ofrece dejar el pedido igual. El folio queda; el comercio lo ve al abrir</td></tr>
+    <tr><td>Atribución</td><td>El pedido guarda de qué página vino y si llegó desde una campaña, para el reporte de §18</td></tr>
+  </table>
+
+  <h3>9.4 · La bandeja de pedidos</h3>
+  <p>Es la pantalla que el dueño mira veinte veces al día, y por eso vive también en el POS y no solo en el panel: cuatro columnas —Nuevos, Confirmados, Preparados, Entregados hoy—, con toque para avanzar de estado y un buscador por folio o teléfono. Un pedido sin atender más de dos horas se marca en ámbar; más de un día, en rojo. Es la funcionalidad que hace que el comercio abra la aplicación todos los días, y por lo tanto la que hace que renueve el soporte.</p>
+</section>
+
+<section id="s10">
+  <h2><span class="num">SECCIÓN 10</span>Motor de personalización</h2>
+  <p class="lead">Doce comercios distintos, una sola base de código, y ninguno debe parecerse al anterior. Se consigue con tokens derivados, no con libertad.</p>
+
+  <h3>10.1 · Lo que el cliente elige</h3>
+  <table>
+    <tr><th>Ajuste</th><th>Opciones</th><th>Efecto</th></tr>
+    <tr><td>Color de marca</td><td>Un selector de color, o extraído automáticamente del logo</td><td>Se derivan 11 pasos en OKLCH, más color de acento, superficies y estados. Contraste AA garantizado por construcción</td></tr>
+    <tr><td>Tema base</td><td>8 presets curados: <em>Mercado</em>, <em>Boutique</em>, <em>Taller</em>, <em>Sabor</em>, <em>Farmacia</em>, <em>Estudio</em>, <em>Nocturno</em>, <em>Papel</em></td><td>Fija tipografía, escala, densidad, forma de tarjeta y estilo de portada de una vez</td></tr>
+    <tr><td>Tipografía</td><td>6 pares curados, todos con soporte de acentos y peso variable</td><td>Se sirven localmente, no desde Google Fonts: menos latencia y sin dependencia externa</td></tr>
+    <tr><td>Forma de tarjeta</td><td>Los 4 presets de §8.2</td><td>Radio, proporción de imagen, sombra, jerarquía del precio</td></tr>
+    <tr><td>Densidad</td><td>Cómoda / Compacta</td><td>Espaciado y cuántos productos entran en pantalla</td></tr>
+    <tr><td>Portada</td><td>5 disposiciones: héroe con foto, bento, carrusel de categorías, catálogo directo, editorial</td><td>Estructura de la página inicial</td></tr>
+    <tr><td>Marca</td><td>Logo, favicon, imagen para compartir, color de la barra del navegador</td><td>Generados automáticamente en todos los tamaños desde un archivo</td></tr>
+    <tr><td>Contacto</td><td>Teléfonos, redes, dirección con mapa, horarios por día</td><td>Pie de página, página de contacto, datos estructurados, botón flotante</td></tr>
+  </table>
+
+  <h3>10.2 · Cómo se implementa</h3>
+  <pre><span class="cm">// packages/theme/derive.ts — pura, probada, compartida</span>
+<span class="k">export function</span> deriveTokens(brand: <span class="t">Oklch</span>, preset: <span class="t">PresetName</span>): <span class="t">Tokens</span> {
+  <span class="k">const</span> scale = rampOklch(brand, { steps: 11, minL: 0.14, maxL: 0.97 });
+  <span class="k">return</span> {
+    <span class="s">'--brand-1'</span>: scale[0], <span class="cm">/* … */</span> <span class="s">'--brand-11'</span>: scale[10],
+    <span class="s">'--surface'</span>:  preset === <span class="s">'NOCTURNO'</span> ? scale[1] : <span class="s">'oklch(99% 0.004 '</span> + brand.h + <span class="s">')'</span>,
+    <span class="s">'--on-brand'</span>: bestContrast(scale[6], [scale[0], scale[10]]), <span class="cm">// AA garantizado</span>
+    <span class="s">'--radius-card'</span>: PRESETS[preset].radius,
+    <span class="s">'--ratio-media'</span>: PRESETS[preset].ratio,
+  };
+}</pre>
+  <p>Los tokens se emiten como variables CSS en una etiqueta <code>&lt;style&gt;</code> del layout raíz, leídas desde <code>site_settings</code> y cacheadas con la etiqueta <code>settings</code>. Tailwind consume esas variables, de modo que <strong>no hay una compilación por cliente</strong>: la misma imagen sirve a los doce comercios y cada uno se ve distinto en tiempo de ejecución. Es la pieza que hace viable el modelo de despliegue.</p>
+
+  <h3>10.3 · Vista previa</h3>
+  <p>El editor de apariencia muestra el catálogo real dentro de un marco, con los tokens aplicados en vivo mientras se arrastra el selector de color. Sin guardar, sin recargar. El cliente necesita ver su tienda, no una tarjeta de muestra: es el momento en que el paquete «se siente suyo» y es el que hay que pulir para la demostración comercial.</p>
+
+  <div class="callout">
+    <span class="tag">Lo que deliberadamente no se ofrece</span>
+    <p>Sin CSS libre, sin subir fuentes propias, sin mover elementos píxel a píxel, sin más de un color de marca. Cada una de esas libertades produce un catálogo peor y una llamada de soporte. Si un cliente insiste, es un trabajo de diseño facturado aparte que DIMA hace sobre el preset, no una funcionalidad del paquete.</p>
+  </div>
+</section>
+
+<section id="s11">
+  <h2><span class="num">SECCIÓN 11</span>CMS de páginas y blog</h2>
+  <p class="lead">La landing del comercio y su blog viven en la misma base y el mismo panel que los productos. El cliente edita bloques, nunca markdown ni HTML.</p>
+
+  <h3>11.1 · Bloques disponibles</h3>
+  <table>
+    <tr><th>Bloque</th><th>Contenido</th><th>Nota</th></tr>
+    <tr><td><code>HERO</code></td><td>Título, subtítulo, imagen o video, hasta dos botones</td><td>Tres variantes visuales según el preset</td></tr>
+    <tr><td><code>BENTO</code></td><td>Piezas mixtas: productos, categorías, imágenes, texto, números</td><td>El bloque estrella de §8</td></tr>
+    <tr><td><code>PRODUCTOS</code></td><td>Selección manual, por categoría, destacados o con descuento</td><td>Se alimenta del catálogo, no se duplica contenido</td></tr>
+    <tr><td><code>TEXTO_MEDIA</code></td><td>Párrafo + imagen, alternable</td><td>El «quiénes somos» de siempre</td></tr>
+    <tr><td><code>GALERIA</code></td><td>Grilla de fotos con visor</td><td>Local, taller, equipo</td></tr>
+    <tr><td><code>TESTIMONIOS</code></td><td>Cita, nombre, foto opcional</td><td></td></tr>
+    <tr><td><code>FAQ</code></td><td>Preguntas plegables</td><td>Emite datos estructurados <code>FAQPage</code></td></tr>
+    <tr><td><code>MAPA_CONTACTO</code></td><td>Dirección, horarios, WhatsApp, mapa incrustado</td><td>Mapa cargado solo al entrar en pantalla</td></tr>
+    <tr><td><code>CTA_WHATSAPP</code></td><td>Franja con botón directo al chat</td><td>Con mensaje inicial configurable</td></tr>
+    <tr><td><code>ENTRADAS</code></td><td>Últimas publicaciones del blog</td><td></td></tr>
+  </table>
+  <p>Cada bloque es un registro en <code>page_block</code> con <code>type</code>, <code>position</code> y <code>data</code> en JSON validado por un esquema zod propio. Renderizar es un <code>switch</code> sobre el tipo; agregar un bloque nuevo es un esquema, un componente y una entrada en el registro. Ningún bloque puede ejecutar HTML arbitrario del cliente: el texto enriquecido se limita a negrita, cursiva, enlaces y listas, y se sanea al guardar.</p>
+
+  <h3>11.2 · El blog</h3>
+  <p>Entradas con portada, resumen, cuerpo por bloques, etiquetas, autor y fecha de publicación programable. Borrador y publicado. Emite <code>Article</code> en datos estructurados, canal RSS y una imagen para compartir generada al vuelo con el título sobre los colores de la marca.</p>
+  <div class="callout warn">
+    <span class="tag">Expectativa que hay que gestionar en la venta</span>
+    <p>La mayoría de los comercios pequeños <strong>no va a escribir un blog</strong>. Se incluye porque cuesta poco sobre el motor de bloques que ya hace falta para las páginas, y porque el que sí escribe obtiene tráfico de búsqueda real. Pero no se lo vende como el argumento principal ni se lo pone en el primer lugar del panel: se lo ofrece, y DIMA puede vender aparte la redacción de las primeras entradas como servicio.</p>
+  </div>
+
+  <h3>11.3 · Vista previa y publicación</h3>
+  <p>Cada página tiene un enlace de borrador con testigo, compartible por WhatsApp para que el dueño lo apruebe desde su celular antes de publicar. Publicar invalida la etiqueta <code>content</code> y el sitio se actualiza en segundos, sin despliegue.</p>
+</section>
+
+<section id="s12">
+  <h2><span class="num">SECCIÓN 12</span>Imágenes y medios</h2>
+  <p class="lead">El apartado que decide si el producto se ve caro o barato, y el que más trabajo real esconde. Un catálogo «sumamente visual» con fotos torcidas, con fondos distintos y a contraluz se ve peor que uno sobrio.</p>
+
+  <h3>12.1 · El camino de una foto</h3>
+  <div class="mermaid">
+flowchart LR
+  A["Foto del celular<br/>4 MB · 4032×3024"] --> B["Recorte guiado<br/>en el navegador"]
+  B --> C["Redimensión a 1600px<br/>canvas + WebP q80"]
+  C --> D["Subida directa a S3<br/>URL prefirmada"]
+  D --> E["Variantes en segundo plano<br/>AVIF 400/800/1600"]
+  E --> F["next/image<br/>srcset + lazy + blur"]
+  </div>
+  <table>
+    <tr><th>Etapa</th><th>Decisión</th></tr>
+    <tr><td>Recorte</td><td>Obligatorio, con la proporción del preset de tarjeta. El cliente no puede subir una foto sin encuadrar: es la única forma de que la grilla se vea pareja</td></tr>
+    <tr><td>Reducción</td><td>En el navegador, antes de subir. Sube ~200 KB en vez de 4 MB, lo que también salva al dueño que carga 80 productos con datos móviles</td></tr>
+    <tr><td>Subida</td><td>Directa a S3 con URL prefirmada; el contenedor de la aplicación nunca ve el archivo</td></tr>
+    <tr><td>Variantes</td><td>AVIF y WebP en tres anchos, generadas por un trabajo en segundo plano con concurrencia 1 y prioridad baja. Mientras no existan, se sirve el original</td></tr>
+    <tr><td>Marcador de posición</td><td><code>blurDataURL</code> de 8×8 guardado en la fila de la imagen. Cero peticiones extra y la percepción de velocidad cambia por completo</td></tr>
+    <tr><td>Texto alternativo</td><td>Campo obligatorio con sugerencia automática a partir del nombre del producto. Accesibilidad y posicionamiento por el mismo precio</td></tr>
+  </table>
+
+  <h3>12.2 · Ayudar al cliente a tener fotos decentes</h3>
+  <p>Es un problema de producto, no de código, y define el resultado visual. Lo que se incluye en el paquete:</p>
+  <ul>
+    <li><strong>Guía de fondo:</strong> al subir, una superposición sugiere fondo liso, luz de día y encuadre centrado. Tres segundos de fricción que salvan el catálogo.</li>
+    <li><strong>Detección de problemas:</strong> se avisa si la foto está muy oscura, muy pequeña o borrosa, antes de aceptarla.</li>
+    <li><strong>Fondo uniforme opcional:</strong> quitar el fondo con un modelo ligero en el navegador y reemplazarlo por el color de superficie del tema. Un solo toque, y de golpe las 80 fotos parecen del mismo catálogo. <span class="pill warn">Fase 8, si el tiempo alcanza</span></li>
+    <li><strong>Servicio de fotografía</strong> como venta adicional de DIMA. Es donde está el margen y donde el resultado final se vuelve incomparable con la competencia.</li>
+  </ul>
+</section>
+
+<div class="partbar">
+  <div class="p">Parte III</div>
+  <h2>Superficie operativa</h2>
+  <p>Inventario, caja y escaneo. Es lo que el comercio usa ocho horas al día y lo que ninguna plataforma de catálogos de la competencia tiene.</p>
+</div>
+
+<section id="s13">
+  <h2><span class="num">SECCIÓN 13</span>Precios, descuentos y dinero</h2>
+  <p class="lead">El mismo cálculo tiene que dar el mismo centavo en el servidor y en una tablet sin conexión. Por eso vive en <code>packages/domain</code>, es puro y está cubierto por pruebas de referencia.</p>
+
+  <h3>13.1 · Reglas del dinero</h3>
+  <table>
+    <tr><th>Regla</th><th>Decisión</th></tr>
+    <tr><td>Representación</td><td><strong>Entero de centavos.</strong> <code>unitPriceBob: Int</code>. Nunca <code>float</code>, nunca <code>Decimal</code> de JavaScript</td></tr>
+    <tr><td>Moneda</td><td>Del sitio, en <code>site_settings</code>. Bolivianos por defecto. Un segundo precio en dólares es opcional y solo informativo en v1</td></tr>
+    <tr><td>Impuestos</td><td><strong>El precio mostrado incluye impuestos</strong>, como se acostumbra en el comercio minorista boliviano. No se descompone el IVA en el catálogo ni en el ticket de v1, porque sin facturación fiscal sería una descomposición sin valor legal</td></tr>
+    <tr><td>Redondeo</td><td>Interruptor por sitio: sin redondeo, o al múltiplo de 0,10 Bs más cercano en el total. Los comercios que cobran en efectivo lo piden porque no hay monedas chicas</td></tr>
+    <tr><td>Orden de cálculo</td><td>Descuento por línea → subtotal → descuento global → redondeo del total. Fijo, documentado y probado. Cambiar el orden cambia centavos y aparecen diferencias de arqueo</td></tr>
+  </table>
+
+  <div class="formula">
+    <span class="lbl">Cálculo de una línea</span>
+    precioEfectivo   = precioBase − descuentoAplicable(producto, categoría, fecha)<br>
+    subtotalLinea    = precioEfectivo × cantidad<br>
+    <br>
+    <span class="lbl" style="margin-top:10px">Cálculo del documento</span>
+    subtotal         = Σ subtotalLinea<br>
+    totalPrevio      = subtotal − descuentoGlobal<br>
+    total            = redondeo(totalPrevio, políticaDelSitio)<br>
+    <br>
+    <span class="cm">Todo en centavos enteros. La única división es la del porcentaje,</span><br>
+    <span class="cm">que redondea al centavo con «media hacia arriba» y se prueba con casos de referencia.</span>
+  </div>
+
+  <h3>13.2 · Descuentos</h3>
+  <table>
+    <tr><th>Tipo</th><th>Alcance</th><th>Comportamiento</th></tr>
+    <tr><td>Porcentaje</td><td>Producto, categoría o todo el sitio</td><td>Muestra precio tachado y nuevo precio en la tarjeta</td></tr>
+    <tr><td>Monto fijo</td><td>Producto</td><td>Igual, útil para redondear a un precio psicológico</td></tr>
+    <tr><td>Precio promocional</td><td>Variante</td><td>Reemplaza el precio directamente, con vigencia</td></tr>
+    <tr><td>Descuento de caja</td><td>Venta en curso</td><td>Lo aplica el cajero hasta un tope configurado; por encima pide PIN superior (§6.4)</td></tr>
+  </table>
+  <p>Los descuentos tienen <code>startsAt</code> y <code>endsAt</code>. <strong>No se acumulan</strong>: si un producto está alcanzado por dos, gana el de mayor beneficio para el comprador y se registra cuál se aplicó en la línea. Acumular descuentos es la vía más rápida a una venta con precio negativo y a una discusión en el mostrador.</p>
+
+  <div class="callout warn">
+    <span class="tag">Sin conexión y con precios cambiados</span>
+    <p>Una tablet con un paquete de hace seis horas puede tener un precio viejo. Decisión: <strong>manda el precio del ticket</strong>. La venta guarda <code>priceSnapshotAt</code>; al sincronizar, si el precio del servidor difiere, la venta se acepta igual y se marca en el reporte como «vendida a precio anterior». Al dueño le sirve saberlo; al cliente que ya pagó no se le puede cobrar la diferencia.</p>
+  </div>
+</section>
+
+<section id="s14">
+  <h2><span class="num">SECCIÓN 14</span>Inventario y movimientos</h2>
+  <p class="lead">El libro de asientos que sostiene todo lo demás. Sin él, el POS sin conexión sería imposible de reconciliar.</p>
+
+  <h3>14.1 · Tipos de movimiento</h3>
+  <table>
+    <tr><th>Tipo</th><th>Signo</th><th>Origen</th><th>Quién lo genera</th></tr>
+    <tr><td><code>INGRESO</code></td><td>+</td><td>Compra a proveedor</td><td>Almacén, con costo unitario opcional</td></tr>
+    <tr><td><code>VENTA</code></td><td>−</td><td><code>Sale</code></td><td>El POS, automático</td></tr>
+    <tr><td><code>PEDIDO_ENTREGADO</code></td><td>−</td><td><code>Order</code></td><td>El panel, al marcar entregado sin pasar por caja</td></tr>
+    <tr><td><code>DEVOLUCION</code></td><td>+</td><td><code>Sale</code> original</td><td>Caja, con PIN superior</td></tr>
+    <tr><td><code>MERMA</code></td><td>−</td><td>Motivo obligatorio</td><td>Almacén: roto, vencido, robo</td></tr>
+    <tr><td><code>AJUSTE</code></td><td>±</td><td>Toma de inventario o corrección</td><td>Almacén, con nota obligatoria</td></tr>
+    <tr><td><code>CARGA_INICIAL</code></td><td>+</td><td>Alta del producto o importación</td><td>Sistema, una sola vez por variante</td></tr>
+  </table>
+
+  <h3>14.2 · Cómo se lee el saldo</h3>
+  <pre><span class="cm">-- vista materializada, refrescada por disparador en cada inserción</span>
+<span class="k">CREATE MATERIALIZED VIEW</span> variant_stock <span class="k">AS</span>
+<span class="k">SELECT</span> variant_id,
+       <span class="k">SUM</span>(qty)                                    <span class="k">AS</span> on_hand,
+       <span class="k">MAX</span>(occurred_at)                            <span class="k">AS</span> last_movement_at,
+       <span class="k">SUM</span>(qty) <span class="k">FILTER</span> (<span class="k">WHERE</span> kind = <span class="s">'VENTA'</span>) <span class="k">AS</span> sold_total
+<span class="k">FROM</span> stock_movement
+<span class="k">GROUP BY</span> variant_id;</pre>
+  <p>El catálogo y el POS leen <code>variant_stock</code>. Nadie escribe ahí. Cualquier discrepancia se resuelve mirando los asientos, y una toma de inventario no «arregla» el número: <strong>genera los ajustes que lo explican</strong>.</p>
+
+  <h3>14.3 · Toma de inventario</h3>
+  <ol>
+    <li>Se congela una lista con el saldo teórico del momento (<code>stock_count</code> con sus líneas).</li>
+    <li>Se cuenta escaneando en modo continuo (§15). Cada lectura suma uno; se puede corregir la cantidad a mano.</li>
+    <li>Al cerrar, el sistema muestra solo las diferencias, ordenadas por impacto en dinero.</li>
+    <li>Se aprueba y se generan los <code>AJUSTE</code> correspondientes, con el identificador de la toma como origen.</li>
+  </ol>
+  <p>Se puede contar por categoría o por pasillo sin cerrar el negocio, y una toma parcial es igual de válida que una completa. Exigir contar toda la tienda de una vez es la razón por la que nadie usa la función de toma de inventario en los sistemas que la tienen.</p>
+
+  <h3>14.4 · Alertas</h3>
+  <table>
+    <tr><th>Alerta</th><th>Disparo</th><th>Dónde aparece</th></tr>
+    <tr><td>Bajo mínimo</td><td><code>on_hand ≤ minStock</code> de la variante</td><td>Tablero y lista de reposición, exportable como pedido al proveedor</td></tr>
+    <tr><td>Existencia negativa</td><td><code>on_hand &lt; 0</code></td><td>Aviso destacado: casi siempre viene de una venta sin conexión o de una carga inicial mal hecha (§17)</td></tr>
+    <tr><td>Sin movimiento</td><td>90 días sin venta</td><td>Reporte de capital dormido, con el dinero inmovilizado</td></tr>
+    <tr><td>Variante sin código</td><td>Sin <code>barcode</code></td><td>Bandeja de etiquetas pendientes de imprimir</td></tr>
+  </table>
+</section>
+
+<section id="s15">
+  <h2><span class="num">SECCIÓN 15</span>Escaneo de códigos</h2>
+  <p class="lead">Se hereda la decisión técnica de Kraken §16.2 y se le agrega la salida que aquel caso no necesitaba: un lector físico, porque una caja con cola es otra cosa que un depósito.</p>
+
+  <h3>15.1 · Las tres vías de entrada</h3>
+  <table>
+    <tr><th>Vía</th><th>Tecnología</th><th>Cuándo</th></tr>
+    <tr><td><strong>Cámara</strong></td><td><code>BarcodeDetector</code> nativo donde exista (Chrome/Android); respaldo universal con <code>@zxing/browser</code> compilado a WebAssembly, que cubre iOS y Safari. La detección de soporte es automática</td><td>Reposición, toma de inventario, búsqueda en el catálogo, ventas de bajo volumen</td></tr>
+    <tr><td><strong>Lector USB o Bluetooth (HID)</strong> <span class="pill ok">recomendado para caja</span></td><td>Se comporta como un teclado. Un escuchador captura ráfagas de teclas rápidas terminadas en <code>Enter</code> y las distingue de la escritura humana por el intervalo entre pulsaciones (&lt; 30 ms)</td><td>Caja con volumen. Veinte líneas de código, y transforma la experiencia por unos 25 dólares de hardware</td></tr>
+    <tr><td><strong>Teclado</strong></td><td>Escribir el código o el nombre</td><td>Siempre disponible, porque siempre hay una etiqueta arrugada</td></tr>
+  </table>
+
+  <div class="callout">
+    <span class="tag">Lo que hay que decir en la propuesta comercial</span>
+    <p>Leer un EAN-13 lineal con la cámara de una tablet económica funciona, pero es <strong>notablemente más lento</strong> que un QR y peor con poca luz, con envases brillantes o con etiquetas curvas. Prometer «escaneá con tu tablet» y que en la caja tarde tres segundos por producto genera una decepción que ya no se recupera. Se vende así: cámara para inventario y reposición, lector HID para el mostrador, incluido en el paquete o cotizado aparte.</p>
+  </div>
+
+  <h3>15.2 · Formatos y etiquetas</h3>
+  <table>
+    <tr><th>Caso</th><th>Formato</th><th>Nota</th></tr>
+    <tr><td>Producto con código de fábrica</td><td>EAN-13, UPC-A, Code-128</td><td>Se guarda tal cual en <code>Variant.barcode</code>, con unicidad por sitio</td></tr>
+    <tr><td>Producto sin código</td><td>Código interno <code>VIT-{base36}</code> en Code-128</td><td>Generado al crear la variante</td></tr>
+    <tr><td>Etiqueta impresa</td><td>Plantillas PDF de 50×25 mm y 38×19 mm, por lote</td><td>Incluyen código, nombre corto y precio; se imprimen en cualquier impresora común sobre etiquetas adhesivas</td></tr>
+    <tr><td>Etiqueta de estante</td><td>Tarjeta con QR al producto del catálogo</td><td>El comprador escanea en el pasillo y ve fotos, descripción y disponibilidad. Barato de hacer y muy vistoso en la demostración</td></tr>
+  </table>
+
+  <h3>15.3 · Qué hace una lectura</h3>
+  <p>Depende del contexto, como en Kraken: en el POS agrega el producto a la venta; en reposición abre el ingreso con el producto cargado; en una toma de inventario lo marca como contado; en el catálogo público lo busca; y si el código no existe en ninguna parte, ofrece <strong>crear el producto en ese momento</strong> con el código ya puesto. Ese último atajo es el que convierte el escáner en la herramienta de carga inicial (§19).</p>
+
+  <h3>15.4 · Modo continuo</h3>
+  <p>La cámara queda abierta y acumula lecturas con confirmación sonora y vibración, sin un toque por producto. Se descartan lecturas repetidas del mismo código dentro de 1,5 segundos para evitar el doble conteo. Escanear treinta artículos no debe requerir treinta toques.</p>
+</section>
+
+<section id="s16">
+  <h2><span class="num">SECCIÓN 16</span>Punto de venta</h2>
+  <p class="lead">Una pantalla, un pulgar, cero menús anidados. Si el cajero necesita dos toques donde una calculadora necesita uno, vuelve a la calculadora.</p>
+
+  <h3>16.1 · La pantalla</h3>
+  <div class="mermaid">
+flowchart LR
+  subgraph POS["Pantalla de venta · tablet horizontal"]
+    A["Buscador y escáner<br/>siempre visible arriba"]
+    B["Grilla de productos<br/>favoritos y categorías"]
+    C["Ticket en curso<br/>columna derecha fija"]
+    D["Cobrar<br/>botón grande permanente"]
+  end
+  A --> C
+  B --> C
+  C --> D
+  </div>
+  <table>
+    <tr><th>Elemento</th><th>Decisión de diseño</th></tr>
+    <tr><td>Grilla de productos</td><td>Los 24 más vendidos del comercio, calculados solos, más pestañas de categoría. Un almacén vende el 80% con 30 artículos: tienen que estar a un toque</td></tr>
+    <tr><td>Objetivos táctiles</td><td>Mínimo 48 px, separación de 8. Se usa con dedos, a veces con guantes, a veces con prisa</td></tr>
+    <tr><td>Cantidad</td><td>Toque repetido suma uno; toque largo abre el teclado numérico. Sin campos de texto diminutos</td></tr>
+    <tr><td>Ticket</td><td>Columna fija, siempre visible, con el total en el tipo más grande de toda la aplicación</td></tr>
+    <tr><td>Cobro</td><td>Un solo diálogo: método, monto recibido, vuelto calculado en letras grandes. El vuelto mal calculado es la razón número uno de las diferencias de caja</td></tr>
+    <tr><td>Después de cobrar</td><td>Vuelve a la pantalla lista para la venta siguiente en menos de 300 ms. Sin pantalla de confirmación que haya que descartar</td></tr>
+  </table>
+
+  <h3>16.2 · Turnos y arqueo</h3>
+  <ol>
+    <li><strong>Apertura:</strong> el operador entra con su PIN y declara el fondo de caja. Nace una <code>CashSession</code>.</li>
+    <li><strong>Durante el turno:</strong> toda venta y todo movimiento de efectivo —retiro, ingreso, gasto con nota— quedan atados a esa sesión.</li>
+    <li><strong>Cierre:</strong> el operador cuenta el efectivo y lo declara <strong>antes</strong> de que el sistema le muestre lo esperado. Al revés, el arqueo no vale nada.</li>
+    <li><strong>Diferencia:</strong> se muestra, se pide una nota si supera un umbral configurable, y se cierra igual. La sesión cerrada es inmutable.</li>
+  </ol>
+  <div class="formula">
+    <span class="lbl">Arqueo</span>
+    esperadoEnCaja = fondoApertura + Σ ventasEnEfectivo + Σ ingresos − Σ retiros − Σ vueltos…<br>
+    diferencia     = contadoDeclarado − esperadoEnCaja<br>
+    <span class="cm">Los cobros con QR, transferencia o tarjeta se totalizan aparte: no están en el cajón.</span>
+  </div>
+
+  <h3>16.3 · Devoluciones y anulaciones</h3>
+  <table>
+    <tr><th>Acción</th><th>Regla</th></tr>
+    <tr><td>Anular una línea antes de cobrar</td><td>Libre</td></tr>
+    <tr><td>Anular una venta del turno abierto</td><td>PIN superior. Genera <code>DEVOLUCION</code> y una venta anulada visible en el arqueo. <strong>No se borra nada</strong></td></tr>
+    <tr><td>Devolución de un turno cerrado</td><td>Documento de devolución propio, con referencia a la venta original y motivo</td></tr>
+    <tr><td>Cambio de producto</td><td>Devolución + venta nueva. Modelar el cambio como operación propia complica el arqueo sin aportar nada</td></tr>
+  </table>
+
+  <h3>16.4 · El comprobante</h3>
+  <p>No es una factura fiscal y el sistema lo dice explícitamente en el pie: «Nota de venta · no válida como factura». Tres salidas: PDF para compartir, mensaje de WhatsApp al cliente, o impresión térmica si el comercio tiene impresora <span class="pill warn">decisión abierta §28</span>. Se numera con folio propio y correlativo por sitio.</p>
+</section>
+
+<section id="s17">
+  <h2><span class="num">SECCIÓN 17</span>El POS sin conexión</h2>
+  <p class="lead">La sección más difícil del proyecto y la razón por la que el paquete se puede vender más caro que un catálogo. También el mayor riesgo del cronograma: se le reservan dos semanas completas y no se lo mezcla con otras tareas.</p>
+
+  <h3>17.1 · El modelo mental</h3>
+  <p>La tablet no es una pantalla que consulta al servidor: es una <strong>caja registradora con memoria propia</strong> que además sincroniza. La diferencia práctica es que nada en la ruta de cobro toca la red. Se cobra contra la base local, siempre, esté o no haya internet. La sincronización es un proceso en segundo plano que el cajero nunca ve, salvo un indicador de estado.</p>
+
+  <div class="mermaid">
+flowchart TB
+  subgraph Tablet
+    S["Dexie / IndexedDB<br/>catálogo · precios · descuentos<br/>existencias de referencia · hashes de PIN"]
+    V["Venta cobrada<br/>clientSaleId · UUID v7"]
+    Q["Cola de comandos<br/>persistente y ordenada"]
+    V --> Q
+    S --> V
+  end
+  Q -->|"lote, cuando hay red"| API["POST /api/sync/batch"]
+  API --> SRV["Servidor: aplica por idempotencia<br/>inserta Sale + StockMovement"]
+  SRV -->|"acuses + paquete nuevo"| S
+  </div>
+
+  <h3>17.2 · Las seis reglas de la sincronización</h3>
+  <table>
+    <tr><th>#</th><th>Regla</th><th>Por qué</th></tr>
+    <tr><td>1</td><td><strong>Identidad en el origen.</strong> El <code>clientSaleId</code> lo genera la tablet, no el servidor</td><td>Es la clave de idempotencia. Sin ella, una red que se corta después de que el servidor grabó pero antes de responder produce ventas duplicadas</td></tr>
+    <tr><td>2</td><td><strong>Idempotencia en el destino.</strong> Índice único sobre <code>clientSaleId</code>; reenviar el mismo lote diez veces inserta una vez</td><td>La red móvil se corta a mitad de respuesta todo el tiempo</td></tr>
+    <tr><td>3</td><td><strong>Orden por dispositivo.</strong> Cada comando lleva <code>deviceId</code> y <code>seq</code> creciente; el servidor aplica en orden y rechaza huecos</td><td>Una anulación no puede aplicarse antes que la venta que anula</td></tr>
+    <tr><td>4</td><td><strong>La venta cobrada gana.</strong> El servidor nunca rechaza una venta por falta de existencias: la registra y levanta la alerta</td><td>Principio 3 de §1.2. Rechazarla no devuelve el producto al estante</td></tr>
+    <tr><td>5</td><td><strong>Dos relojes.</strong> Se guardan <code>occurredAtDevice</code> y <code>receivedAtServer</code>; los reportes usan el del dispositivo, las auditorías comparan ambos</td><td>El reloj de una tablet barata se desfasa, y a veces alguien lo cambia a propósito</td></tr>
+    <tr><td>6</td><td><strong>El paquete caduca.</strong> A las 24 horas sin sincronizar se advierte; a las 72 se bloquean las ventas nuevas, con desbloqueo por PIN del propietario</td><td>Un dispositivo con dos semanas de desfase vende a precios inexistentes. El límite es configurable</td></tr>
+  </table>
+
+  <h3>17.3 · Qué se guarda en la tablet y qué no</h3>
+  <table>
+    <tr><th>Sí</th><th>No</th></tr>
+    <tr><td>Catálogo activo: nombre, código, precio, foto pequeña</td><td>Costos y márgenes</td></tr>
+    <tr><td>Descuentos vigentes y los de los próximos 7 días</td><td>Reportes históricos</td></tr>
+    <tr><td>Existencias de referencia, solo informativas</td><td>Datos de otros dispositivos</td></tr>
+    <tr><td>Ventas del turno abierto y de los 7 días previos</td><td>Ventas antiguas, pedidos, contenido</td></tr>
+    <tr><td>Hashes de PIN de operadores activos</td><td>Contraseñas o testigos del panel</td></tr>
+  </table>
+  <p>Peso objetivo del paquete: <strong>menos de 8 MB para 2 000 productos</strong>, con miniaturas de 120 px en WebP. Si un comercio supera los 5 000 productos, las fotos se cargan bajo demanda y solo se guarda el texto.</p>
+
+  <h3>17.4 · Lo que el cajero ve</h3>
+  <table>
+    <tr><th>Estado</th><th>Indicador</th><th>Comportamiento</th></tr>
+    <tr><td>En línea y al día</td><td>Punto verde, sin texto</td><td>Sincroniza al vuelo tras cada venta</td></tr>
+    <tr><td>Sin conexión</td><td>Punto ámbar y «Sin conexión · 6 ventas por enviar»</td><td><strong>Se sigue vendiendo con total normalidad</strong></td></tr>
+    <tr><td>Sincronizando</td><td>Punto girando</td><td>En segundo plano, sin bloquear la pantalla</td></tr>
+    <tr><td>Conflicto detectado</td><td>Punto rojo con detalle tocable</td><td>Nunca interrumpe una venta en curso; se resuelve desde el panel</td></tr>
+    <tr><td>Paquete caducado</td><td>Franja roja</td><td>Bloqueo de ventas nuevas con desbloqueo por PIN del propietario</td></tr>
+  </table>
+
+  <h3>17.5 · Los conflictos que sí ocurren</h3>
+  <table>
+    <tr><th>Conflicto</th><th>Resolución</th></tr>
+    <tr><td>Existencia insuficiente al aplicar</td><td>Se acepta, saldo negativo, alerta de ajuste en el panel</td></tr>
+    <tr><td>El producto fue borrado en el panel</td><td>Se acepta la venta contra el producto archivado. Borrar es archivar: <strong>nunca se elimina físicamente un producto con historial</strong></td></tr>
+    <tr><td>El precio cambió</td><td>Manda el del ticket; se marca en el reporte (§13)</td></tr>
+    <tr><td>El operador fue dado de baja</td><td>Se acepta, se registra el operador tal como estaba y se avisa</td></tr>
+    <tr><td>Dos tablets venden la última unidad</td><td>Ambas se aceptan, saldo −1, alerta. Es un hecho físico que el sistema no puede deshacer, solo reportar</td></tr>
+    <tr><td>Dispositivo revocado</td><td>El servidor rechaza el lote, pero <strong>lo conserva en cuarentena</strong> para que el propietario pueda recuperar esas ventas si la revocación fue un error</td></tr>
+  </table>
+
+  <div class="callout err">
+    <span class="tag">La prueba que decide si esto funciona</span>
+    <p>Un guion automatizado de Playwright que: abre turno, vende, corta la red, vende cinco veces más, mata el proceso de la aplicación a mitad de un cobro, la reabre, comprueba que la venta a medias no existe y las cinco cobradas sí, reconecta, sincroniza, y verifica que el servidor tiene exactamente seis ventas y los movimientos correctos. <strong>Se ejecuta en cada integración.</strong> Sin esta prueba corriendo en verde, el modo sin conexión no se entrega, porque su fallo silencioso es dinero perdido que el comercio descubre semanas después.</p>
+  </div>
+</section>
+
+<section id="s18">
+  <h2><span class="num">SECCIÓN 18</span>Reportes y tablero</h2>
+  <p class="lead">Cuatro números que el dueño mira todos los días y seis reportes que mira una vez por semana. Nada más. Un tablero con veinte gráficos no lo abre nadie.</p>
+
+  <h3>18.1 · La pantalla de inicio del panel</h3>
+  <div class="stat">
+    <div><b>Bs 4 280</b><span>Vendido hoy</span></div>
+    <div><b>37</b><span>Ventas de hoy</span></div>
+    <div><b>5</b><span>Pedidos sin atender</span></div>
+    <div><b>12</b><span>Productos bajo mínimo</span></div>
+  </div>
+  <p>Debajo: la curva de los últimos 14 días, los cinco productos más vendidos de la semana y las alertas que exigen acción. La comparación siempre contra <strong>el mismo día de la semana anterior</strong>, nunca contra ayer: un lunes contra un domingo no dice nada y asusta sin motivo.</p>
+
+  <h3>18.2 · Los reportes</h3>
+  <table>
+    <tr><th>Reporte</th><th>Responde</th><th>Filtros</th></tr>
+    <tr><td>Ventas por período</td><td>¿Cuánto vendí y en qué?</td><td>Rango, operador, método de pago, canal (mostrador o pedido)</td></tr>
+    <tr><td>Productos más vendidos</td><td>¿Qué repongo primero?</td><td>Rango, categoría, por unidades o por dinero</td></tr>
+    <tr><td>Margen por producto <span class="pill neutral">solo propietario</span></td><td>¿Qué me deja plata de verdad?</td><td>Requiere costo cargado; se muestra vacío si no lo hay, sin inventar</td></tr>
+    <tr><td>Arqueos</td><td>¿Cuadró la caja?</td><td>Por sesión y por operador, con las diferencias destacadas</td></tr>
+    <tr><td>Movimientos de inventario</td><td>¿Por qué tengo esta cantidad?</td><td>Por variante, tipo y origen: el libro completo</td></tr>
+    <tr><td>Pedidos y conversión</td><td>¿Cuántos pedidos de WhatsApp terminan en venta?</td><td>Rango y estado. Es el número que justifica el catálogo ante el dueño</td></tr>
+    <tr><td>Capital dormido</td><td>¿Cuánto dinero tengo parado en el estante?</td><td>Sin movimiento en 90 días</td></tr>
+  </table>
+  <p>Todos exportables a CSV y a PDF con la marca del comercio. El PDF importa más de lo que parece: es lo que el dueño le manda al contador y a su socio, y lleva el logo de su negocio, no el de DIMA.</p>
+
+  <h3>18.3 · Rendimiento</h3>
+  <p>Los reportes se calculan sobre tablas de agregado diario (<code>daily_sales_rollup</code>), refrescadas por un trabajo nocturno más el día en curso al vuelo. Recorrer el libro de movimientos entero para dibujar una curva de 14 días funciona el primer mes y se arrastra al año. Se resuelve desde el principio porque después exige rehacer las consultas.</p>
+</section>
+
+<section id="s19">
+  <h2><span class="num">SECCIÓN 19</span>Carga inicial e importación</h2>
+  <p class="lead">El momento donde se pierden los clientes. Un comercio con 600 productos que tiene que cargarlos a mano abandona el paquete en la semana dos, y el problema no fue el software.</p>
+
+  <h3>19.1 · Los cuatro caminos</h3>
+  <table>
+    <tr><th>Camino</th><th>Para</th><th>Detalle</th></tr>
+    <tr><td><strong>Escaneo progresivo</strong> <span class="pill ok">el que de verdad se usa</span></td><td>Comercios sin ningún sistema previo</td><td>Se escanea, si el código no existe se crea el producto ahí mismo con nombre, precio y cantidad. Tres campos, un toque. El inventario se construye vendiendo y reponiendo, no en un censo previo</td></tr>
+    <tr><td>Importación CSV</td><td>Quien ya tiene una planilla</td><td>Asistente con mapeo de columnas, vista previa de las primeras 20 filas, validación completa antes de escribir nada y reporte de errores por fila descargable</td></tr>
+    <tr><td>Alta manual</td><td>Pocos productos, servicios</td><td>Formulario de una pantalla, optimizado para pulgar</td></tr>
+    <tr><td>Carga asistida por DIMA</td><td>Servicio adicional facturable</td><td>Donde está el margen y donde se garantiza que el catálogo arranque con buen aspecto</td></tr>
+  </table>
+
+  <div class="callout ok">
+    <span class="tag">La decisión que evita el fracaso más común</span>
+    <p><strong>Vitrina arranca vacío y no exige un censo perfecto antes de servir.</strong> Es la misma decisión de Kraken §16.3 y por la misma razón: el comercio puede empezar a vender el primer día con veinte productos cargados y completar el resto en las semanas siguientes. Pedirle que cargue todo antes de usarlo garantiza que no cargue nada.</p>
+  </div>
+
+  <h3>19.2 · Reglas del importador</h3>
+  <ul>
+    <li><strong>Nada se escribe hasta que todo valida.</strong> Una importación es una transacción: o entran las 600 filas o no entra ninguna.</li>
+    <li><strong>La clave es el código de barras</strong>, y si falta, el SKU. Coincidencia = actualización, no duplicado. Reimportar la misma planilla dos veces debe ser inocuo.</li>
+    <li><strong>Precios tolerantes:</strong> se aceptan <code>1.234,56</code>, <code>1234.56</code> y <code>Bs 1.234,56</code>. Nadie limpia su planilla antes de subirla.</li>
+    <li><strong>Categorías creadas al vuelo</strong> a partir de la columna, con confirmación en la vista previa.</li>
+    <li><strong>Imágenes por URL</strong> en una columna opcional, descargadas en segundo plano tras la importación.</li>
+    <li><strong>Deshacer:</strong> toda importación es reversible durante 24 horas, porque el error se descubre al ver el catálogo, no al importar.</li>
+  </ul>
+</section>
+
+<div class="partbar">
+  <div class="p">Parte IV</div>
+  <h2>Transversal</h2>
+  <p>Rendimiento, seguridad, entrega, pruebas y las reglas con las que se escribe el código. Lo que no se ve pero decide si el paquete se puede vender doce veces.</p>
+</div>
+
+<section id="s20">
+  <h2><span class="num">SECCIÓN 20</span>Rendimiento y posicionamiento</h2>
+  <p class="lead">Un presupuesto que se verifica en cada integración, no una aspiración. Sin control automático, el peso solo sube.</p>
+
+  <h3>20.1 · El presupuesto</h3>
+  <table>
+    <tr><th>Métrica</th><th>Objetivo</th><th>Medido en</th></tr>
+    <tr><td>LCP · catálogo</td><td>&lt; 2,5 s</td><td>Móvil, 4G simulada con 400 ms de latencia</td></tr>
+    <tr><td>INP · catálogo</td><td>&lt; 200 ms</td><td>Gama media</td></tr>
+    <tr><td>JavaScript inicial · catálogo</td><td><strong>&lt; 120 KB comprimido</strong></td><td>Falla la integración si se supera</td></tr>
+    <tr><td>JavaScript inicial · landing</td><td>&lt; 260 KB comprimido</td><td>Se le concede el doble por la animación</td></tr>
+    <tr><td>Peso de la primera vista</td><td>&lt; 600 KB con imágenes</td><td></td></tr>
+    <tr><td>Arranque en frío del POS</td><td>&lt; 1,5 s desde el ícono</td><td>Tablet de 3 GB de RAM</td></tr>
+    <tr><td>Agregar producto a la venta</td><td>&lt; 100 ms</td><td>Percibido como instantáneo</td></tr>
+    <tr><td>Consulta del catálogo, p95</td><td>&lt; 400 ms</td><td>En el servidor, con 2 000 productos</td></tr>
+  </table>
+  <p>La integración continua corre Lighthouse contra una instancia de prueba con datos realistas —2 000 productos, 40 categorías, fotos de verdad— y falla si el presupuesto de JavaScript se rompe. Probar contra un catálogo de doce productos de mentira es no probar nada.</p>
+
+  <h3>20.2 · Posicionamiento</h3>
+  <table>
+    <tr><th>Elemento</th><th>Tratamiento</th></tr>
+    <tr><td>Datos estructurados</td><td><code>Product</code> con <code>Offer</code> y disponibilidad real, <code>LocalBusiness</code> con horarios y dirección, <code>BreadcrumbList</code>, <code>FAQPage</code>, <code>Article</code> en el blog</td></tr>
+    <tr><td>Metadatos</td><td>Título y descripción por producto y por página, editables, con valores derivados sensatos si el cliente no los escribe</td></tr>
+    <tr><td>Imagen para compartir</td><td>Generada al vuelo con la foto del producto, el precio y los colores de la marca. <strong>Es lo que se ve al pegar el enlace en WhatsApp</strong>, que es el canal real de distribución: importa más que cualquier otra optimización</td></tr>
+    <tr><td>Mapa del sitio</td><td>Dinámico, con productos, categorías, páginas y entradas</td></tr>
+    <tr><td>URLs</td><td><code>/producto/taladro-bosch-gsb-550</code>. El slug se congela al publicar; si cambia, redirección 301 automática guardada en <code>slug_history</code></td></tr>
+    <tr><td>Idioma</td><td><code>es-BO</code> declarado. Estructura preparada para un segundo idioma, no expuesta en v1</td></tr>
+  </table>
+</section>
+
+<section id="s21">
+  <h2><span class="num">SECCIÓN 21</span>Seguridad</h2>
+  <table>
+    <tr><th>Frente</th><th>Medida</th></tr>
+    <tr><td>Aislamiento entre clientes</td><td>Base y rol por cliente en el Postgres compartido, con <code>REVOKE CONNECT</code> cruzado. Ninguna credencial de una instancia sirve en otra. Se verifica con una prueba automatizada en el alta</td></tr>
+    <tr><td>Sesión del panel</td><td>Better Auth, cookie <code>HttpOnly</code>, <code>Secure</code>, <code>SameSite=Lax</code>. Rotación al elevar privilegios</td></tr>
+    <tr><td>Token de dispositivo</td><td>Opaco, de larga duración, revocable, ligado a <code>deviceId</code>. Su alcance es exclusivamente la sincronización: no da acceso al panel</td></tr>
+    <tr><td>PIN</td><td><code>argon2id</code>. Bloqueo progresivo tras 5 intentos. Identifica, no autoriza (§6.2)</td></tr>
+    <tr><td>Entradas</td><td>Todo <code>action</code> y toda ruta de API valida con zod en el límite. Sin excepciones «porque viene de mi propio formulario»</td></tr>
+    <tr><td>Contenido del CMS</td><td>Texto enriquecido saneado al guardar y al renderizar. Ningún bloque acepta HTML libre</td></tr>
+    <tr><td>Subidas</td><td>URL prefirmada, tipo verificado por contenido y no por extensión, límite de tamaño, sin ejecución desde el bucket</td></tr>
+    <tr><td>Límite de peticiones</td><td>Creación de pedidos, búsqueda y sincronización, por IP y por dispositivo. Un catálogo público es un objetivo trivial de raspado</td></tr>
+    <tr><td>Registro de auditoría</td><td>Cambios de precio, anulaciones, ajustes de inventario, altas de usuario y de dispositivo. Quién, cuándo, valor anterior y nuevo</td></tr>
+    <tr><td>Datos personales</td><td>Del comprador solo se guarda el teléfono que él escribe, y solo si lo escribe. Sin rastreo de terceros por defecto: la analítica es propia, agregada, sin cookies</td></tr>
+    <tr><td>Respaldos</td><td>Diarios, cifrados, fuera del VPS, con <strong>prueba de restauración mensual</strong> a un entorno desechable. Un respaldo que nunca se restauró no es un respaldo</td></tr>
+    <tr><td>Secretos</td><td>En Coolify, distintos por instancia. Nunca en el repositorio, nunca en la imagen</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <span class="tag">El riesgo específico de este modelo</span>
+    <p>Un solo VPS con doce comercios significa que una vulnerabilidad de escape de contenedor, o un descuido en las credenciales de Postgres, expone a doce clientes a la vez. Se mitiga con el aislamiento por rol, con actualizaciones del anfitrión programadas y —sobre todo— con la honestidad de saber que <strong>el nodo es un punto único de falla</strong> y decírselo al cliente en el contrato, junto con el compromiso de restauración.</p>
+  </div>
+</section>
+
+<section id="s22">
+  <h2><span class="num">SECCIÓN 22</span>Entornos y DevOps</h2>
+
+  <h3>22.1 · Todo ocurre en contenedores</h3>
+  <p>Coolify es solo el destino final. <strong>El ciclo entero —desarrollo, pruebas, construcción y despliegue— corre en Docker</strong>, y el equipo del desarrollador no tiene instalado ni Node, ni pnpm, ni Postgres, ni el cliente de S3. Esto no es purismo: es lo que hace que el error de un cliente se reproduzca localmente en vez de descubrirse en el VPS de doce comercios.</p>
+  <table>
+    <tr><th>Entorno</th><th>Cómo corre</th><th>Para qué</th></tr>
+    <tr><td>Local</td><td><code>compose.yml</code> + <code>compose.dev.yml</code>: aplicación en modo desarrollo, Postgres, MinIO, Mailpit</td><td>Desarrollo diario. Un solo comando de arranque</td></tr>
+    <tr><td>Pruebas</td><td><code>compose.test.yml</code>: Postgres efímero en <code>tmpfs</code> + contenedor de Playwright con navegadores incluidos</td><td>Pruebas idénticas en la máquina y en la integración continua</td></tr>
+    <tr><td>Demostración</td><td>Imagen de producción en el VPS, orquestada por Coolify, con datos ficticios</td><td><strong>Es la que se usa para vender.</strong> Se actualiza primero</td></tr>
+    <tr><td>Producción</td><td>La misma imagen, una instancia por cliente</td><td>Actualización por tandas tras 48 horas en demostración</td></tr>
+  </table>
+  <div class="callout ok">
+    <span class="tag">La regla de paridad</span>
+    <p>Los cuatro entornos usan <strong>el mismo <code>Dockerfile</code></strong>, cambiando solo la etapa de destino. La imagen que corre en la tablet de un cliente en El Alto se construyó con las mismas instrucciones que la que corre en la máquina del desarrollador. Cualquier paso que exista solo en un entorno —una dependencia instalada a mano, una variable puesta «temporalmente»— es deuda que se va a cobrar en un despliegue.</p>
+  </div>
+
+  <h3>22.2 · La topología local</h3>
+  <div class="mermaid">
+flowchart LR
+  subgraph Host["Anfitrión Docker · VM Ubuntu Server"]
+    APP["vitrina-app<br/>node:22-alpine · pnpm dev<br/>:3000"]
+    PG[("postgres:16-alpine<br/>:5432")]
+    MIN["minio<br/>:9000 · consola :9001"]
+    MAIL["mailpit<br/>:8025"]
+    APP --> PG
+    APP --> MIN
+    APP --> MAIL
+  end
+  DEV["Editor en Windows<br/>VS Code Remote-SSH"] -.->|"código montado"| APP
+  NAV["Navegador y tablet<br/>en la LAN"] -->|":3000"| APP
+  </div>
+  <table>
+    <tr><th>Servicio</th><th>Imagen</th><th>Por qué está</th></tr>
+    <tr><td><code>app</code></td><td><code>node:22-alpine</code>, etapa <code>dev</code></td><td>Next.js en modo desarrollo con recarga en caliente. El código va montado, no copiado</td></tr>
+    <tr><td><code>postgres</code></td><td><code>postgres:16-alpine</code></td><td><strong>La misma versión mayor que producción.</strong> Desarrollar contra otra versión es cómo aparecen sorpresas con índices y tipos</td></tr>
+    <tr><td><code>minio</code></td><td><code>minio/minio</code></td><td>S3 compatible en local. El código no distingue entre esto y el almacenamiento real (ADR-09)</td></tr>
+    <tr><td><code>mailpit</code></td><td><code>axllent/mailpit</code></td><td>Captura los correos de Better Auth —verificación, recuperación— sin enviarlos a nadie. Bandeja en el navegador</td></tr>
+    <tr><td><code>playwright</code></td><td><code>mcr.microsoft.com/playwright</code></td><td>Solo en <code>compose.test.yml</code>. Trae los navegadores preinstalados: evita descargar 400 MB en cada máquina</td></tr>
+  </table>
+
+  <h3>22.3 · El compose de desarrollo</h3>
+  <pre><span class="cm"># compose.dev.yml — sobre la base común de compose.yml</span>
+services:
+  <span class="k">app</span>:
+    build: { context: ., dockerfile: docker/Dockerfile, target: <span class="s">dev</span> }
+    command: pnpm dev
+    volumes:
+      - <span class="s">.:/app</span>                       <span class="cm"># el código, montado desde el anfitrión</span>
+      - <span class="s">node_modules:/app/node_modules</span>  <span class="cm"># volumen nombrado: NO se monta desde el host</span>
+      - <span class="s">next_cache:/app/apps/web/.next</span> <span class="cm"># idem, o la recarga se arrastra</span>
+    environment:
+      DATABASE_URL: postgresql://vitrina:vitrina@postgres:5432/vitrina
+      S3_ENDPOINT: http://minio:9000
+      WATCHPACK_POLLING: <span class="s">"true"</span>          <span class="cm"># sondeo: los eventos de archivo no cruzan el montaje</span>
+    ports: [<span class="s">"3000:3000"</span>]
+    depends_on:
+      postgres: { condition: service_healthy }
+      minio:    { condition: service_started }
+
+  <span class="k">postgres</span>:
+    image: postgres:16-alpine
+    environment: { POSTGRES_USER: vitrina, POSTGRES_PASSWORD: vitrina, POSTGRES_DB: vitrina }
+    volumes: [ <span class="s">pgdata:/var/lib/postgresql/data</span> ]
+    healthcheck:
+      test: [<span class="s">"CMD-SHELL"</span>, <span class="s">"pg_isready -U vitrina"</span>]
+      interval: 5s
+      retries: 10
+
+  <span class="k">minio</span>:
+    image: minio/minio
+    command: server /data --console-address <span class="s">":9001"</span>
+    volumes: [ <span class="s">miniodata:/data</span> ]
+    ports: [<span class="s">"9000:9000"</span>, <span class="s">"9001:9001"</span>]
+
+  <span class="k">mailpit</span>:
+    image: axllent/mailpit
+    ports: [<span class="s">"8025:8025"</span>]
+
+volumes: { pgdata: {}, miniodata: {}, node_modules: {}, next_cache: {} }</pre>
+
+  <table>
+    <tr><th>Detalle</th><th>Por qué importa</th></tr>
+    <tr><td><code>node_modules</code> en volumen nombrado</td><td>Si se monta desde el anfitrión, los binarios compilados para Linux chocan con los del sistema del desarrollador y la instalación se arrastra hasta volverse inutilizable. <strong>Es el error más común y el más frustrante de diagnosticar</strong></td></tr>
+    <tr><td><code>WATCHPACK_POLLING</code></td><td>Los eventos <code>inotify</code> no cruzan un montaje de red ni el sistema de archivos de una máquina virtual. Sin sondeo, la recarga en caliente simplemente no ocurre y se pierde media hora buscando por qué</td></tr>
+    <tr><td><code>healthcheck</code> en Postgres</td><td>La aplicación arranca antes que la base y la migración falla. Con <code>service_healthy</code> el arranque es determinista</td></tr>
+    <tr><td>Usuario no root en la imagen <code>dev</code></td><td>Los archivos creados por el contenedor —migraciones generadas, tipos de Prisma— quedan con el UID correcto en el anfitrión. Coherente además con Docker sin privilegios de root del laboratorio</td></tr>
+  </table>
+
+  <h3>22.4 · El Dockerfile multietapa</h3>
+  <pre><span class="cm"># docker/Dockerfile — una sola fuente para los cuatro entornos</span>
+
+<span class="k">FROM</span> node:22-alpine <span class="k">AS</span> <span class="t">base</span>
+RUN corepack enable && apk add --no-cache libc6-compat
+WORKDIR /app
+
+<span class="k">FROM</span> base <span class="k">AS</span> <span class="t">deps</span>
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+COPY packages/*/package.json apps/*/package.json ./
+RUN pnpm install --frozen-lockfile
+
+<span class="k">FROM</span> deps <span class="k">AS</span> <span class="t">dev</span>            <span class="cm"># ← objetivo de compose.dev.yml</span>
+ENV NODE_ENV=development
+EXPOSE 3000
+CMD [<span class="s">"pnpm"</span>, <span class="s">"dev"</span>]
+
+<span class="k">FROM</span> deps <span class="k">AS</span> <span class="t">build</span>
+COPY . .
+RUN pnpm db:generate && pnpm build   <span class="cm"># salida standalone de Next</span>
+
+<span class="k">FROM</span> base <span class="k">AS</span> <span class="t">runner</span>         <span class="cm"># ← lo que corre en Coolify</span>
+ENV NODE_ENV=production
+RUN addgroup -S app && adduser -S app -G app
+COPY --from=build --chown=app:app /app/apps/web/.next/standalone ./
+COPY --from=build --chown=app:app /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=build --chown=app:app /app/packages/db/prisma ./prisma
+USER app
+EXPOSE 3000
+CMD [<span class="s">"sh"</span>, <span class="s">"-c"</span>, <span class="s">"pnpm db:deploy && node apps/web/server.js"</span>]</pre>
+  <p>La imagen final debe quedar <strong>por debajo de 250 MB</strong>. Se vigila en la integración continua: doce instancias en un nodo hacen que cada cien megabytes de más se paguen doce veces en disco y en tiempo de descarga durante una actualización.</p>
+
+  <h3>22.5 · El flujo de trabajo diario</h3>
+  <pre><span class="cm"># nada de esto requiere Node instalado en el anfitrión</span>
+make up            <span class="cm"># docker compose up -d, espera a que Postgres esté sano</span>
+make seed          <span class="cm"># migraciones + 2 000 productos + 6 meses de ventas</span>
+make sh            <span class="cm"># shell dentro del contenedor de la aplicación</span>
+make test          <span class="cm"># vitest en compose.test.yml, Postgres en tmpfs</span>
+make e2e           <span class="cm"># Playwright en su contenedor, contra la aplicación levantada</span>
+make migrate n=agregar_descuentos   <span class="cm"># prisma migrate dev dentro del contenedor</span>
+make logs · make down · make reset  <span class="cm"># reset borra volúmenes y vuelve a sembrar</span></pre>
+  <p>Un <code>Makefile</code> de treinta líneas envolviendo <code>docker compose</code>. Existe porque nadie recuerda <code>docker compose -f compose.yml -f compose.dev.yml exec app pnpm prisma migrate dev --name …</code>, y lo que no se recuerda se ejecuta mal o se ejecuta fuera del contenedor, que es peor.</p>
+
+  <div class="callout warn">
+    <span class="tag">El entorno concreto de este proyecto</span>
+    <p>El equipo diario es Windows y el anfitrión Docker es la VM de Ubuntu Server del laboratorio. La combinación que funciona es <strong>editar por VS Code con Remote-SSH contra la VM</strong>, con el repositorio clonado <em>dentro</em> del sistema de archivos de la VM. Lo que no hay que hacer es tener el código en una carpeta de Windows compartida hacia la VM: el rendimiento del montaje se desploma con un proyecto de Node y la recarga en caliente pasa de un segundo a quince. Alternativa igual de válida: Dev Containers apuntando al mismo anfitrión remoto.</p>
+  </div>
+
+  <h3>22.6 · Datos de siembra</h3>
+  <p>Un comando genera un comercio ficticio completo: 2 000 productos con fotos reales de dominio público, 40 categorías, seis meses de ventas con estacionalidad creíble, pedidos en todos los estados, arqueos con diferencias. Es lo que permite probar el rendimiento de verdad (§20) y hacer una demostración que no parezca un formulario vacío. Corre dentro del contenedor, contra la misma base que usará el código, y se construye en la fase 0, no al final.</p>
+  <p>El sembrado es <strong>determinista con semilla fija</strong>: la misma semilla produce el mismo catálogo, los mismos folios y las mismas cifras. Sin eso, una prueba de referencia de dinero (§23) no se puede escribir contra datos sembrados.</p>
+
+  <h3>22.7 · Integración y despliegue</h3>
+  <pre><span class="cm"># .github/workflows/main.yml — resumen</span>
+verificar:   docker compose -f compose.test.yml run --rm app pnpm verify
+             <span class="cm"># typecheck · lint · vitest · presupuesto de tamaño</span>
+e2e:         docker compose -f compose.test.yml up --abort-on-container-exit
+             <span class="cm"># los 6 recorridos de §23, incluido el de red caída</span>
+construir:   docker build --target runner → ghcr.io/dima/vitrina:{sha} y :{tag}
+             <span class="cm"># caché de capas entre ejecuciones; falla si la imagen supera 250 MB</span>
+desplegar:   webhook a Coolify → demostración (automático)
+             → producción por tandas (manual, con aprobación)</pre>
+  <p>La integración continua <strong>no instala nada</strong>: usa los mismos ficheros de compose que el desarrollador. Si las pruebas pasan en la máquina y fallan en la integración, es un problema real y no una diferencia de entorno, que es exactamente el punto de trabajar así.</p>
+  <p>Las migraciones de Prisma corren al arrancar el contenedor, en una transacción y con bloqueo de aviso para que dos réplicas no las apliquen a la vez. Toda migración debe ser compatible hacia atrás durante un ciclo (§4.4).</p>
+
+  <h3>22.8 · PWA</h3>
+  <table>
+    <tr><th>Superficie</th><th>Manifiesto</th><th>Trabajador de servicio</th></tr>
+    <tr><td>Catálogo</td><td>Instalable, pantalla mínima con navegador</td><td>Caché de recursos estáticos. Sin funcionamiento sin conexión</td></tr>
+    <tr><td>POS</td><td>Manifiesto propio en <code>/pos</code>, pantalla completa, orientación horizontal sugerida</td><td><strong>Completo:</strong> aplicación en caché, datos en IndexedDB, sincronización en segundo plano donde el navegador la soporte</td></tr>
+  </table>
+  <p>Dos manifiestos separados: quien usa la caja no quiere el catálogo en su pantalla de inicio, y quien mira el catálogo no debe poder instalar la caja.</p>
+</section>
+
+<section id="s23">
+  <h2><span class="num">SECCIÓN 23</span>Testing</h2>
+  <p class="lead">No se persigue un porcentaje de cobertura. Se protegen las cinco cosas cuya falla destruye la confianza del comercio: el dinero, las existencias, la sincronización, los permisos y el catálogo público.</p>
+
+  <table>
+    <tr><th>Nivel</th><th>Herramienta</th><th>Qué cubre</th></tr>
+    <tr><td>Unitarias de dominio</td><td>Vitest</td><td>Todo <code>packages/domain</code>: cálculo de precio efectivo, orden de descuentos, redondeo, proyección de existencias, construcción de una venta, validación de la cola. Funciones puras, milisegundos</td></tr>
+    <tr><td>Casos de referencia</td><td>Vitest</td><td>Tickets reales del comercio de demostración como archivos de oro: entrada JSON → totales esperados. Si alguien toca el redondeo, saltan con cifras que un humano reconoce</td></tr>
+    <tr><td>Integración</td><td>Vitest + Postgres efímero</td><td>Repositorios, idempotencia de la sincronización, disparadores de la vista materializada, transaccionalidad del importador</td></tr>
+    <tr><td>Extremo a extremo</td><td>Playwright</td><td>Los seis recorridos de abajo</td></tr>
+    <tr><td>Rendimiento</td><td>Lighthouse CI</td><td>Presupuesto de §20 contra el catálogo sembrado</td></tr>
+    <tr><td>Visual</td><td>Playwright · capturas</td><td>Los 8 presets de tema renderizados sobre el mismo catálogo. Un cambio en los tokens no debe romper cinco temas en silencio</td></tr>
+  </table>
+
+  <h3>23.1 · Los recorridos que sí o sí se prueban</h3>
+  <ol>
+    <li><strong>Comprar:</strong> entrar al catálogo → filtrar → ver producto → agregar dos → crear pedido → verificar folio, total y contenido del enlace de WhatsApp.</li>
+    <li><strong>Vender en caja:</strong> abrir turno → escanear (simulado por teclado) → aplicar descuento con PIN → cobrar en efectivo → verificar vuelto, movimiento de inventario y ticket.</li>
+    <li><strong>Vender sin conexión:</strong> el guion completo de §17.5, incluida la muerte del proceso a mitad de un cobro. <span class="pill err">bloqueante</span></li>
+    <li><strong>Reponer:</strong> escanear un código inexistente → crear producto → ingresar 12 unidades → verificar que aparece en el catálogo con existencia correcta.</li>
+    <li><strong>Cerrar caja:</strong> declarar el conteo → verificar el cálculo del esperado y de la diferencia → sesión inmutable.</li>
+    <li><strong>Personalizar:</strong> cambiar color y preset → verificar que el catálogo público cambia sin desplegar y que el contraste sigue cumpliendo AA.</li>
+  </ol>
+</section>
+
+<section id="s24">
+  <h2><span class="num">SECCIÓN 24</span>Reglas de codificación</h2>
+  <p class="lead">Se heredan íntegras las de Kraken §26 —mismo lenguaje, mismo equipo, misma cabeza— con cuatro adiciones propias de este producto.</p>
+
+  <h3>24.1 · Lo heredado</h3>
+  <table>
+    <tr><th>Elemento</th><th>Convención</th><th>Ejemplo</th></tr>
+    <tr><td>Archivos y directorios</td><td>kebab-case</td><td><code>apply-discount.service.ts</code></td></tr>
+    <tr><td>Componentes React</td><td>PascalCase, archivo en kebab</td><td><code>ProductCard</code> en <code>product-card.tsx</code></td></tr>
+    <tr><td>Server actions</td><td>infinitivo + <code>Action</code></td><td><code>createOrderAction</code></td></tr>
+    <tr><td>Esquemas zod</td><td>sufijo <code>Schema</code></td><td><code>const CreateOrderSchema = …</code></td></tr>
+    <tr><td>Tablas y columnas</td><td>snake_case vía <code>@@map</code></td><td><code>stock_movement.occurred_at</code></td></tr>
+    <tr><td>Modelos Prisma</td><td>PascalCase singular</td><td><code>StockMovement</code></td></tr>
+    <tr><td>Enumeraciones</td><td>UPPER_SNAKE validado con <code>z.enum</code></td><td><code>"PEDIDO_ENTREGADO"</code></td></tr>
+    <tr><td>Dinero</td><td>sufijo de moneda, siempre</td><td><code>unitPriceBob</code>, <code>totalBob</code></td></tr>
+    <tr><td>Fechas</td><td><code>At</code> para instantes, <code>On</code> para días</td><td><code>occurredAt</code>, <code>reportOn</code></td></tr>
+    <tr><td>Tamaño</td><td>400 líneas por archivo, 60 por función</td><td>Al superarlo se divide por responsabilidad</td></tr>
+    <tr><td>Idioma</td><td>Código e identificadores en inglés; interfaz, mensajes y documentación en español</td><td>Los términos sin traducción limpia se conservan: <code>folio</code>, <code>arqueo</code></td></tr>
+  </table>
+
+  <h3>24.2 · Las cuatro reglas propias de Vitrina</h3>
+  <div class="card">
+    <h4>1 · Nada de lógica de negocio fuera de <code>packages/domain</code></h4>
+    <p>Si un cálculo tiene que dar el mismo resultado en el servidor y en la tablet, vive ahí, es puro y está probado. Un descuento calculado dentro de un componente React es un error de compilación conceptual, aunque compile.</p>
+  </div>
+  <div class="card">
+    <h4>2 · Ninguna consulta de la superficie pública sin límite</h4>
+    <p>Toda lectura del catálogo lleva paginación y un tope máximo. Un cliente con 20 000 productos aparecerá, y el día que aparezca no se puede caer el nodo entero.</p>
+  </div>
+  <div class="card">
+    <h4>3 · Ningún componente cliente en la ruta del catálogo sin justificación escrita</h4>
+    <p><code>"use client"</code> en <code>(shop)</code> requiere un comentario de una línea explicando por qué. Es la barrera que hace cumplir el presupuesto de §20 en el momento de escribir, no en la revisión.</p>
+  </div>
+  <div class="card">
+    <h4>4 · Nada se borra, todo se archiva</h4>
+    <p>Productos, ventas, pedidos y operadores tienen <code>archivedAt</code>, no <code>DELETE</code>. Una venta sincronizada tarde debe poder apuntar a un producto que el dueño «borró» ayer (§17.5).</p>
+  </div>
+
+  <h3>24.3 · Lista de revisión antes de pedir revisión humana</h3>
+  <ul>
+    <li>¿El cálculo de dinero está en <code>domain</code> y tiene su caso de referencia?</li>
+    <li>¿La consulta tiene límite e índice?</li>
+    <li>¿La acción valida con zod y comprueba el rol?</li>
+    <li>¿Se agregó JavaScript a la ruta del catálogo? ¿Cuánto?</li>
+    <li>¿Funciona con el tema <em>Nocturno</em> y con el preset <em>Compacta</em>?</li>
+    <li>¿Se probó con el pulgar en una pantalla de 7 pulgadas?</li>
+    <li>¿Qué pasa si esto ocurre sin conexión?</li>
+  </ul>
+</section>
+
+<section id="s25">
+  <h2><span class="num">SECCIÓN 25</span>Roadmap</h2>
+  <p class="lead">Ocho fases, aproximadamente doce semanas, un desarrollador con Claude Code. El orden no es negociable en un punto: <strong>el POS en línea funciona antes de intentar el modo sin conexión.</strong></p>
+
+  <div class="phase">
+    <header><span class="fnum">FASE 0</span><h4>Andamiaje</h4><span class="dur">1 semana</span></header>
+    <div class="body">
+      <table>
+        <tr><td><strong>Entorno en contenedores completo (§22)</strong>: Dockerfile multietapa, los tres ficheros de compose y el Makefile. Antes que cualquier código de producto</td></tr>
+        <tr><td>Repositorio, monorepo con pnpm, Next.js 15, Tailwind, Prisma, Better Auth</td></tr>
+        <tr><td>Esquema inicial completo de §5 y apéndice A, con migraciones</td></tr>
+        <tr><td><strong>Generador de datos de siembra</strong> con 2 000 productos y seis meses de ventas</td></tr>
+        <tr><td>Coolify: instancia de demostración desplegándose desde la integración continua</td></tr>
+        <tr><td><code>packages/theme</code> con la derivación OKLCH y dos presets</td></tr>
+      </table>
+      <p><strong>Se termina cuando:</strong> <code>make up &amp;&amp; make seed</code> levanta el entorno completo desde cero en una máquina limpia, y hay una URL de demostración con 2 000 productos sembrados desplegándose sola desde la integración continua.</p>
+    </div>
+  </div>
+
+  <div class="phase">
+    <header><span class="fnum">FASE 1</span><h4>Catálogo público</h4><span class="dur">1,5 semanas</span></header>
+    <div class="body">
+      <table>
+        <tr><td>Portada, catálogo, categorías, ficha de producto, búsqueda y filtros</td></tr>
+        <tr><td>Separación estático / dinámico de precio y existencias (§7.1)</td></tr>
+        <tr><td>Los 4 presets de tarjeta y la grilla responsiva</td></tr>
+        <tr><td>Datos estructurados, mapa del sitio, imagen para compartir</td></tr>
+        <tr><td>Presupuesto de rendimiento verificándose en la integración</td></tr>
+      </table>
+      <p><strong>Se termina cuando:</strong> Lighthouse móvil da verde sobre el catálogo sembrado.</p>
+    </div>
+  </div>
+
+  <div class="phase">
+    <header><span class="fnum">FASE 2</span><h4>Panel, productos e imágenes</h4><span class="dur">1,5 semanas</span></header>
+    <div class="body">
+      <table>
+        <tr><td>Better Auth con Google, roles, siembra del propietario</td></tr>
+        <tr><td>ABM de productos, variantes, categorías, descuentos</td></tr>
+        <tr><td>Camino completo de la imagen (§12): recorte, reducción, subida, variantes</td></tr>
+        <tr><td>Importador CSV con vista previa, validación y deshacer</td></tr>
+      </table>
+      <p><strong>Se termina cuando:</strong> un no-desarrollador carga 50 productos con fotos desde una tablet sin ayuda.</p>
+    </div>
+  </div>
+
+  <div class="phase">
+    <header><span class="fnum">FASE 3</span><h4>Carrito, pedido y bandeja</h4><span class="dur">1 semana</span></header>
+    <div class="body">
+      <table>
+        <tr><td>Carrito local, creación de pedido con folio, enlace <code>wa.me</code></td></tr>
+        <tr><td>Página pública de seguimiento del pedido</td></tr>
+        <tr><td>Bandeja de pedidos con estados, en panel y en POS</td></tr>
+        <tr><td>Horarios, mínimo de pedido, varios números de WhatsApp</td></tr>
+      </table>
+      <p><strong>Se termina cuando:</strong> el recorrido 1 de §23.1 pasa en verde. <strong>Aquí ya hay algo vendible</strong> como catálogo, aunque incompleto.</p>
+    </div>
+  </div>
+
+  <div class="phase">
+    <header><span class="fnum">FASE 4</span><h4>Inventario y escaneo</h4><span class="dur">1,5 semanas</span></header>
+    <div class="body">
+      <table>
+        <tr><td>Libro de movimientos, vista materializada, alertas</td></tr>
+        <tr><td>Ingresos, ajustes, mermas, toma de inventario</td></tr>
+        <tr><td>Escáner: <code>BarcodeDetector</code> + respaldo zxing + lector HID + modo continuo</td></tr>
+        <tr><td>Generación e impresión de etiquetas</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="phase">
+    <header><span class="fnum">FASE 5</span><h4>POS en línea</h4><span class="dur">1,5 semanas</span></header>
+    <div class="body">
+      <table>
+        <tr><td>Pantalla de venta, cobro, vuelto, comprobante</td></tr>
+        <tr><td>Turnos, arqueo, movimientos de efectivo</td></tr>
+        <tr><td>Dispositivos, operadores, PIN, autorizaciones</td></tr>
+        <tr><td>Conversión de pedido en venta por folio</td></tr>
+      </table>
+      <p><strong>Se termina cuando:</strong> se puede operar un día entero de mostrador con red estable.</p>
+    </div>
+  </div>
+
+  <div class="phase">
+    <header><span class="fnum">FASE 6</span><h4>POS sin conexión</h4><span class="dur">2 semanas · riesgo alto</span></header>
+    <div class="body">
+      <table>
+        <tr><td>Dexie, paquete inicial, caducidad, arranque desde caché</td></tr>
+        <tr><td>Cola de comandos, idempotencia, orden por dispositivo</td></tr>
+        <tr><td><code>/api/sync/batch</code>, cuarentena, resolución de conflictos</td></tr>
+        <tr><td>Indicadores de estado y panel de conflictos</td></tr>
+        <tr><td>El guion de Playwright de §17.5 en verde</td></tr>
+      </table>
+      <p><strong>No se mezcla con otras tareas.</strong> Si se desborda, se desborda sola y el resto del plan no se contamina.</p>
+    </div>
+  </div>
+
+  <div class="phase">
+    <header><span class="fnum">FASE 7</span><h4>Contenido y blog</h4><span class="dur">1 semana</span></header>
+    <div class="body">
+      <table>
+        <tr><td>Motor de bloques, los 10 bloques de §11.1, editor con arrastre</td></tr>
+        <tr><td>Páginas, blog, borradores con enlace de vista previa</td></tr>
+        <tr><td>Landing comercial con la biblioteca de animación diferida</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="phase">
+    <header><span class="fnum">FASE 8</span><h4>Personalización, tablero y endurecimiento</h4><span class="dur">1,5 semanas</span></header>
+    <div class="body">
+      <table>
+        <tr><td>Los 8 presets, editor de apariencia con vista previa en vivo</td></tr>
+        <tr><td>Tablero y los 7 reportes, con tablas de agregado</td></tr>
+        <tr><td>PWA de ambas superficies, respaldos, prueba de restauración</td></tr>
+        <tr><td>Manual del cliente, guion de demostración, plantilla de alta</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <h3>25.1 · Ruta crítica</h3>
+  <div class="formula">
+    Fase 0 → Fase 1 → Fase 2 → <b>Fase 4</b> → <b>Fase 5</b> → <b>Fase 6</b><br>
+    <span class="cm">Las fases 3, 7 y 8 pueden reordenarse o comprimirse sin bloquear nada.</span><br>
+    <span class="cm">La 6 depende de que la 5 esté estable: sincronizar una caja que todavía cambia de forma es trabajo perdido.</span>
+  </div>
+  <div class="callout warn">
+    <span class="tag">Punto de venta anticipada</span>
+    <p>Al terminar la fase 3 —semana 5 aproximadamente— ya existe un catálogo con pedidos por WhatsApp mejor que el de la competencia. Se puede <strong>empezar a vender ahí</strong>, con el POS anunciado como incluido en la actualización. Cobrar antes de terminar financia el resto y, más importante, pone clientes reales a usar el catálogo mientras se construye la caja.</p>
+  </div>
+</section>
+
+<section id="s26">
+  <h2><span class="num">SECCIÓN 26</span>Trabajar con Claude</h2>
+
+  <h3>26.1 · Criterio de asignación</h3>
+  <table>
+    <tr><th>Tipo de tarea</th><th>Modelo</th><th>Por qué</th></tr>
+    <tr><td>Motor de dinero, sincronización sin conexión, resolución de conflictos, derivación de tokens</td><td><span class="pill opus">Opus</span></td><td>Son las piezas donde un error sutil cuesta dinero real y se descubre tarde</td></tr>
+    <tr><td>Componentes, formularios, ABM, bloques del CMS, reportes, estilos</td><td><span class="pill sonnet">Sonnet</span></td><td>Volumen alto, patrón claro, verificable de un vistazo</td></tr>
+    <tr><td>Migraciones, semillas, guiones de despliegue</td><td><span class="pill sonnet">Sonnet</span></td><td>Con revisión humana obligatoria antes de correr contra datos de un cliente</td></tr>
+  </table>
+
+  <h3>26.2 · Plantilla de prompt de tarea</h3>
+  <pre><span class="k">Contexto:</span>   Vitrina · §{sección} del plan maestro. Lee docs/CLAUDE.md antes de escribir.
+<span class="k">Objetivo:</span>   {una frase, resultado observable}
+<span class="k">Alcance:</span>    Tocar solo {rutas}. No modificar el esquema sin pedirlo explícitamente.
+<span class="k">Reglas:</span>     §24 de este plan. Dinero en centavos. Sin lógica de negocio fuera de domain.
+<span class="k">Pruebas:</span>    {casos concretos, con cifras esperadas cuando haya dinero}
+<span class="k">Entregable:</span> Diff + cómo lo probaste + qué NO cubriste.</pre>
+
+  <h3>26.3 · Higiene con código generado</h3>
+  <ul>
+    <li>Nada relacionado con dinero, existencias o sincronización se acepta sin leerlo línea por línea. El resto se revisa por resultado.</li>
+    <li>Toda función de <code>domain</code> llega con su prueba en el mismo cambio. Sin prueba, no entra.</li>
+    <li>Si Claude propone una biblioteca nueva, se justifica contra el presupuesto de §20 antes de instalarla.</li>
+    <li>Los cambios de esquema se piden explícitamente y se revisan en la migración, nunca solo en el <code>schema.prisma</code>.</li>
+    <li>Cuando una respuesta no encaja con este documento, gana el documento; y si el documento está equivocado, se corrige el documento <strong>antes</strong> de escribir el código.</li>
+  </ul>
+</section>
+
+<section id="s27">
+  <h2><span class="num">SECCIÓN 27</span>Empaquetado comercial</h2>
+  <p class="lead">El plan técnico no sirve si el paquete no se puede vender ni operar. Esta sección es para la propuesta, no para el código.</p>
+
+  <h3>27.1 · Qué incluye el paquete</h3>
+  <table>
+    <tr><th>Componente</th><th>Detalle</th></tr>
+    <tr><td>Instancia desplegada</td><td>Contenedores en el nodo de DIMA, con dominio propio del cliente o subdominio</td></tr>
+    <tr><td>Puesta a punto</td><td>Logo, colores, tema, datos de contacto, horarios, redes, textos iniciales</td></tr>
+    <tr><td>Carga inicial asistida</td><td>Hasta N productos con fotos, por acuerdo. Por encima, se cotiza</td></tr>
+    <tr><td>Capacitación</td><td>Una sesión de 90 minutos: dueño (panel y reportes) y cajeros (POS y escáner), por separado</td></tr>
+    <tr><td>Manual</td><td>PDF corto y específico del comercio, con sus propias pantallas, no un genérico</td></tr>
+    <tr><td>Soporte y actualizaciones</td><td>Cuota mensual: alojamiento, respaldos, actualizaciones y soporte con tiempo de respuesta acordado</td></tr>
+    <tr><td>Salida</td><td>Si el cliente se va, se le entrega el volcado de su base y sus imágenes. Se dice en la propuesta: <strong>vende confianza y no cuesta nada</strong></td></tr>
+  </table>
+
+  <h3>27.2 · El guion de la demostración</h3>
+  <ol>
+    <li><strong>Su marca en 60 segundos.</strong> Se sube el logo del prospecto en vivo y el catálogo de demostración adopta sus colores. Es el momento que cierra ventas.</li>
+    <li><strong>El pedido.</strong> Se arma un carrito desde el celular del prospecto y le llega el WhatsApp a su propio teléfono.</li>
+    <li><strong>La caja.</strong> Se escanea un producto real que traiga y se cobra.</li>
+    <li><strong>El modo avión.</strong> Se corta la red delante suyo, se cobran tres ventas, se reconecta y aparecen en el reporte. <strong>Este es el argumento.</strong></li>
+    <li><strong>El número.</strong> Se abre el tablero y se muestran las ventas del día.</li>
+  </ol>
+  <p>Todo con la instancia de demostración cargada de datos creíbles (§22.2). El guion se ensaya: la diferencia entre una demostración de cinco minutos que funciona y una de veinte que titubea es todo el margen del paquete.</p>
+
+  <h3>27.3 · Costos que hay que tener presentes al fijar precio</h3>
+  <table>
+    <tr><th>Concepto</th><th>Naturaleza</th></tr>
+    <tr><td>VPS y almacenamiento</td><td>Fijo, se reparte entre clientes: es lo que mejora con cada venta</td></tr>
+    <tr><td>Dominio y correo del cliente</td><td>Variable, se traslada</td></tr>
+    <tr><td>Alta y puesta a punto</td><td>Una vez, alrededor de una jornada por cliente si el proceso del apéndice D se respeta</td></tr>
+    <tr><td>Carga de productos y fotografía</td><td>Variable, facturable aparte, con margen alto</td></tr>
+    <tr><td><strong>Soporte</strong></td><td><strong>Crece linealmente con los clientes y es el que mata el negocio si no se acota.</strong> Un canal, horario definido, y todo lo que se repita tres veces se convierte en una mejora del producto o en un video</td></tr>
+  </table>
+</section>
+
+<section id="s28">
+  <h2><span class="num">SECCIÓN 28</span>Riesgos y decisiones abiertas</h2>
+
+  <h3>28.1 · Riesgos</h3>
+  <table>
+    <tr><th>Riesgo</th><th>Nivel</th><th>Mitigación</th></tr>
+    <tr><td>La sincronización sin conexión resulta más costosa de lo estimado</td><td><span class="pill err">Alto</span></td><td>Dos semanas aisladas, prueba automatizada como criterio de terminación, y salida de emergencia: entregar el POS en línea con cola de reintentos simple y postergar el modo completo a la v1.1</td></tr>
+    <tr><td>Fotos malas del cliente arruinan el producto «sumamente visual»</td><td><span class="pill err">Alto</span></td><td>Recorte obligatorio, detección de problemas, guía al subir, y servicio de fotografía como venta adicional</td></tr>
+    <tr><td>El escaneo por cámara decepciona en la caja</td><td><span class="pill warn">Medio</span></td><td>Lector HID incluido en la propuesta y expectativas fijadas en la venta (§15.1)</td></tr>
+    <tr><td>El soporte crece más rápido que los ingresos</td><td><span class="pill warn">Medio</span></td><td>Manual específico, capacitación separada por rol, y la regla de convertir en producto todo lo que se pregunte tres veces</td></tr>
+    <tr><td>El nodo único es punto de falla para todos los clientes</td><td><span class="pill warn">Medio</span></td><td>Respaldos verificados con restauración mensual, compromiso contractual explícito, y plan de segundo nodo al superar diez clientes</td></tr>
+    <tr><td>El presupuesto de rendimiento se erosiona fase a fase</td><td><span class="pill warn">Medio</span></td><td>Verificación automática que falla la integración, no una recomendación</td></tr>
+    <tr><td>Un cliente pide facturación fiscal como condición de compra</td><td><span class="pill warn">Medio</span></td><td>Se dice que no en la v1 y se cotiza como proyecto aparte. Improvisar SIAT dentro del cronograma lo destruye</td></tr>
+    <tr><td>La imagen crece y las instancias se vuelven pesadas</td><td><span class="pill neutral">Bajo</span></td><td><code>standalone</code>, imagen base delgada, límite vigilado</td></tr>
+  </table>
+
+  <h3>28.2 · Decisiones resueltas en este documento</h3>
+  <ul>
+    <li>Next.js, no Astro + Svelte (ADR-01).</li>
+    <li>Una instancia por cliente sobre Coolify, no SaaS multi-inquilino (ADR-02).</li>
+    <li>Postgres compartido con base por cliente, no un contenedor por cliente (ADR-03).</li>
+    <li>PIN local para la caja, OAuth solo para el panel (ADR-04).</li>
+    <li>Existencias derivadas de un libro de movimientos (ADR-05).</li>
+    <li><code>wa.me</code> con pedido persistido, no Cloud API (ADR-06).</li>
+    <li>La venta cobrada nunca se rechaza (§1.2, principio 3).</li>
+    <li>Sin facturación fiscal, sin pagos en línea, sin multi-sucursal en la v1 (§1.3).</li>
+    <li>Bento en portada y contenido, grilla uniforme en el catálogo (§8.1).</li>
+    <li>Personalización por presets, sin CSS libre (§10.3).</li>
+  </ul>
+
+  <h3>28.3 · Decisiones abiertas</h3>
+  <table>
+    <tr><th>#</th><th>Decisión</th><th>Quién y cuándo</th></tr>
+    <tr><td>DA-01</td><td><strong>Impresión térmica.</strong> Web Bluetooth con ESC/POS solo existe en Chrome sobre Android: quedaría fuera todo iPad. Alternativas: exigir Android en la propuesta, usar impresoras de red por IP, o quedarse con el comprobante digital</td><td>Adhemar, antes de la fase 5. Depende de qué hardware tengan los primeros clientes</td></tr>
+    <tr><td>DA-02</td><td><strong>Nombre comercial del paquete.</strong> «Vitrina» es el nombre de trabajo de este documento</td><td>Antes de la landing (fase 7)</td></tr>
+    <tr><td>DA-03</td><td><strong>MinIO propio o Cloudflare R2.</strong> R2 saca el tráfico de imágenes del VPS y suele entrar en el plan gratuito; MinIO mantiene todo en casa</td><td>Antes de la fase 2</td></tr>
+    <tr><td>DA-04</td><td><strong>Multi-sucursal.</strong> ¿Algún cliente del primer año tiene dos locales? Cambia el modelo de existencias y conviene saberlo antes de la fase 4, aunque no se implemente</td><td>Comercial, antes de la fase 4</td></tr>
+    <tr><td>DA-05</td><td><strong>Precio y estructura de la cuota.</strong> Alta más mensualidad, y qué incluye cada tramo</td><td>Gerencia, antes del primer cierre</td></tr>
+    <tr><td>DA-06</td><td><strong>Segundo precio en dólares.</strong> Con el régimen cambiario flexible vigente desde junio de 2026, algunos rubros cotizan en dólares. Si hace falta, se decide el origen del tipo de cambio como en Kraken §11.3</td><td>Comercial, v1.1</td></tr>
+    <tr><td>DA-07</td><td><strong>Quitar fondo de las fotos en el navegador.</strong> Mejora enormemente el aspecto del catálogo; pesa unos 5 MB de modelo</td><td>Fase 8, según tiempo</td></tr>
+  </table>
+</section>
+
+<section id="a1">
+  <h2><span class="num">APÉNDICE A</span>Esquema de datos</h2>
+  <pre><span class="cm">// packages/db/schema.prisma — resumen de los modelos centrales</span>
+
+<span class="k">model</span> <span class="t">SiteSettings</span> {           <span class="cm">// fila única</span>
+  id String @id @default(<span class="s">"singleton"</span>)
+  name  String;  logoPath String?;  currency String @default(<span class="s">"BOB"</span>)
+  themePreset String;  brandColor String;  cardPreset String;  density String
+  whatsappNumbers Json;  socials Json;  address Json?;  hours Json
+  stockDisplay StockDisplay @default(UMBRAL);  lowStockThreshold Int @default(5)
+  roundingMode RoundingMode @default(NONE);  minOrderBob Int?
+  orderMessageTemplate String?
+}
+
+<span class="k">model</span> <span class="t">Product</span> {
+  id String @id @default(cuid());  slug String @unique
+  name String;  description String?;  isActive Boolean @default(true)
+  trackStock Boolean @default(true);  archivedAt DateTime?
+  categories Category[];  variants Variant[];  images ProductImage[]
+  @@index([isActive, archivedAt])
+}
+
+<span class="k">model</span> <span class="t">Variant</span> {
+  id String @id @default(cuid());  productId String
+  sku String?;  barcode String?;  attributes Json?          <span class="cm">// { talla: "M", color: "Azul" }</span>
+  basePriceBob Int                                          <span class="cm">// centavos, siempre</span>
+  costBob Int?                                              <span class="cm">// solo visible al propietario</span>
+  minStock Int @default(0);  archivedAt DateTime?
+  movements StockMovement[]
+  @@unique([barcode])
+}
+
+<span class="k">model</span> <span class="t">StockMovement</span> {
+  id String @id @default(cuid());  variantId String
+  kind MovementKind;  qty Int                               <span class="cm">// negativo para salidas</span>
+  occurredAt DateTime;  sourceType String;  sourceId String?
+  note String?;  operatorId String?
+  @@index([variantId, occurredAt])
+}
+
+<span class="k">model</span> <span class="t">Order</span> {
+  id String @id @default(cuid());  folio String @unique      <span class="cm">// P-000184</span>
+  channel OrderChannel @default(WHATSAPP);  status OrderStatus @default(NUEVO)
+  customerPhone String?;  customerName String?;  note String?
+  subtotalBob Int;  discountBob Int;  totalBob Int
+  createdAt DateTime @default(now());  saleId String?        <span class="cm">// si se cobró en caja</span>
+  items OrderItem[]
+  @@index([status, createdAt])
+}
+
+<span class="k">model</span> <span class="t">Sale</span> {
+  id String @id @default(cuid());  folio String @unique      <span class="cm">// V-004512</span>
+  clientSaleId String @unique                                <span class="cm">// UUID v7 del dispositivo</span>
+  deviceId String;  seq Int;  operatorId String;  cashSessionId String
+  subtotalBob Int;  discountBob Int;  roundingBob Int;  totalBob Int
+  occurredAtDevice DateTime;  receivedAtServer DateTime @default(now())
+  priceSnapshotAt DateTime;  authorizedByOperatorId String?
+  voidedAt DateTime?;  voidReason String?
+  items SaleItem[];  payments Payment[]
+  @@unique([deviceId, seq])
+  @@index([occurredAtDevice])
+}
+
+<span class="k">model</span> <span class="t">CashSession</span> {
+  id String @id @default(cuid());  operatorId String;  deviceId String
+  openedAt DateTime;  closedAt DateTime?
+  openingBob Int;  countedBob Int?;  expectedBob Int?;  differenceBob Int?
+  note String?;  sales Sale[];  cashMovements CashMovement[]
+}
+
+<span class="k">model</span> <span class="t">Device</span> {
+  id String @id @default(cuid());  name String;  token String @unique
+  lastSyncAt DateTime?;  revokedAt DateTime?;  appVersion String?
+}
+
+<span class="k">model</span> <span class="t">Operator</span> {
+  id String @id @default(cuid());  name String;  pinHash String
+  role Role;  userId String?;  archivedAt DateTime?
+}
+
+<span class="k">model</span> <span class="t">Page</span>      { id String @id; slug String @unique; title String; status ContentStatus; blocks PageBlock[] }
+<span class="k">model</span> <span class="t">PageBlock</span> { id String @id; pageId String?; postId String?; type BlockType; position Int; data Json }
+<span class="k">model</span> <span class="t">Post</span>      { id String @id; slug String @unique; title String; excerpt String?; coverPath String?; publishedAt DateTime?; blocks PageBlock[] }
+
+<span class="k">enum</span> <span class="t">MovementKind</span> { INGRESO VENTA PEDIDO_ENTREGADO DEVOLUCION MERMA AJUSTE CARGA_INICIAL }
+<span class="k">enum</span> <span class="t">OrderStatus</span>  { NUEVO CONFIRMADO PREPARADO ENTREGADO CANCELADO }
+<span class="k">enum</span> <span class="t">Role</span>         { PROPIETARIO ADMINISTRADOR EDITOR CAJERO ALMACEN }
+<span class="k">enum</span> <span class="t">StockDisplay</span> { EXACTO UMBRAL OCULTO }</pre>
+</section>
+
+<section id="a2">
+  <h2><span class="num">APÉNDICE B</span>Casos canónicos</h2>
+  <p class="lead">Tres casos con cifras concretas. Son las pruebas de referencia de §23 y la fuente de verdad cuando una implementación y este documento no coinciden.</p>
+
+  <h3>CANON-01 · Dinero y descuentos</h3>
+  <div class="formula">
+    <span class="lbl">Entrada</span>
+    Sitio: moneda BOB, redondeo al 0,10 activado<br>
+    Línea 1: Taladro · base Bs 310,00 · descuento de categoría 10% · cantidad 2<br>
+    Línea 2: Broca 6mm · base Bs 45,00 · descuento de producto Bs 5,00 · cantidad 1<br>
+    Descuento global de caja: 3%<br>
+    <br>
+    <span class="lbl" style="margin-top:10px">Cálculo</span>
+    L1: 31000 − 3100 = 27900 → × 2 = <b>55800</b><br>
+    L2: 4500 − 500 = 4000 → × 1 = <b>4000</b><br>
+    subtotal = 59800<br>
+    descuento global = redondear(59800 × 0,03) = 1794<br>
+    totalPrevio = 58006<br>
+    total = redondeoA10(58006) = <b>58010</b>  →  <b>Bs 580,10</b><br>
+    <br>
+    <span class="cm">La diferencia de redondeo (+4 centavos) se guarda en roundingBob y aparece</span><br>
+    <span class="cm">en el arqueo. No se reparte entre las líneas: eso rompería la trazabilidad.</span>
+  </div>
+
+  <h3>CANON-02 · Sincronización sin conexión</h3>
+  <table>
+    <tr><th>t</th><th>Suceso</th><th>Estado resultante</th></tr>
+    <tr><td>10:00</td><td>Tablet sincroniza. Broca 6mm: existencia 4</td><td>Paquete al día</td></tr>
+    <tr><td>10:12</td><td>Cae internet</td><td>Indicador ámbar, se sigue vendiendo</td></tr>
+    <tr><td>10:20</td><td>Venta A: 3 brocas · <code>seq</code> 41</td><td>Cola: 1 · existencia local 1</td></tr>
+    <tr><td>10:31</td><td>Venta B: 2 brocas · <code>seq</code> 42</td><td>Cola: 2 · existencia local −1, <strong>se permite</strong></td></tr>
+    <tr><td>10:44</td><td>Alguien vende 1 broca desde el panel con el celular del dueño (con red)</td><td>Servidor: existencia 3</td></tr>
+    <tr><td>11:02</td><td>Vuelve internet. Se envía el lote [41, 42]</td><td>Servidor inserta ambas por <code>clientSaleId</code></td></tr>
+    <tr><td>11:02</td><td>La red se corta al recibir el acuse; la tablet reenvía [41, 42]</td><td><strong>El índice único descarta los duplicados.</strong> Se responde con los mismos acuses</td></tr>
+    <tr><td>11:03</td><td>Servidor proyecta: 4 − 3 − 2 − 1 = <b>−2</b></td><td>Alerta de existencia negativa en el panel, con las tres ventas listadas</td></tr>
+    <tr><td>11:10</td><td>El dueño cuenta: hay 0 físicas. Genera <code>AJUSTE</code> +2 con nota</td><td>Existencia 0, historia completa y explicada</td></tr>
+  </table>
+  <p>Lo que este caso demuestra: <strong>ninguna venta se perdió, ninguna se duplicó y la diferencia quedó explicada por asientos</strong>, no por un número corregido a mano.</p>
+
+  <h3>CANON-03 · Arqueo con diferencia</h3>
+  <div class="formula">
+    <span class="lbl">Turno de María · 08:00 a 16:00</span>
+    fondo de apertura                    Bs   200,00<br>
+    ventas en efectivo (31)              Bs 3 480,50<br>
+    ventas con QR (12)                   Bs 1 240,00   <span class="cm">← no está en el cajón</span><br>
+    ingreso de efectivo (cambio)         Bs   100,00<br>
+    retiro a caja fuerte                 Bs −2 000,00<br>
+    gasto: agua para el local            Bs    −35,00<br>
+    ────────────────────────────────────────────────<br>
+    esperado en caja                     Bs 1 745,50<br>
+    contado declarado por María          Bs 1 730,00<br>
+    <b>diferencia                           Bs   −15,50</b>  <span class="cm">← supera el umbral de 10, pide nota</span>
+  </div>
+  <p>María declara el conteo <strong>antes</strong> de ver el esperado. La sesión se cierra con la nota, queda inmutable y aparece en el reporte de arqueos con la diferencia destacada. Se cierra igual: bloquear el cierre por una diferencia solo consigue que el próximo arqueo se falsee.</p>
+</section>
+
+<section id="a3">
+  <h2><span class="num">APÉNDICE C</span>CLAUDE.md</h2>
+  <pre><span class="cm"># Vitrina — contexto permanente para Claude Code</span>
+
+<span class="k">## Qué es esto</span>
+Catálogo en línea + punto de venta + inventario para comercios pequeños en Bolivia.
+Se vende empaquetado: una instancia por cliente, contenedores sobre Coolify.
+El plan maestro está en docs/plan-maestro.html y manda sobre cualquier otra cosa.
+
+<span class="k">## Reglas que no se negocian</span>
+1. Dinero SIEMPRE en centavos enteros, con sufijo de moneda: totalBob, unitPriceBob.
+2. Lógica de negocio SOLO en packages/domain. Pura, sin Prisma, sin React, sin reloj.
+3. Las existencias se derivan de stock_movement. Jamás una columna stock mutable.
+4. Nada se borra: archivedAt. Una venta sincronizada tarde puede apuntar a algo "borrado".
+5. La venta cobrada nunca se rechaza. Existencia negativa es una alerta, no un error.
+6. "use client" en app/(shop) exige un comentario justificándolo. El catálogo tiene
+   presupuesto: menos de 120 KB de JS comprimido, verificado en CI.
+7. Framer Motion y las bibliotecas de animación SOLO en la landing, con next/dynamic.
+8. El código está en inglés; la interfaz, los mensajes y los docs, en español.
+   Términos sin traducción limpia se conservan: folio, arqueo.
+9. Todo esquema de entrada se valida con zod en el límite. Toda action comprueba el rol.
+10. Máximo 400 líneas por archivo, 60 por función.
+
+<span class="k">## Antes de escribir</span>
+- ¿Esto tiene que funcionar sin conexión? Si sí, va en domain y se prueba en ambos lados.
+- ¿Agrega JS al catálogo? Decir cuánto.
+- ¿Toca dinero, existencias o sincronización? Trae su prueba en el mismo cambio.
+
+<span class="k">## Estructura</span>
+apps/web/app/(shop)   público    · SSR estático, presupuesto estricto
+apps/web/app/(admin)  panel      · cliente, sin obsesión por el peso
+apps/web/app/(pos)    caja       · local primero, Dexie, cola de sincronización
+packages/domain       lógica pura compartida
+packages/db           Prisma
+packages/theme        tokens OKLCH y presets
+
+<span class="k">## Comandos — TODO corre en contenedores (§22). Nunca sugieras instalar Node,</span>
+<span class="k">## Postgres o pnpm en el anfitrión, ni ejecutar pnpm fuera del contenedor.</span>
+make up · make seed · make sh · make test · make e2e · make logs · make down · make reset
+make migrate n={nombre}          # prisma migrate dev dentro del contenedor
+Dentro del contenedor: pnpm dev · pnpm test · pnpm db:seed --products=2000 --seed=42</pre>
+</section>
+
+<section id="a4">
+  <h2><span class="num">APÉNDICE D</span>Alta de un cliente</h2>
+  <p class="lead">El objetivo es que esto tome menos de una jornada y que lo pueda ejecutar alguien que no escribió el código. Si toma más, hay algo que debería estar automatizado y no lo está.</p>
+
+  <table>
+    <tr><th>#</th><th>Paso</th><th>Responsable</th><th>Tiempo</th></tr>
+    <tr><td>1</td><td>Crear base y rol en el Postgres compartido: <code>vit_{slug}</code></td><td>Técnico</td><td>5 min</td></tr>
+    <tr><td>2</td><td>Crear bucket y política en el almacenamiento</td><td>Técnico</td><td>5 min</td></tr>
+    <tr><td>3</td><td>Nueva aplicación en Coolify desde la plantilla, con las variables de §4.3</td><td>Técnico</td><td>10 min</td></tr>
+    <tr><td>4</td><td>Apuntar el dominio y verificar el certificado</td><td>Técnico</td><td>15 min + propagación</td></tr>
+    <tr><td>5</td><td>Primer arranque: migraciones y siembra del propietario con <code>OWNER_EMAIL</code></td><td>Automático</td><td>2 min</td></tr>
+    <tr><td>6</td><td><strong>Verificar aislamiento</strong>: el rol del cliente no puede conectarse a otra base</td><td>Técnico</td><td>5 min</td></tr>
+    <tr><td>7</td><td>Cargar logo, color, tema, contactos, horarios y redes</td><td>Implementador</td><td>45 min</td></tr>
+    <tr><td>8</td><td>Cargar productos: CSV o carga asistida</td><td>Implementador</td><td>Variable</td></tr>
+    <tr><td>9</td><td>Registrar dispositivos de caja y dar de alta operadores con PIN</td><td>Implementador</td><td>20 min</td></tr>
+    <tr><td>10</td><td>Prueba de humo: crear un pedido, cobrarlo, cortar la red y vender, reconectar</td><td>Implementador</td><td>15 min</td></tr>
+    <tr><td>11</td><td>Verificar que el respaldo nocturno incluye la base nueva</td><td>Técnico</td><td>5 min</td></tr>
+    <tr><td>12</td><td>Capacitación separada: dueño y cajeros</td><td>Implementador</td><td>90 min</td></tr>
+    <tr><td>13</td><td>Entregar el manual con las pantallas del propio comercio</td><td>Implementador</td><td>15 min</td></tr>
+  </table>
+  <div class="callout ok">
+    <span class="tag">Regla de operación</span>
+    <p>El paso 10 no es opcional ni se salta por prisa. Es la única verificación de que el diferenciador del producto funciona <strong>en esa instancia</strong>, y descubrirlo roto tres semanas después, con ventas perdidas de por medio, cuesta el cliente y la referencia.</p>
+  </div>
+</section>
+
+<section id="a5">
+  <h2><span class="num">APÉNDICE E</span>Glosario</h2>
+  <table>
+    <tr><td><strong>Arqueo</strong></td><td>Conteo del efectivo al cerrar un turno, contra lo que el sistema esperaba. Se declara antes de ver el esperado (§16.2)</td></tr>
+    <tr><td><strong>Bento</strong></td><td>Disposición en retícula con piezas de tamaños mixtos. En Vitrina vive en la portada y el contenido, nunca en la grilla del catálogo (§8.1)</td></tr>
+    <tr><td><strong>Caducidad del paquete</strong></td><td>Límite de horas que una tablet puede operar sin sincronizar antes de bloquear ventas nuevas (§17.2, regla 6)</td></tr>
+    <tr><td><strong>clientSaleId</strong></td><td>UUID v7 generado en el dispositivo. Clave de idempotencia de la sincronización</td></tr>
+    <tr><td><strong>Existencia de referencia</strong></td><td>La cantidad que la tablet cree tener. Informativa: nunca bloquea una venta</td></tr>
+    <tr><td><strong>Folio</strong></td><td>Numeración correlativa y legible del comercio. <code>P-</code> para pedidos, <code>V-</code> para ventas</td></tr>
+    <tr><td><strong>Instancia</strong></td><td>El conjunto de contenedores, base y bucket de un comercio. Unidad de venta del paquete</td></tr>
+    <tr><td><strong>Lector HID</strong></td><td>Escáner USB o Bluetooth que se comporta como teclado. Recomendado para el mostrador (§15.1)</td></tr>
+    <tr><td><strong>Paquete inicial</strong></td><td>Los datos que el servidor entrega a un dispositivo de caja para operar sin conexión (§17.3)</td></tr>
+    <tr><td><strong>Pedido</strong></td><td>Intención de compra por WhatsApp. No mueve existencias ni dinero hasta convertirse en venta (§5.1)</td></tr>
+    <tr><td><strong>Preset</strong></td><td>Combinación curada de tipografía, escala, densidad y forma de tarjeta. El cliente elige entre ocho (§10.1)</td></tr>
+    <tr><td><strong>Token de diseño</strong></td><td>Variable CSS derivada del color de marca en OKLCH. Permite que una sola imagen sirva a doce comercios distintos (§10.2)</td></tr>
+    <tr><td><strong>Variante</strong></td><td>La unidad que tiene precio, código de barras y existencias. Todo producto tiene al menos una, aunque la interfaz la esconda (§5.1)</td></tr>
+    <tr><td><strong>Venta</strong></td><td>Hecho consumado: hubo cobro. Genera asientos de inventario y entra al arqueo</td></tr>
+  </table>
+
+  <div class="footer">
+    <div class="depthbar"></div>
+    VITRINA · DIMA LTDA · Plan maestro de desarrollo v1.0<br>
+    Catálogo en línea · Punto de venta · Inventario · Contenido<br>
+    Paquete comercial 02 del catálogo de DIMA · Bolivia, 2026<br>
+    Documento vivo: toda decisión abierta que se resuelva se registra aquí antes de escribirse en código.
+  </div>
+</section>
+
+</main>
+</div>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    themeVariables: {
+      background: '#ffffff',
+      primaryColor: '#f4f1f7',
+      primaryTextColor: '#1a1420',
+      primaryBorderColor: '#7c3aed',
+      lineColor: '#4c4155',
+      secondaryColor: '#f3eef8',
+      tertiaryColor: '#faf8f7',
+      fontFamily: "'Source Sans 3', system-ui, sans-serif",
+      fontSize: '14px'
+    },
+    flowchart: { curve: 'basis', useMaxWidth: true },
+    sequence: { useMaxWidth: true, actorMargin: 40 },
+    er: { useMaxWidth: true },
+    class: { useMaxWidth: true },
+    state: { useMaxWidth: true }
+  });
+
+  (function () {
+    var links = Array.prototype.slice.call(document.querySelectorAll('.toc nav a'));
+    var map = {};
+    links.forEach(function (a) {
+      var id = a.getAttribute('href').slice(1);
+      var el = document.getElementById(id);
+      if (el) map[id] = a;
+    });
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        var a = map[e.target.id];
+        if (!a) return;
+        if (e.isIntersecting) {
+          links.forEach(function (l) { l.style.borderLeftColor = 'transparent'; l.style.background = ''; });
+          a.style.borderLeftColor = 'var(--d2)';
+          a.style.background = 'var(--line-soft)';
+        }
+      });
+    }, { rootMargin: '-10% 0px -80% 0px' });
+    Object.keys(map).forEach(function (id) { obs.observe(document.getElementById(id)); });
+  })();
+</script>
+</body>
+</html>
