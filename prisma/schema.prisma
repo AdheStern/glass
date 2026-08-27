@@ -230,6 +230,9 @@ model Product {
   archivedAt  DateTime? @map("archived_at")
   createdAt   DateTime  @default(now()) @map("created_at")
 
+  // Mantenida por trigger (prisma/sql/search.sql). Prisma no la consulta; se usa por $queryRaw.
+  searchTsv Unsupported("tsvector")? @map("search_tsv")
+
   categories ProductCategory[]
   variants   Variant[]
   images     ProductImage[]
@@ -264,11 +267,12 @@ model Variant {
 }
 
 model ProductImage {
-  id        String  @id @default(cuid())
-  productId String  @map("product_id")
-  path      String
-  alt       String?
-  position  Int     @default(0)
+  id          String  @id @default(cuid())
+  productId   String  @map("product_id")
+  path        String
+  alt         String?
+  position    Int     @default(0)
+  blurDataUrl String? @map("blur_data_url") // marcador 8×8 (§12.1)
 
   product Product @relation(fields: [productId], references: [id])
 

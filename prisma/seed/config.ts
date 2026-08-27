@@ -24,7 +24,7 @@ export async function seedConfig(prisma: PrismaClient): Promise<SeededConfig> {
       locale: process.env.DEFAULT_LOCALE ?? "es-BO",
       themePreset: "MERCADO",
       brandColor: "oklch(0.62 0.17 25)",
-      cardPreset: "ESTANTE",
+      cardPreset: "SUAVE",
       density: "COMODA",
       homeLayout: "HERO",
       whatsappNumbers: [{ label: "Ventas", e164: "+59170000000" }],
@@ -44,7 +44,12 @@ export async function seedConfig(prisma: PrismaClient): Promise<SeededConfig> {
       prisma.operator.upsert({
         where: { id: `op_${i}` },
         update: {},
-        create: { id: `op_${i}`, name, pinHash, role: i === 0 ? "ADMINISTRADOR" : "CAJERO" },
+        create: {
+          id: `op_${i}`,
+          name,
+          pinHash,
+          role: i === 0 ? "ADMINISTRADOR" : "CAJERO",
+        },
       }),
     ),
   );
@@ -62,11 +67,20 @@ export async function seedConfig(prisma: PrismaClient): Promise<SeededConfig> {
   const methodDefs = [
     { id: "pm_efectivo", label: "Efectivo", countsInDrawer: true, position: 0 },
     { id: "pm_qr", label: "QR", countsInDrawer: false, position: 1 },
-    { id: "pm_transf", label: "Transferencia", countsInDrawer: false, position: 2 },
+    {
+      id: "pm_transf",
+      label: "Transferencia",
+      countsInDrawer: false,
+      position: 2,
+    },
     { id: "pm_tarjeta", label: "Tarjeta", countsInDrawer: false, position: 3 },
   ];
   for (const m of methodDefs) {
-    await prisma.paymentMethod.upsert({ where: { id: m.id }, update: {}, create: m });
+    await prisma.paymentMethod.upsert({
+      where: { id: m.id },
+      update: {},
+      create: m,
+    });
   }
 
   return {

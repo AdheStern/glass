@@ -13,11 +13,12 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "playwright test",
+    "perf": "lhci autorun",
     "verify": "next typegen && biome check && tsc --noEmit && vitest run",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
-    "db:sql": "prisma db execute --file prisma/sql/stock_trigger.sql --schema prisma/schema.prisma",
+    "db:sql": "node prisma/sql/apply.mjs",
     "db:seed": "tsx prisma/seed/index.ts",
     "db:studio": "prisma studio"
   },
@@ -38,7 +39,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.2",
-    "@faker-js/faker": "9.3.0",
+    "@lhci/cli": "0.15.1",
     "@playwright/test": "1.49.1",
     "@tailwindcss/postcss": "^4",
     "@types/culori": "2.1.1",

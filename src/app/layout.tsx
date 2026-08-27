@@ -1,22 +1,52 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { getSiteSettings } from "@/db/settings";
+import { deriveTokens, parseBrandColor, tokensToCss } from "@/theme/derive";
+import type { PresetName } from "@/theme/presets";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
 
-export const metadata: Metadata = {
-  title: "Glass",
-  description: "Catálogo, punto de venta e inventario para comercios pequeños.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  return {
+    metadataBase: new URL(process.env.SITE_URL ?? "http://localhost:3000"),
+    title: { default: settings.name, template: `%s · ${settings.name}` },
+    description:
+      "Catálogo, punto de venta e inventario para comercios pequeños.",
+  };
+}
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+function resolvePreset(name: string): PresetName {
+  return name === "NOCTURNO" ? "NOCTURNO" : "MERCADO";
+}
+
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const settings = await getSiteSettings();
+  const tokens = deriveTokens(
+    parseBrandColor(settings.brandColor),
+    resolvePreset(settings.themePreset),
+  );
+
   return (
     <html
-      lang={process.env.DEFAULT_LOCALE ?? "es-BO"}
+      lang={settings.locale}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <head>
+        {/* Tokens derivados del color de marca (§10.2). Sin compilación por cliente. */}
+        <style
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: CSS generado, sin entrada del usuario
+          dangerouslySetInnerHTML={{ __html: tokensToCss(tokens) }}
+        />
+      </head>
+      <body className="min-h-full flex flex-col bg-[var(--surface)] text-[var(--ink)]">
+        {children}
+      </body>
     </html>
   );
 }

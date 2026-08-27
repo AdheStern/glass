@@ -9,11 +9,17 @@ const BUCKET = process.env.SUPABASE_STORAGE_BUCKET ?? "product-images";
 function serviceClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error("glass/storage: faltan credenciales de Supabase");
+  if (!url || !key)
+    throw new Error("glass/storage: faltan credenciales de Supabase");
   return createClient(url, key, { auth: { persistSession: false } });
 }
 
-const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp", "image/avif"]);
+const ALLOWED = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+]);
 
 export async function uploadImage(
   path: string,
@@ -34,7 +40,10 @@ export function publicUrl(path: string): string {
   return serviceClient().storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
 }
 
-export async function signedUrl(path: string, expiresInSeconds = 3600): Promise<string> {
+export async function signedUrl(
+  path: string,
+  expiresInSeconds = 3600,
+): Promise<string> {
   const { data, error } = await serviceClient()
     .storage.from(BUCKET)
     .createSignedUrl(path, expiresInSeconds);

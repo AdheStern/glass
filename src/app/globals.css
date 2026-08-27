@@ -1,26 +1,40 @@
 @import "tailwindcss";
 
+/* Valores de arranque: el layout raíz los sobrescribe con los tokens derivados
+   del color de marca (§10.2). */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --brand-1: oklch(0.97 0.02 25);
+  --brand-6: oklch(0.62 0.17 25);
+  --brand-7: oklch(0.55 0.17 25);
+  --brand-11: oklch(0.2 0.06 25);
+  --brand: var(--brand-7);
+  --on-brand: oklch(0.99 0 0);
+  --surface: oklch(0.99 0.004 25);
+  --ink: oklch(0.2 0.03 25);
+  --radius-card: 16px;
+  --ratio-media: 4 / 5;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-brand: var(--brand);
+  --color-on-brand: var(--on-brand);
+  --color-brand-1: var(--brand-1);
+  --color-brand-6: var(--brand-6);
+  --color-brand-7: var(--brand-7);
+  --color-brand-11: var(--brand-11);
+  --radius-card: var(--radius-card);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+body {
+  font-family: var(--font-sans), system-ui, sans-serif;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Ayuda al presupuesto de rendimiento en la grilla larga del catálogo (§20). */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 320px;
 }

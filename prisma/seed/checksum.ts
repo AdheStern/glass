@@ -13,7 +13,8 @@ export async function seedChecksum(prisma: PrismaClient): Promise<string> {
   });
 
   const h = createHash("sha256");
-  for (const s of sales) h.update(`${s.folio}:${s.totalBob}:${s.roundingBob}\n`);
+  for (const s of sales)
+    h.update(`${s.folio}:${s.totalBob}:${s.roundingBob}\n`);
   for (const o of orders) h.update(`${o.folio}:${o.totalBob}\n`);
   return h.digest("hex");
 }

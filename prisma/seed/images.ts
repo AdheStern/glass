@@ -14,6 +14,19 @@ function gradientSvg(hue: number): string {
 <rect width="800" height="800" fill="url(#g)"/></svg>`;
 }
 
+const POOL_HUES = HUES;
+
+/** Marcador 8×8 (§12.1): data URI de gradiente diminuto para `blurDataURL`. */
+export function gradientDataUri(poolIndex: number): string {
+  const svg = gradientSvg(POOL_HUES[poolIndex % POOL_HUES.length]).replace(
+    /\n/g,
+    "",
+  );
+  return `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
+}
+
+export const POOL_SIZE = HUES.length;
+
 export interface ImageUploader {
   upload(path: string, svg: string): Promise<void>;
 }
@@ -25,7 +38,9 @@ export async function makeUploader(): Promise<ImageUploader> {
   const bucket = process.env.SUPABASE_STORAGE_BUCKET ?? "product-images";
 
   if (!url || !key) {
-    console.warn("glass/seed: sin credenciales de Storage, se omite la subida de imágenes");
+    console.warn(
+      "glass/seed: sin credenciales de Storage, se omite la subida de imágenes",
+    );
     return { upload: async () => {} };
   }
 
@@ -47,7 +62,9 @@ export async function makeUploader(): Promise<ImageUploader> {
 }
 
 /** Sube el pool una vez y devuelve sus rutas (para asignación por turno). */
-export async function seedImagePool(uploader: ImageUploader): Promise<string[]> {
+export async function seedImagePool(
+  uploader: ImageUploader,
+): Promise<string[]> {
   const paths: string[] = [];
   for (let i = 0; i < HUES.length; i++) {
     const path = `pool/${i}.svg`;

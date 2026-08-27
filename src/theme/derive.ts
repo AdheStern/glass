@@ -2,7 +2,7 @@
 // Los tokens se emiten como variables CSS en el layout raíz; Tailwind las consume.
 // No hay compilación por cliente: la misma imagen sirve a doce comercios.
 
-import { formatCss, wcagContrast } from "culori";
+import { formatCss, oklch, wcagContrast } from "culori";
 import { PRESETS, type PresetName } from "./presets";
 
 export interface Oklch {
@@ -12,6 +12,15 @@ export interface Oklch {
   c: number;
   /** Tono 0–360. */
   h: number;
+}
+
+/** Interpreta el color de marca guardado en `site_settings` (cualquier CSS válido). */
+export function parseBrandColor(input: string): Oklch {
+  const parsed = oklch(input);
+  if (!parsed || parsed.l === undefined) {
+    return { l: 0.62, c: 0.17, h: 25 }; // rojo teja por defecto
+  }
+  return { l: parsed.l, c: parsed.c ?? 0.1, h: parsed.h ?? 0 };
 }
 
 export type Tokens = Record<string, string>;
@@ -88,7 +97,9 @@ export function deriveTokens(brand: Oklch, preset: PresetName): Tokens {
   const p = PRESETS[preset];
   const scale = rampOklch(brand, { steps: 11, minL: 0.14, maxL: 0.97 });
 
-  const surface = p.dark ? css(0.16, 0.006, brand.h) : css(0.99, 0.004, brand.h);
+  const surface = p.dark
+    ? css(0.16, 0.006, brand.h)
+    : css(0.99, 0.004, brand.h);
   const ink = p.dark ? scale[1] : scale[10];
   const { fill: brandFill, onBrand } = pickBrandFill(scale);
 

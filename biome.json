@@ -16,7 +16,9 @@
       "!src/generated",
       "!prisma/migrations",
       "!playwright-report",
-      "!test-results"
+      "!test-results",
+      "!docs",
+      "!**/*.html"
     ]
   },
   "formatter": {
@@ -81,6 +83,25 @@
         "rules": {
           "correctness": {
             "noNodejsModules": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/app/(shop)/**", "src/components/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "framer-motion": "Sin animación en el catálogo (§8.3). Va solo en la landing, con next/dynamic.",
+                  "motion": "Sin animación en el catálogo (§8.3).",
+                  "motion/react": "Sin animación en el catálogo (§8.3)."
+                }
+              }
+            }
           }
         }
       }

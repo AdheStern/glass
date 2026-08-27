@@ -11,7 +11,11 @@ const SAMPLE_BRANDS = [
 
 describe("rampOklch", () => {
   it("produce la cantidad de pasos pedida, del claro al oscuro", () => {
-    const scale = rampOklch(SAMPLE_BRANDS[0], { steps: 11, minL: 0.14, maxL: 0.97 });
+    const scale = rampOklch(SAMPLE_BRANDS[0], {
+      steps: 11,
+      minL: 0.14,
+      maxL: 0.97,
+    });
     expect(scale).toHaveLength(11);
     expect(scale[0]).toContain("oklch");
   });
@@ -19,7 +23,10 @@ describe("rampOklch", () => {
 
 describe("bestContrast", () => {
   it("elige el candidato de mayor contraste", () => {
-    const pick = bestContrast("oklch(0.2 0.05 260)", ["oklch(0.25 0 0)", "oklch(0.98 0 0)"]);
+    const pick = bestContrast("oklch(0.2 0.05 260)", [
+      "oklch(0.25 0 0)",
+      "oklch(0.98 0 0)",
+    ]);
     expect(pick).toBe("oklch(0.98 0 0)");
   });
 });

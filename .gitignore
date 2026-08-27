@@ -38,6 +38,10 @@ yarn-error.log*
 /test-results
 /playwright-report
 /blob-report
+/.lighthouseci
+
+# logs
+*.log
 
 # seed image cache (populated inside a docker volume, not committed)
 /prisma/seed/.image-cache

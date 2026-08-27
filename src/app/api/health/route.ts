@@ -1,10 +1,10 @@
 // Glass — healthcheck para el contenedor y para Coolify.
-import { NextResponse } from "next/server";
+import { connection, NextResponse } from "next/server";
 import { prisma } from "@/db/client";
 
-export const dynamic = "force-dynamic";
-
 export async function GET() {
+  await connection(); // lectura fresca en cada petición (Cache Components)
+
   let db = false;
   try {
     await prisma.$queryRaw`SELECT 1`;
@@ -13,8 +13,5 @@ export async function GET() {
     db = false;
   }
 
-  return NextResponse.json(
-    { ok: true, db, ts: new Date().toISOString() },
-    { status: db ? 200 : 503 },
-  );
+  return NextResponse.json({ ok: true, db }, { status: db ? 200 : 503 });
 }

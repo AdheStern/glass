@@ -64,13 +64,23 @@ export async function seedSales(
       const deviceId = cfg.deviceIds[k % cfg.deviceIds.length];
       const id = sessionId();
       const openedAt = new Date(dayStart.getTime() + 8 * 3_600_000);
-      return { id, operatorId, deviceId, openedAt, cashInBob: 0, insBob: 0, outsBob: 0 };
+      return {
+        id,
+        operatorId,
+        deviceId,
+        openedAt,
+        cashInBob: 0,
+        insBob: 0,
+        outsBob: 0,
+      };
     });
 
     for (let s = 0; s < dayCount; s++) {
       const session = rng.pick(openSessions);
       deviceSeq[session.deviceId] = (deviceSeq[session.deviceId] ?? 0) + 1;
-      const occurredAt = new Date(session.openedAt.getTime() + rng.int(0, 8 * 3_600_000));
+      const occurredAt = new Date(
+        session.openedAt.getTime() + rng.int(0, 8 * 3_600_000),
+      );
 
       const lines = rng.sample(variants, rng.int(1, 4)).map((v) => ({
         variantId: v.id,
@@ -126,41 +136,74 @@ export async function seedSales(
 
       // Pagos: 80 % efectivo completo, resto mixto o no efectivo.
       if (rng.bool(0.8)) {
-        payments.push({ id: paymentId(), saleId: id, methodId: cfg.cashMethodId, amountBob: built.totalBob });
+        payments.push({
+          id: paymentId(),
+          saleId: id,
+          methodId: cfg.cashMethodId,
+          amountBob: built.totalBob,
+        });
         session.cashInBob += built.totalBob;
       } else if (rng.bool(0.5)) {
         const cash = Math.round(built.totalBob / 2);
-        payments.push({ id: paymentId(), saleId: id, methodId: cfg.cashMethodId, amountBob: cash });
-        payments.push({ id: paymentId(), saleId: id, methodId: rng.pick(cfg.nonCashMethodIds), amountBob: built.totalBob - cash });
+        payments.push({
+          id: paymentId(),
+          saleId: id,
+          methodId: cfg.cashMethodId,
+          amountBob: cash,
+        });
+        payments.push({
+          id: paymentId(),
+          saleId: id,
+          methodId: rng.pick(cfg.nonCashMethodIds),
+          amountBob: built.totalBob - cash,
+        });
         session.cashInBob += cash;
       } else {
-        payments.push({ id: paymentId(), saleId: id, methodId: rng.pick(cfg.nonCashMethodIds), amountBob: built.totalBob });
+        payments.push({
+          id: paymentId(),
+          saleId: id,
+          methodId: rng.pick(cfg.nonCashMethodIds),
+          amountBob: built.totalBob,
+        });
       }
     }
 
     // Cierre de turnos: movimientos de efectivo, esperado, contado, diferencia.
     for (const session of openSessions) {
       const openingBob = 20_000;
-      const closedAt = new Date(session.openedAt.getTime() + rng.int(8, 11) * 3_600_000);
+      const closedAt = new Date(
+        session.openedAt.getTime() + rng.int(8, 11) * 3_600_000,
+      );
 
       for (let m = 0; m < rng.int(0, 2); m++) {
         const kind = rng.pick(["INGRESO", "RETIRO", "GASTO"] as const);
-        const amountBob = kind === "INGRESO" ? rng.int(50, 200) * 100 : rng.int(20, 2000) * 100;
+        const amountBob =
+          kind === "INGRESO" ? rng.int(50, 200) * 100 : rng.int(20, 2000) * 100;
         cashMovements.push({
           id: cashMovId(),
           cashSessionId: session.id,
           kind,
           amountBob,
-          reason: kind === "GASTO" ? "insumos del local" : kind === "RETIRO" ? "a caja fuerte" : "cambio",
+          reason:
+            kind === "GASTO"
+              ? "insumos del local"
+              : kind === "RETIRO"
+                ? "a caja fuerte"
+                : "cambio",
           operatorId: session.operatorId,
-          occurredAt: new Date(session.openedAt.getTime() + rng.int(1, 7) * 3_600_000),
+          occurredAt: new Date(
+            session.openedAt.getTime() + rng.int(1, 7) * 3_600_000,
+          ),
         });
         if (kind === "INGRESO") session.insBob += amountBob;
         else session.outsBob += amountBob;
       }
 
-      const expectedBob = openingBob + session.cashInBob + session.insBob - session.outsBob;
-      const noise = rng.bool(0.82) ? 0 : rng.pick([-1550, -1000, -500, 500, 1200, -2050]);
+      const expectedBob =
+        openingBob + session.cashInBob + session.insBob - session.outsBob;
+      const noise = rng.bool(0.82)
+        ? 0
+        : rng.pick([-1550, -1000, -500, 500, 1200, -2050]);
       const countedBob = expectedBob + noise;
 
       sessions.push({
@@ -179,12 +222,24 @@ export async function seedSales(
   }
 
   // Insertar en orden: sesiones → ventas → items/pagos/movimientos.
-  await inBatches(sessions, 500, (b) => prisma.cashSession.createMany({ data: b as never }));
-  await inBatches(cashMovements, 1000, (b) => prisma.cashMovement.createMany({ data: b as never }));
-  await inBatches(sales, 500, (b) => prisma.sale.createMany({ data: b as never }));
-  await inBatches(saleItems, 1000, (b) => prisma.saleItem.createMany({ data: b as never }));
-  await inBatches(payments, 1000, (b) => prisma.payment.createMany({ data: b as never }));
-  await inBatches(movements, 1000, (b) => prisma.stockMovement.createMany({ data: b as never }));
+  await inBatches(sessions, 500, (b) =>
+    prisma.cashSession.createMany({ data: b as never }),
+  );
+  await inBatches(cashMovements, 1000, (b) =>
+    prisma.cashMovement.createMany({ data: b as never }),
+  );
+  await inBatches(sales, 500, (b) =>
+    prisma.sale.createMany({ data: b as never }),
+  );
+  await inBatches(saleItems, 1000, (b) =>
+    prisma.saleItem.createMany({ data: b as never }),
+  );
+  await inBatches(payments, 1000, (b) =>
+    prisma.payment.createMany({ data: b as never }),
+  );
+  await inBatches(movements, 1000, (b) =>
+    prisma.stockMovement.createMany({ data: b as never }),
+  );
 
   const orderCount = await seedOrders(prisma, rng, variants);
 
@@ -214,7 +269,8 @@ async function seedOrders(
     let acc = rng.float();
     let status = "NUEVO";
     for (const [name, w] of ORDER_STATUS_WEIGHTS) {
-      if ((acc -= w) <= 0) {
+      acc -= w;
+      if (acc <= 0) {
         status = name;
         break;
       }
@@ -254,7 +310,11 @@ async function seedOrders(
     }
   }
 
-  await inBatches(orders, 500, (b) => prisma.order.createMany({ data: b as never }));
-  await inBatches(items, 1000, (b) => prisma.orderItem.createMany({ data: b as never }));
+  await inBatches(orders, 500, (b) =>
+    prisma.order.createMany({ data: b as never }),
+  );
+  await inBatches(items, 1000, (b) =>
+    prisma.orderItem.createMany({ data: b as never }),
+  );
   return orders.length;
 }

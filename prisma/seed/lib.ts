@@ -22,7 +22,8 @@ export function makeRng(seed: number) {
   const rng = seedrandom(String(seed));
   return {
     float: () => rng(),
-    int: (min: number, max: number) => min + Math.floor(rng() * (max - min + 1)),
+    int: (min: number, max: number) =>
+      min + Math.floor(rng() * (max - min + 1)),
     pick: <T>(arr: readonly T[]): T => arr[Math.floor(rng() * arr.length)],
     bool: (p = 0.5) => rng() < p,
     /** Muestra `k` elementos distintos de `arr`. */

@@ -5,7 +5,9 @@ export type Cents = number;
 
 export function assertCents(n: number): asserts n is Cents {
   if (!Number.isInteger(n)) {
-    throw new Error(`glass/money: se esperaba un entero de centavos, llegó ${n}`);
+    throw new Error(
+      `glass/money: se esperaba un entero de centavos, llegó ${n}`,
+    );
   }
 }
 

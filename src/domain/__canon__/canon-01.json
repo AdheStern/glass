@@ -5,8 +5,18 @@
     "roundingMode": "NEAREST_10",
     "globalDiscountPercent": 3,
     "lines": [
-      { "variantId": "taladro", "qty": 2, "baseUnitPriceBob": 31000, "discount": { "percent": 10 } },
-      { "variantId": "broca-6mm", "qty": 1, "baseUnitPriceBob": 4500, "discount": { "amountBob": 500 } }
+      {
+        "variantId": "taladro",
+        "qty": 2,
+        "baseUnitPriceBob": 31000,
+        "discount": { "percent": 10 }
+      },
+      {
+        "variantId": "broca-6mm",
+        "qty": 1,
+        "baseUnitPriceBob": 4500,
+        "discount": { "amountBob": 500 }
+      }
     ]
   },
   "expected": {

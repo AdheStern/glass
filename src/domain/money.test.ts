@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { applyPercent, assertCents, formatBob, roundTo10, roundToStep } from "./money";
+import {
+  applyPercent,
+  assertCents,
+  formatBob,
+  roundTo10,
+  roundToStep,
+} from "./money";
 
 describe("roundToStep", () => {
   it("redondea media-arriba al múltiplo pedido", () => {

@@ -5,56 +5,56 @@ empaquetado: una instancia por cliente. El plan maestro manda: [`docs/plan-maest
 
 ## Estado
 
-**Fase 0 — Andamiaje.** Contenedores, esquema, dominio puro, tema y siembra.
-El roadmap completo está en el §25 del plan maestro.
+**Fase 1 — Catálogo público** (en curso). Portada, catálogo, categorías, ficha de producto,
+búsqueda, filtros, SEO. El roadmap completo está en el §25 del plan maestro.
 
 ## Requisitos
 
-- Docker Desktop (Windows/macOS/Linux). **Nada más**: ni Node, ni pnpm, ni Postgres
-  en el anfitrión (§22.1).
+- **Node 22+** y **Corepack** (`corepack enable` → pnpm 11) en el host.
 - Un proyecto de **Supabase** (Postgres + Storage + Auth).
-
-> En Windows, para que la recarga en caliente sea rápida, clona el repositorio
-> dentro del sistema de archivos de WSL2 (`\\wsl$\...`), no en `C:\Users`.
+- Docker es opcional: los archivos de `docker/` y `compose*.yml` quedan como referencia para
+  producción/CI, no para el desarrollo diario.
 
 ## Puesta en marcha
 
 ```sh
-cp .env.example .env          # y completa las claves de Supabase
-make lock                     # genera pnpm-lock.yaml dentro de un contenedor (una vez)
-make up                       # levanta la app + Mailpit
-make migrate n=init           # crea la migración inicial + aplica el trigger de stock
-make seed                     # 2000 productos + 6 meses de ventas (semilla 42)
+cp .env.example .env                      # completa las claves de Supabase
+pnpm install
+pnpm prisma migrate dev --name init       # esquema → Supabase
+pnpm db:sql                               # triggers de stock + búsqueda
+pnpm db:seed -- --products=2000 --seed=42 # catálogo ficticio + 6 meses de ventas
+pnpm dev                                  # http://localhost:3000
 ```
 
-- App: <http://localhost:3000>
-- Bandeja de correo (Mailpit): <http://localhost:8025>
+> Sin `NEXT_PUBLIC_SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` la siembra omite subir
+> las imágenes del pool (los productos quedan con su `blurDataURL` de gradiente).
 
 ## Comandos
 
 | Comando | Qué hace |
 |---|---|
-| `make up` / `make down` / `make logs` | ciclo de vida del entorno |
-| `make sh` | shell dentro del contenedor de la app |
-| `make migrate n=<nombre>` | `prisma migrate dev` + trigger de stock |
-| `make seed` | siembra determinista (2000 productos, 6 meses) |
-| `make reset` | borra volúmenes, vuelve a levantar y siembra |
-| `make test` | `biome` + `tsc` + `vitest` con Postgres efímero |
-| `make e2e` | humo de Playwright |
-| `make image` | construye la imagen de producción y verifica el presupuesto de 250 MB |
+| `pnpm dev` | servidor de desarrollo |
+| `pnpm verify` | typegen + biome + tsc + vitest |
+| `pnpm test` / `pnpm e2e` | unitarias / Playwright |
+| `pnpm perf` | Lighthouse CI (necesita Chrome/Edge) |
+| `pnpm prisma migrate dev --name X` | nueva migración |
+| `pnpm db:sql` | (re)aplica `prisma/sql/*.sql` (idempotente) |
+| `pnpm db:seed -- --products=N --seed=S` | siembra determinista |
 
 ## Estructura
 
 ```
-docker/            Dockerfile multietapa + entrypoints
-compose*.yml       base · dev · test
-prisma/            esquema, migraciones, SQL del trigger, generador de siembra
+prisma/            esquema, migraciones, SQL (triggers, búsqueda), siembra
 src/domain/        lógica pura compartida servidor ↔ POS (dinero, precios, stock, venta, PIN)
-src/theme/         derivación de tokens OKLCH + presets
-src/db/            cliente Prisma
-src/auth/          Supabase (panel) + guarda de rol; dispositivo/PIN (POS)
+src/theme/         derivación de tokens OKLCH + presets de tema y de tarjeta
+src/db/            cliente Prisma + ajustes del sitio cacheados
+src/catalog/       consultas del catálogo, precio efectivo, existencias, búsqueda
+src/components/    UI del catálogo (Server Components; formularios nativos)
+src/auth/          Supabase (panel) + dispositivo/PIN (POS)
 src/storage/       Supabase Storage
-src/app/(shop|admin|pos)/   zonas de renderizado (§ADR-12)
+src/app/(shop)/    superficie pública — SSR con Cache Components (§7.1)
+src/app/(admin|pos)/  placeholders (fases 2 y 5)
+docker/, compose*.yml, Makefile   referencia para producción/CI
 ```
 
 ## Repositorio remoto

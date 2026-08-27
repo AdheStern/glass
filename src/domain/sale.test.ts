@@ -41,8 +41,12 @@ describe("buildSale", () => {
 
 describe("isValidClientSaleId", () => {
   it("acepta un UUID v7 y rechaza otros", () => {
-    expect(isValidClientSaleId("018f8c1e-7b2a-7c3d-8e4f-1a2b3c4d5e6f")).toBe(true);
+    expect(isValidClientSaleId("018f8c1e-7b2a-7c3d-8e4f-1a2b3c4d5e6f")).toBe(
+      true,
+    );
     expect(isValidClientSaleId("not-a-uuid")).toBe(false);
-    expect(isValidClientSaleId("018f8c1e-7b2a-4c3d-8e4f-1a2b3c4d5e6f")).toBe(false); // v4
+    expect(isValidClientSaleId("018f8c1e-7b2a-4c3d-8e4f-1a2b3c4d5e6f")).toBe(
+      false,
+    ); // v4
   });
 });

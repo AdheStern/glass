@@ -2,7 +2,6 @@
 // Uso: pnpm db:seed -- --products=2000 --seed=42
 // Determinista: la misma semilla produce el mismo catálogo, los mismos folios y
 // las mismas cifras.
-import { faker } from "@faker-js/faker";
 import { PrismaClient } from "@prisma/client";
 import { seedCatalog } from "./catalog";
 import { seedChecksum } from "./checksum";
@@ -43,7 +42,6 @@ async function main() {
   const args = parseArgs(process.argv.slice(2));
   console.log(`glass/seed: productos=${args.products} semilla=${args.seed}`);
 
-  faker.seed(args.seed);
   const rng = makeRng(args.seed);
   const stockStartAt = new Date(Date.UTC(2026, 0, 1));
 
@@ -57,16 +55,23 @@ async function main() {
 
   console.time("catalog");
   const uploader = await makeUploader();
-  const variants = await seedCatalog(prisma, rng, uploader, args.products, stockStartAt);
+  const variants = await seedCatalog(
+    prisma,
+    rng,
+    uploader,
+    args.products,
+    stockStartAt,
+  );
   console.timeEnd("catalog");
 
   console.time("sales");
   const totals = await seedSales(prisma, rng, cfg, variants);
   console.timeEnd("sales");
 
-  console.time("rebuild-stock");
+  console.time("rebuild-derived");
   await prisma.$executeRaw`SELECT glass_rebuild_variant_stock()`;
-  console.timeEnd("rebuild-stock");
+  await prisma.$executeRaw`SELECT glass_rebuild_search()`;
+  console.timeEnd("rebuild-derived");
 
   const checksum = await seedChecksum(prisma);
   console.log(

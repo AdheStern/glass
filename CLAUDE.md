@@ -62,15 +62,26 @@ src/storage       Supabase Storage
 prisma            esquema, migraciones, siembra
 ```
 
-## Comandos — TODO corre en contenedores (§22)
+## Comandos — desarrollo en el host con pnpm
 
-Nunca sugieras instalar Node, Postgres o pnpm en el anfitrión, ni ejecutar pnpm fuera del
-contenedor.
+El desarrollo diario es `pnpm dev` en Windows (Node 22+ + Corepack). Los archivos de
+Docker/Compose/Makefile quedan en el repo como **referencia para producción/CI**, no se
+usan a diario.
 
 ```
-make up · make seed · make sh · make test · make e2e · make logs · make down · make reset
-make migrate n={nombre}          # prisma migrate dev dentro del contenedor
-make lock                        # regenera pnpm-lock.yaml dentro del contenedor
+pnpm dev                              # servidor de desarrollo (Next 16, Turbopack)
+pnpm verify                           # typegen + biome + tsc + vitest
+pnpm test / pnpm e2e / pnpm perf
+pnpm prisma migrate dev --name X      # migración contra Supabase (DIRECT_URL)
+pnpm db:sql                           # aplica prisma/sql/*.sql (triggers, búsqueda)
+pnpm db:seed -- --products=2000 --seed=42
 ```
 
-Dentro del contenedor: `pnpm dev` · `pnpm test` · `pnpm db:seed -- --products=2000 --seed=42`
+## Rendimiento del catálogo (Fase 1)
+
+- `next.config.ts` usa `cacheComponents: true`. Las lecturas cacheables llevan `"use cache"`
+  + `cacheTag(...)` (`settings`, `catalog`, `featured`, `product:{id}`).
+- El precio/existencia de la GRILLA salen de una sola consulta SQL cacheada
+  (`src/catalog/list-query.ts`); la separación fina estático/dinámico del §7.1 vive en la
+  FICHA (`<PriceTag>` / `<StockBadge>` dentro de `<Suspense>`).
+- Nada de `framer-motion` en `src/app/(shop)` ni en `src/components` (regla de biome).

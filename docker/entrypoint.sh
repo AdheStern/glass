@@ -8,8 +8,11 @@ PRISMA="node node_modules/prisma/build/index.js"
 echo "glass: aplicando migraciones (prisma migrate deploy)..."
 $PRISMA migrate deploy
 
-echo "glass: aplicando trigger de existencias..."
-$PRISMA db execute --file prisma/sql/stock_trigger.sql --schema prisma/schema.prisma
+echo "glass: aplicando SQL idempotente (triggers, búsqueda)..."
+for f in prisma/sql/*.sql; do
+  echo "  - $f"
+  $PRISMA db execute --file "$f" --schema prisma/schema.prisma
+done
 
 echo "glass: iniciando servidor Next..."
 exec "$@"

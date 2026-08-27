@@ -15,7 +15,9 @@ describe("effectiveUnitPriceBob", () => {
   });
 
   it("porcentaje primero, luego monto fijo", () => {
-    expect(effectiveUnitPriceBob(10000, { percent: 10, amountBob: 500 })).toBe(8500);
+    expect(effectiveUnitPriceBob(10000, { percent: 10, amountBob: 500 })).toBe(
+      8500,
+    );
   });
 
   it("nunca por debajo de cero", () => {

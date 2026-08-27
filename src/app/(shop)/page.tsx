@@ -1,19 +1,43 @@
-// Portada pública (§7.1). Placeholder de Fase 0 — la portada real es Fase 1.
-export default function HomePage() {
+import Link from "next/link";
+import { getCategoryTree, getFeatured } from "@/catalog/queries";
+import { CategoryNav } from "@/components/category-nav";
+import { ProductGrid } from "@/components/product-grid";
+import { getSiteSettings } from "@/db/settings";
+import { resolveCardPresetName } from "@/theme/card-presets";
+
+export default async function HomePage() {
+  const [settings, tree, featured] = await Promise.all([
+    getSiteSettings(),
+    getCategoryTree(),
+    getFeatured(8),
+  ]);
+
   return (
-    <main className="mx-auto flex max-w-2xl flex-1 flex-col justify-center gap-4 p-8">
-      <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">
-        Glass · Fase 0
-      </p>
-      <h1 className="text-3xl font-semibold tracking-tight">
-        Andamiaje en pie.
-      </h1>
-      <p className="text-zinc-600 dark:text-zinc-400">
-        Catálogo, punto de venta e inventario. La portada real llega en la Fase 1.
-      </p>
-      <a className="font-medium underline" href="/catalogo">
-        Ver catálogo
-      </a>
-    </main>
+    <div className="mx-auto w-full max-w-6xl px-4 py-8">
+      <section className="mb-8 rounded-2xl bg-[var(--brand)] px-6 py-12 text-[var(--on-brand)]">
+        <p className="font-mono text-xs uppercase tracking-widest opacity-80">
+          {settings.name}
+        </p>
+        <h1 className="mt-2 max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl">
+          Todo para tu obra y tu casa, a un mensaje de distancia.
+        </h1>
+        <Link
+          href="/catalogo"
+          className="mt-6 inline-block rounded-lg bg-[var(--surface)] px-4 py-2 font-medium text-[var(--ink)]"
+        >
+          Ver catálogo
+        </Link>
+      </section>
+
+      <div className="mb-6">
+        <CategoryNav tree={tree} />
+      </div>
+
+      <h2 className="mb-4 text-xl font-bold tracking-tight">Destacados</h2>
+      <ProductGrid
+        products={featured}
+        preset={resolveCardPresetName(settings.cardPreset)}
+      />
+    </div>
   );
 }

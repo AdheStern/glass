@@ -9,7 +9,8 @@ export async function ensureProfile(params: {
   name?: string | null;
 }) {
   const isOwner =
-    params.email.toLowerCase() === (process.env.OWNER_EMAIL ?? "").toLowerCase();
+    params.email.toLowerCase() ===
+    (process.env.OWNER_EMAIL ?? "").toLowerCase();
 
   return prisma.userProfile.upsert({
     where: { authUserId: params.authUserId },

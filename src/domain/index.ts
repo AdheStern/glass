@@ -2,7 +2,7 @@
 // Nada aquí importa Prisma, Supabase, React, Next ni toca la red o el reloj.
 
 export * from "./money";
+export * from "./pin";
 export * from "./pricing";
 export * from "./sale";
 export * from "./stock";
-export * from "./pin";
