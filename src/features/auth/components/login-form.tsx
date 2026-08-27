@@ -27,6 +27,22 @@ export function LoginForm() {
     params.get("e") === "rol" ? "Tu cuenta no tiene acceso al panel." : null,
   );
 
+  const configured = !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!configured) {
+    return (
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <CardTitle>Falta configurar Supabase</CardTitle>
+          <CardDescription>
+            Agregá <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code> y{" "}
+            <code>SUPABASE_SERVICE_ROLE_KEY</code> a <code>.env</code> y
+            reiniciá.
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
+
   const supabase = createSupabaseBrowserClient();
 
   async function withGoogle() {

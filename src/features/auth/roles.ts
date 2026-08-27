@@ -21,6 +21,7 @@ export const PANEL_ROLES: Role[] = ["PROPIETARIO", "ADMINISTRADOR", "EDITOR"];
  * (cualquier método de login), asignando PROPIETARIO si el correo es OWNER_EMAIL.
  */
 export const currentProfile = cache(async (): Promise<UserProfile | null> => {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) return null; // Supabase sin configurar
   const supabase = await createSupabaseServerClient();
   const {
     data: { user },

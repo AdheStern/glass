@@ -7,7 +7,7 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { JsonLd } from "@/components/json-ld";
 import { BadgeSkeleton, PriceSkeleton } from "@/components/skeletons";
 import { getSiteSettings } from "@/db/settings";
-import { formatBob } from "@/domain/money";
+import { AddToCartControl } from "@/features/cart/components/add-to-cart-control";
 import { PriceTag } from "@/features/catalog/components/price-tag";
 import { StockBadge } from "@/features/catalog/components/stock-badge";
 import { getDisplayPrice } from "@/features/catalog/pricing-view";
@@ -18,6 +18,7 @@ import {
 } from "@/features/catalog/queries";
 import { getStockView } from "@/features/catalog/stock-view";
 import type { ProductDetail } from "@/features/catalog/types";
+import { getVariantPricing } from "@/features/orders/pricing";
 
 type Params = { slug: string };
 
@@ -70,32 +71,27 @@ async function ProductJsonLd({ product }: { product: ProductDetail }) {
   return <JsonLd data={data} />;
 }
 
-async function AddToCart({ productId }: { productId: string }) {
+async function AddToCart({ product }: { product: ProductDetail }) {
   await connection();
-  const stock = await getStockView(productId);
-  if (!stock.available) {
-    return (
-      <div className="flex flex-col gap-2">
-        <button
-          type="button"
-          disabled
-          className="rounded-lg bg-black/10 px-5 py-3 font-medium text-black/40"
-        >
-          Agotado
-        </button>
-        <a href="#avisame" className="text-sm text-[var(--brand)] underline">
-          Avísame cuando vuelva
-        </a>
-      </div>
-    );
-  }
+  const pricing = await getVariantPricing(product.variants.map((v) => v.id));
+
+  const options = product.variants.map((v) => {
+    const p = pricing.get(v.id);
+    return {
+      variantId: v.id,
+      label: (v.attributes?.variante as string | undefined) ?? null,
+      effectiveBob: p?.effectiveBob ?? v.basePriceBob,
+      available: (p?.stockQty ?? 0) > 0,
+    };
+  });
+
   return (
-    <button
-      type="button"
-      className="rounded-lg bg-[var(--brand)] px-5 py-3 font-medium text-[var(--on-brand)]"
-    >
-      Agregar al pedido
-    </button>
+    <AddToCartControl
+      productId={product.id}
+      productName={product.name}
+      slug={product.slug}
+      variants={options}
+    />
   );
 }
 
@@ -196,27 +192,12 @@ export default async function ProductoPage({
             </p>
           )}
 
-          {product.variants.length > 1 && (
-            <ul className="flex flex-col gap-1 text-sm text-black/60">
-              {product.variants.map((v) => (
-                <li key={v.id}>
-                  {v.attributes
-                    ? Object.entries(v.attributes)
-                        .map(([k, val]) => `${k}: ${val}`)
-                        .join(" · ")
-                    : (v.sku ?? "Variante")}{" "}
-                  — {formatBob(v.basePriceBob)}
-                </li>
-              ))}
-            </ul>
-          )}
-
           <Suspense
             fallback={
               <div className="h-12 w-40 animate-pulse rounded-lg bg-black/10" />
             }
           >
-            <AddToCart productId={product.id} />
+            <AddToCart product={product} />
           </Suspense>
         </div>
       </div>

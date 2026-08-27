@@ -1,5 +1,14 @@
 "use client";
-import { FolderTree, Gauge, LogOut, Package, Tag, Upload } from "lucide-react";
+import {
+  FolderTree,
+  Gauge,
+  Inbox,
+  LogOut,
+  Package,
+  Settings,
+  Tag,
+  Upload,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -23,6 +32,8 @@ const ICONS = {
   "folder-tree": FolderTree,
   tag: Tag,
   upload: Upload,
+  inbox: Inbox,
+  settings: Settings,
 } as const;
 
 export function PanelSidebar({

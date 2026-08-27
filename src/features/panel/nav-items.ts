@@ -4,13 +4,26 @@ import type { Role } from "@prisma/client";
 export interface NavItem {
   href: string;
   label: string;
-  icon: "gauge" | "package" | "folder-tree" | "tag" | "upload";
+  icon:
+    | "gauge"
+    | "package"
+    | "folder-tree"
+    | "tag"
+    | "upload"
+    | "inbox"
+    | "settings";
   roles?: Role[];
   exact?: boolean;
 }
 
 export const NAV_ITEMS: NavItem[] = [
   { href: "/panel", label: "Resumen", icon: "gauge", exact: true },
+  {
+    href: "/panel/pedidos",
+    label: "Pedidos",
+    icon: "inbox",
+    roles: ["PROPIETARIO", "ADMINISTRADOR", "CAJERO"],
+  },
   {
     href: "/panel/productos",
     label: "Productos",
@@ -33,6 +46,12 @@ export const NAV_ITEMS: NavItem[] = [
     href: "/panel/importar",
     label: "Importar",
     icon: "upload",
+    roles: ["PROPIETARIO", "ADMINISTRADOR"],
+  },
+  {
+    href: "/panel/ajustes",
+    label: "Ajustes",
+    icon: "settings",
     roles: ["PROPIETARIO", "ADMINISTRADOR"],
   },
 ];

@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { JsonLd } from "@/components/json-ld";
 import { getSiteSettings } from "@/db/settings";
+import { CartButton } from "@/features/cart/components/cart-button";
 
 // Zona pública: catálogo, producto, carrito, páginas, blog (§3.1).
 // Presupuesto estricto (§20): sin "use client" sin justificar (§24.2 regla 3).
@@ -44,6 +45,7 @@ export default async function ShopLayout({
             <Link href="/buscar" className="hover:underline">
               Buscar
             </Link>
+            <CartButton />
           </nav>
         </div>
       </header>

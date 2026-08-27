@@ -351,6 +351,9 @@ model Order {
   discountBob   Int          @map("discount_bob")
   totalBob      Int          @map("total_bob")
   saleId        String?      @unique @map("sale_id")
+  whatsappLabel String?      @map("whatsapp_label")
+  source        String?      // de qué página vino (§9.2)
+  statusChangedAt DateTime   @default(now()) @map("status_changed_at")
   createdAt     DateTime     @default(now()) @map("created_at")
   updatedAt     DateTime     @updatedAt @map("updated_at")
 
@@ -358,16 +361,21 @@ model Order {
   sale  Sale?       @relation(fields: [saleId], references: [id])
 
   @@index([status, createdAt])
+  @@index([status, statusChangedAt])
   @@map("order")
 }
 
 model OrderItem {
-  id           String @id @default(cuid())
-  orderId      String @map("order_id")
-  variantId    String @map("variant_id")
-  qty          Int
-  unitPriceBob Int    @map("unit_price_bob")
-  discountBob  Int    @default(0) @map("discount_bob")
+  id            String  @id @default(cuid())
+  orderId       String  @map("order_id")
+  variantId     String  @map("variant_id")
+  nameSnapshot  String  @default("") @map("name_snapshot") // nombre a la hora del pedido (§9.2)
+  productSlug   String? @map("product_slug")
+  qty           Int
+  unitPriceBob  Int     @map("unit_price_bob") // precio efectivo congelado
+  listPriceBob  Int     @default(0) @map("list_price_bob") // precio sin descuento
+  discountBob   Int     @default(0) @map("discount_bob")
+  note          String?
 
   order   Order   @relation(fields: [orderId], references: [id])
   variant Variant @relation(fields: [variantId], references: [id])
