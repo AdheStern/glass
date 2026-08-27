@@ -1,12 +1,60 @@
-// Panel — placeholder de Fase 0. El tablero real es Fase 8.
-export default function PanelPage() {
+import { connection } from "next/server";
+import { Suspense } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { prisma } from "@/db/client";
+
+async function Counts() {
+  await connection();
+  const [products, categories, discounts, orders] = await Promise.all([
+    prisma.product.count({ where: { archivedAt: null } }),
+    prisma.category.count({ where: { archivedAt: null } }),
+    prisma.discount.count({ where: { archivedAt: null, isActive: true } }),
+    prisma.order.count({ where: { status: "NUEVO" } }),
+  ]);
+
+  const tiles = [
+    { label: "Productos", value: products },
+    { label: "Categorías", value: categories },
+    { label: "Descuentos activos", value: discounts },
+    { label: "Pedidos nuevos", value: orders },
+  ];
+
   return (
-    <main className="mx-auto flex max-w-2xl flex-1 flex-col justify-center gap-4 p-8">
-      <h1 className="text-2xl font-semibold tracking-tight">Panel</h1>
-      <p className="text-zinc-600 dark:text-zinc-400">
-        Autenticación con Supabase y roles llegan cableados en la Fase 0; las
-        pantallas de gestión, en la Fase 2.
-      </p>
-    </main>
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {tiles.map((t) => (
+        <Card key={t.label}>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              {t.label}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <span className="text-3xl font-bold tabular-nums">
+              {t.value.toLocaleString("es-BO")}
+            </span>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+export default function PanelResumenPage() {
+  return (
+    <div className="flex flex-col gap-6">
+      <h1 className="text-2xl font-bold tracking-tight">Resumen</h1>
+      <Suspense
+        fallback={
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {["a", "b", "c", "d"].map((k) => (
+              <Skeleton key={k} className="h-28" />
+            ))}
+          </div>
+        }
+      >
+        <Counts />
+      </Suspense>
+    </div>
   );
 }
