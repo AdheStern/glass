@@ -560,6 +560,23 @@ model SlugHistory {
   @@map("slug_history")
 }
 
+// Lote de importación CSV (§19.2). Reversible durante 24 h.
+model ImportBatch {
+  id                String    @id @default(cuid())
+  status            String    @default("APPLIED") // APPLIED | UNDONE
+  createdByUserId   String?   @map("created_by_user_id")
+  rowCount          Int       @map("row_count")
+  createdCount      Int       @default(0) @map("created_count")
+  updatedCount      Int       @default(0) @map("updated_count")
+  createdProductIds Json      @default("[]") @map("created_product_ids")
+  createdCategoryIds Json     @default("[]") @map("created_category_ids")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  undoneAt          DateTime? @map("undone_at")
+
+  @@index([createdAt])
+  @@map("import_batch")
+}
+
 // Registro de auditoría (§21): cambios de precio, anulaciones, ajustes, altas.
 model AuditLog {
   id         String   @id @default(cuid())
