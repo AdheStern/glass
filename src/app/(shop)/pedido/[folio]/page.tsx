@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatBob } from "@/domain/money";
@@ -19,6 +20,9 @@ export default async function PedidoPage({
 }: {
   params: Promise<{ folio: string }>;
 }) {
+  // Sin shell prerenderizado: así `notFound()` responde 404 y no 200 (el shell
+  // ya se habría enviado).
+  await connection();
   const { folio } = await params;
   const order = await getOrderByFolio(decodeURIComponent(folio));
   if (!order) notFound();

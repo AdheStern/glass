@@ -4,6 +4,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { formatBob } from "@/domain/money";
+import { PLACEHOLDER_IMAGE } from "@/features/catalog/image";
 import type { ProductCardData } from "@/features/catalog/types";
 import {
   CARD_PRESETS,
@@ -36,6 +37,11 @@ export function ProductCard({
   const p = CARD_PRESETS[preset];
   const row = p.layout === "row";
   const discounted = product.effectiveFromPriceBob < product.fromPriceBob;
+  const image = product.image ?? {
+    url: PLACEHOLDER_IMAGE,
+    alt: product.name,
+    blurDataUrl: null,
+  };
 
   return (
     <Link
@@ -55,22 +61,20 @@ export function ProductCard({
           width: row ? 112 : "100%",
         }}
       >
-        {product.image ? (
-          <Image
-            src={product.image.url}
-            alt={product.image.alt}
-            fill
-            unoptimized
-            sizes={
-              row
-                ? "112px"
-                : "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            }
-            className={`object-cover ${product.stock.available ? "" : "opacity-50"}`}
-            placeholder={product.image.blurDataUrl ? "blur" : "empty"}
-            blurDataURL={product.image.blurDataUrl ?? undefined}
-          />
-        ) : null}
+        <Image
+          src={image.url}
+          alt={image.alt}
+          fill
+          unoptimized
+          sizes={
+            row
+              ? "112px"
+              : "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          }
+          className={`object-cover ${product.stock.available ? "" : "opacity-50"}`}
+          placeholder={image.blurDataUrl ? "blur" : "empty"}
+          blurDataURL={image.blurDataUrl ?? undefined}
+        />
       </div>
 
       <div className={`flex min-w-0 flex-col gap-1 ${row ? "flex-1" : ""}`}>

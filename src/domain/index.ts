@@ -6,5 +6,6 @@ export * from "./inventory";
 export * from "./money";
 export * from "./pin";
 export * from "./pricing";
+export * from "./rate-limit";
 export * from "./sale";
 export * from "./stock";

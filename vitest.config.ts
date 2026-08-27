@@ -16,6 +16,7 @@ export default defineConfig({
       "src/domain/**/*.test.ts",
       "src/theme/**/*.test.ts",
       "src/features/**/*.test.ts",
+      "src/server/**/*.test.ts",
       "tests/integration/**/*.test.ts",
     ],
     hookTimeout: 30_000,

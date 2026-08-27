@@ -5,6 +5,7 @@ import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 import { prisma } from "@/db/client";
 import { getSiteSettings } from "@/db/settings";
+import { limitByIp } from "@/server/rate-limit";
 import { publicImageUrl } from "./image";
 import { queryCatalogList } from "./list-query";
 import type {
@@ -83,6 +84,19 @@ export async function getSearchResults(input: {
   filters?: CatalogFilters;
   page?: number;
 }): Promise<CatalogPage> {
+  // Límite de peticiones (§21): la búsqueda a mano no pasa de unas pocas por
+  // minuto; un raspador sí. Al exceder, se devuelve vacío.
+  const rate = await limitByIp("search", 30, 60_000);
+  if (!rate.ok) {
+    return {
+      products: [],
+      total: 0,
+      page: 1,
+      pageSize: PAGE_SIZE,
+      totalPages: 0,
+    };
+  }
+
   const settings = await getSiteSettings();
   return queryCatalogList({
     categoryIds: null,

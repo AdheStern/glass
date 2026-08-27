@@ -31,9 +31,10 @@ test("comprar: agregar al carrito y crear el pedido", async ({
   await expect(page.getByRole("link", { name: "Ver pedido" })).toBeVisible();
 });
 
-test("un pedido inexistente muestra el aviso de no encontrado", async ({
+test("un pedido inexistente responde 404 y muestra el aviso", async ({
   page,
 }) => {
-  await page.goto("/pedido/P-999999");
+  const res = await page.goto("/pedido/P-999999");
+  expect(res?.status()).toBe(404);
   await expect(page.getByText(/No encontramos esa página/i)).toBeVisible();
 });

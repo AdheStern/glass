@@ -4,6 +4,7 @@ import { prisma } from "@/db/client";
 import { getSiteSettings } from "@/db/settings";
 import { roundToStep } from "@/domain/money";
 import { requireRole } from "@/features/auth/roles";
+import { limitByIp } from "@/server/rate-limit";
 import { nextOrderFolio } from "./folio";
 import { buildOrderMessage, waLink } from "./message";
 import { getVariantPricing } from "./pricing";
@@ -27,6 +28,16 @@ export interface CreateOrderResult {
 export async function createOrderAction(
   raw: CreateOrderInput,
 ): Promise<CreateOrderResult> {
+  // Límite de peticiones (§21): un catálogo público es objetivo trivial de spam.
+  const rate = await limitByIp("order", 8, 10 * 60_000);
+  if (!rate.ok) {
+    return {
+      ok: false,
+      error:
+        "Demasiados pedidos seguidos. Esperá unos minutos e intentá de nuevo.",
+    };
+  }
+
   const parsed = CreateOrderSchema.safeParse(raw);
   if (!parsed.success) {
     return {

@@ -10,6 +10,7 @@ import { getSiteSettings } from "@/db/settings";
 import { AddToCartControl } from "@/features/cart/components/add-to-cart-control";
 import { PriceTag } from "@/features/catalog/components/price-tag";
 import { StockBadge } from "@/features/catalog/components/stock-badge";
+import { PLACEHOLDER_IMAGE } from "@/features/catalog/image";
 import { getDisplayPrice } from "@/features/catalog/pricing-view";
 import {
   getProductBySlug,
@@ -148,32 +149,28 @@ export default async function ProductoPage({
 
       <div className="mt-4 grid gap-8 md:grid-cols-2">
         <div className="grid gap-3">
-          {product.images.length > 0 ? (
-            product.images.map((img, i) => (
-              <div
-                key={img.url}
-                className="relative overflow-hidden rounded-[var(--radius-card)] bg-black/5"
-                style={{ aspectRatio: "1 / 1" }}
-              >
-                <Image
-                  src={img.url}
-                  alt={img.alt}
-                  fill
-                  unoptimized
-                  priority={i === 0}
-                  sizes="(max-width: 768px) 100vw, 40vw"
-                  className="object-cover"
-                  placeholder={img.blurDataUrl ? "blur" : "empty"}
-                  blurDataURL={img.blurDataUrl ?? undefined}
-                />
-              </div>
-            ))
-          ) : (
+          {(product.images.length > 0
+            ? product.images
+            : [{ url: PLACEHOLDER_IMAGE, alt: product.name, blurDataUrl: null }]
+          ).map((img, i) => (
             <div
-              className="rounded-[var(--radius-card)] bg-black/5"
+              key={img.url}
+              className="relative overflow-hidden rounded-[var(--radius-card)] bg-black/5"
               style={{ aspectRatio: "1 / 1" }}
-            />
-          )}
+            >
+              <Image
+                src={img.url}
+                alt={img.alt}
+                fill
+                unoptimized
+                priority={i === 0}
+                sizes="(max-width: 768px) 100vw, 40vw"
+                className="object-cover"
+                placeholder={img.blurDataUrl ? "blur" : "empty"}
+                blurDataURL={img.blurDataUrl ?? undefined}
+              />
+            </div>
+          ))}
         </div>
 
         <div className="flex flex-col gap-4">

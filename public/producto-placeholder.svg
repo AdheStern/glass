@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800" role="img" aria-label="Imagen de producto no disponible">
+  <rect width="800" height="800" fill="#f1f1f0"/>
+  <g fill="none" stroke="#c4c3c0" stroke-width="14" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M400 168 592 280 592 520 400 632 208 520 208 280 Z"/>
+    <path d="M208 280 400 392 592 280"/>
+    <path d="M400 392 400 632"/>
+  </g>
+  <circle cx="400" cy="392" r="0" fill="#c4c3c0"/>
+</svg>
