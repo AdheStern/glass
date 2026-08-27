@@ -18,7 +18,9 @@
       "!playwright-report",
       "!test-results",
       "!docs",
-      "!**/*.html"
+      "!**/*.html",
+      "!src/components/ui",
+      "!src/hooks"
     ]
   },
   "formatter": {

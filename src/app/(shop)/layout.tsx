@@ -30,7 +30,7 @@ export default async function ShopLayout({
   };
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="shop-surface flex flex-1 flex-col">
       <JsonLd data={localBusiness} />
       <header className="sticky top-0 z-10 border-b border-black/10 bg-[var(--surface)]/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">

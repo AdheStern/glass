@@ -44,7 +44,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           dangerouslySetInnerHTML={{ __html: tokensToCss(tokens) }}
         />
       </head>
-      <body className="min-h-full flex flex-col bg-[var(--surface)] text-[var(--ink)]">
+      <body className="min-h-full flex flex-col bg-background text-foreground">
         {children}
       </body>
     </html>
