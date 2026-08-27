@@ -1,21 +1,8 @@
 # Glass — pruebas. Postgres efímero en tmpfs (los tests de integración NO tocan Supabase).
 # Uso: docker compose -f compose.yml -f compose.test.yml run --rm test   (`make test`)
-#      docker compose -f compose.yml -f compose.test.yml run --rm e2e    (`make e2e`)
+name: glass-test
 
 services:
-  app:
-    # En el stack de test, `app` solo se usa como servidor para e2e.
-    build:
-      target: dev
-    command: pnpm dev
-    volumes:
-      - .:/app
-      - node_modules:/app/node_modules
-      - next_cache:/app/.next
-    depends_on:
-      postgres-test:
-        condition: service_healthy
-
   postgres-test:
     image: postgres:16-alpine
     environment:
@@ -43,21 +30,10 @@ services:
       DIRECT_URL: postgresql://glass:glass@postgres-test:5432/glass_test
     volumes:
       - .:/app
-      - node_modules:/app/node_modules
+      - test_node_modules:/app/node_modules
     depends_on:
       postgres-test:
         condition: service_healthy
 
-  e2e:
-    image: mcr.microsoft.com/playwright:v1.49.1-jammy
-    working_dir: /app
-    command: sh -c "corepack enable && pnpm playwright test"
-    environment:
-      PLAYWRIGHT_BASE_URL: http://app:3000
-      CI: "true"
-    volumes:
-      - .:/app
-      - node_modules:/app/node_modules
-    depends_on:
-      app:
-        condition: service_started
+volumes:
+  test_node_modules:

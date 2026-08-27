@@ -59,10 +59,9 @@ test: ## Corre verify (biome + tsc + vitest) con Postgres efímero
 	$(COMPOSE_TEST) run --rm test
 	$(COMPOSE_TEST) down -v
 
-e2e: ## Corre el humo de Playwright contra la app levantada
-	$(COMPOSE_TEST) up -d app postgres-test
-	$(COMPOSE_TEST) run --rm e2e
-	$(COMPOSE_TEST) down -v
+e2e: ## Corre el humo de Playwright contra la app de desarrollo
+	$(COMPOSE) up -d app
+	$(COMPOSE) --profile e2e run --rm e2e
 
 studio: ## Abre Prisma Studio (http://localhost:5555)
 	$(COMPOSE) exec app pnpm db:studio

@@ -32,3 +32,19 @@ services:
       MP_SMTP_AUTH_ACCEPT_ANY: "true"
       MP_SMTP_AUTH_ALLOW_INSECURE: "true"
     restart: unless-stopped
+
+  # Playwright. No arranca con `make up`; se invoca con `make e2e`.
+  e2e:
+    profiles: ["e2e"]
+    image: mcr.microsoft.com/playwright:v1.49.1-jammy
+    working_dir: /app
+    command: sh -c "corepack enable && pnpm exec playwright test"
+    environment:
+      PLAYWRIGHT_BASE_URL: http://app:3000
+      CI: "true"
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    depends_on:
+      app:
+        condition: service_started
