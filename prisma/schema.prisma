@@ -59,6 +59,19 @@ enum OrderChannel {
   WEB
 }
 
+enum StockCountStatus {
+  ABIERTA
+  CERRADA
+  APLICADA
+  CANCELADA
+}
+
+enum StockCountScope {
+  TODO
+  CATEGORIA
+  LIBRE
+}
+
 enum OrderStatus {
   NUEVO
   CONFIRMADO
@@ -198,10 +211,11 @@ model Category {
   position   Int       @default(0)
   archivedAt DateTime? @map("archived_at")
 
-  parent    Category?         @relation("CategoryTree", fields: [parentId], references: [id])
-  children  Category[]        @relation("CategoryTree")
-  products  ProductCategory[]
-  discounts Discount[]
+  parent      Category?         @relation("CategoryTree", fields: [parentId], references: [id])
+  children    Category[]        @relation("CategoryTree")
+  products    ProductCategory[]
+  discounts   Discount[]
+  stockCounts StockCount[]
 
   @@index([parentId, position])
   @@map("category")
@@ -254,11 +268,12 @@ model Variant {
   position     Int       @default(0)
   archivedAt   DateTime? @map("archived_at")
 
-  product   Product         @relation(fields: [productId], references: [id])
-  movements StockMovement[]
-  stock     VariantStock?
+  product    Product          @relation(fields: [productId], references: [id])
+  movements  StockMovement[]
+  stock      VariantStock?
   orderItems OrderItem[]
   saleItems  SaleItem[]
+  countLines StockCountLine[]
 
   @@unique([barcode])
   @@index([productId])
@@ -326,13 +341,53 @@ model StockMovement {
 // Tabla-resumen mantenida por trigger AFTER INSERT ON stock_movement
 // (prisma/sql/*.sql). NO es fuente de verdad: es caché para la lectura del catálogo.
 model VariantStock {
-  variantId String   @id @map("variant_id")
-  qty       Int      @default(0)
-  updatedAt DateTime @default(now()) @map("updated_at")
+  variantId      String    @id @map("variant_id")
+  qty            Int       @default(0)
+  lastMovementAt DateTime? @map("last_movement_at") // lo fija el trigger; alimenta el reporte de capital dormido (§14.4)
+  updatedAt      DateTime  @default(now()) @map("updated_at")
 
   variant Variant @relation(fields: [variantId], references: [id])
 
   @@map("variant_stock")
+}
+
+// ===========================================================================
+// Toma de inventario (§14.3) — congela el teórico, el cierre genera los AJUSTE
+// ===========================================================================
+
+model StockCount {
+  id              String           @id @default(cuid())
+  status          StockCountStatus @default(ABIERTA)
+  scope           StockCountScope  @default(LIBRE)
+  categoryId      String?          @map("category_id")
+  note            String?
+  createdByUserId String?          @map("created_by_user_id")
+  frozenAt        DateTime         @default(now()) @map("frozen_at")
+  closedAt        DateTime?        @map("closed_at")
+  appliedAt       DateTime?        @map("applied_at")
+  createdAt       DateTime         @default(now()) @map("created_at")
+
+  category Category?       @relation(fields: [categoryId], references: [id])
+  lines    StockCountLine[]
+
+  @@index([status, createdAt])
+  @@map("stock_count")
+}
+
+model StockCountLine {
+  id             String @id @default(cuid())
+  stockCountId   String @map("stock_count_id")
+  variantId      String @map("variant_id")
+  theoreticalQty Int    @map("theoretical_qty") // saldo congelado al abrir
+  countedQty     Int?   @map("counted_qty") // null = no contada (toma parcial)
+  unitCostBob    Int?   @map("unit_cost_bob")
+
+  stockCount StockCount @relation(fields: [stockCountId], references: [id])
+  variant    Variant    @relation(fields: [variantId], references: [id])
+
+  @@unique([stockCountId, variantId])
+  @@index([variantId])
+  @@map("stock_count_line")
 }
 
 // ===========================================================================

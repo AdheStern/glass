@@ -11,7 +11,9 @@ export interface NavItem {
     | "tag"
     | "upload"
     | "inbox"
-    | "settings";
+    | "settings"
+    | "boxes"
+    | "tags";
   roles?: Role[];
   exact?: boolean;
 }
@@ -41,6 +43,18 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Descuentos",
     icon: "tag",
     roles: ["PROPIETARIO", "ADMINISTRADOR"],
+  },
+  {
+    href: "/panel/inventario",
+    label: "Inventario",
+    icon: "boxes",
+    roles: ["PROPIETARIO", "ADMINISTRADOR", "ALMACEN"],
+  },
+  {
+    href: "/panel/etiquetas",
+    label: "Etiquetas",
+    icon: "tags",
+    roles: ["PROPIETARIO", "ADMINISTRADOR", "ALMACEN"],
   },
   {
     href: "/panel/importar",

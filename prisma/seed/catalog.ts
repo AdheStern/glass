@@ -118,7 +118,7 @@ export async function seedCatalog(
     id: string;
     productId: string;
     sku: string;
-    barcode: string;
+    barcode: string | null;
     basePriceBob: number;
     costBob: number;
     minStock: number;
@@ -170,7 +170,8 @@ export async function seedCatalog(
         id: vid,
         productId: id,
         sku: `SKU-${i}-${v}`,
-        barcode: String(barcodeSeq++),
+        // Una pizca sin código: alimenta la bandeja de etiquetas pendientes (§14.4).
+        barcode: rng.bool(0.004) ? null : String(barcodeSeq++),
         basePriceBob: base,
         costBob: Math.round(base * (0.55 + rng.float() * 0.25)),
         minStock: rng.pick([0, 3, 5, 10]),

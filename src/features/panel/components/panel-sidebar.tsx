@@ -1,5 +1,6 @@
 "use client";
 import {
+  Boxes,
   FolderTree,
   Gauge,
   Inbox,
@@ -7,6 +8,7 @@ import {
   Package,
   Settings,
   Tag,
+  Tags,
   Upload,
 } from "lucide-react";
 import Link from "next/link";
@@ -34,6 +36,8 @@ const ICONS = {
   upload: Upload,
   inbox: Inbox,
   settings: Settings,
+  boxes: Boxes,
+  tags: Tags,
 } as const;
 
 export function PanelSidebar({

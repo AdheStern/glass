@@ -104,7 +104,9 @@
                 "paths": {
                   "framer-motion": "Sin animación en el catálogo (§8.3). Va solo en la landing, con next/dynamic.",
                   "motion": "Sin animación en el catálogo (§8.3).",
-                  "motion/react": "Sin animación en el catálogo (§8.3)."
+                  "motion/react": "Sin animación en el catálogo (§8.3).",
+                  "@zxing/browser": "El escáner no va en el catálogo (§8.3, §15). Vive en src/features/scanner.",
+                  "@zxing/library": "El escáner no va en el catálogo (§8.3, §15). Vive en src/features/scanner."
                 }
               }
             }

@@ -58,6 +58,7 @@ src/app/(shop)    público    · SSR con Cache Components, presupuesto estricto
 src/app/(admin)   panel      · /entrar + /panel/*, gateado por rol, `instant = false`
 src/app/(pos)     caja       · local primero (fases 5-6)
 src/features/     catalog · auth · panel · products · categories · discounts · media · import
+                  cart · orders · settings · inventory · scanner · labels
 src/components/ui shadcn/ui (radix-nova) — base de todos los componentes; fuera del lint
 src/components/   compartido no-feature (json-ld, breadcrumbs, skeletons)
 src/domain        lógica pura compartida servidor ↔ POS
@@ -90,6 +91,19 @@ pnpm prisma migrate dev --name X      # migración contra Supabase (DIRECT_URL)
 pnpm db:sql                           # aplica prisma/sql/*.sql (triggers, búsqueda)
 pnpm db:seed -- --products=2000 --seed=42
 ```
+
+## Reglas de Fase 4 (inventario y escaneo)
+
+- Las existencias solo se mueven con asientos en `stock_movement` (`sourceType` +
+  `sourceId`). Nadie escribe `variant_stock` (lo mantiene el trigger); una toma de
+  inventario **genera los `AJUSTE`** que explican la diferencia, no "arregla" el número.
+- La venta/pedido cobrado nunca se rechaza; existencia negativa es alerta, no error.
+- El escáner vive en `src/features/scanner` (`<ScanField>` = tipeo + HID + cámara).
+  `@zxing/*` se carga con `import()` diferido y biome lo prohíbe en `(shop)`,
+  `features/catalog` y `components`.
+- Etiquetas: PDF por lote con `pdf-lib`; las barras se dibujan desde el codificador puro
+  `src/domain/barcode.ts` (Code-128 / EAN-13). Ruta `/panel/etiquetas/pdf`.
+- Inventario y etiquetas admiten el rol `ALMACEN` (`requireInventory()` / `INVENTORY_ROLES`).
 
 ## Rendimiento del catálogo (Fase 1)
 

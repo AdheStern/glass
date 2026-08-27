@@ -7,6 +7,7 @@ import { seedCatalog } from "./catalog";
 import { seedChecksum } from "./checksum";
 import { seedConfig } from "./config";
 import { makeUploader } from "./images";
+import { seedInventoryExtras } from "./inventory";
 import { makeRng, parseArgs } from "./lib";
 import { seedSales } from "./sales";
 
@@ -26,6 +27,8 @@ async function wipe() {
     prisma.cashSession.deleteMany(),
     prisma.orderItem.deleteMany(),
     prisma.order.deleteMany(),
+    prisma.stockCountLine.deleteMany(),
+    prisma.stockCount.deleteMany(),
     prisma.stockMovement.deleteMany(),
     prisma.variantStock.deleteMany(),
     prisma.productImage.deleteMany(),
@@ -68,6 +71,10 @@ async function main() {
   const totals = await seedSales(prisma, rng, cfg, variants);
   console.timeEnd("sales");
 
+  console.time("inventory-extras");
+  const inv = await seedInventoryExtras(prisma, rng, variants);
+  console.timeEnd("inventory-extras");
+
   console.time("rebuild-derived");
   await prisma.$executeRaw`SELECT glass_rebuild_variant_stock()`;
   await prisma.$executeRaw`SELECT glass_rebuild_search()`;
@@ -76,7 +83,8 @@ async function main() {
   const checksum = await seedChecksum(prisma);
   console.log(
     `glass/seed: ${variants.length} variantes · ${totals.saleCount} ventas · ` +
-      `${totals.orderCount} pedidos · total Bs ${(totals.grandTotalBob / 100).toLocaleString("es-BO")}`,
+      `${totals.orderCount} pedidos · ${inv.mermaCount} mermas · 1 toma aplicada · ` +
+      `total Bs ${(totals.grandTotalBob / 100).toLocaleString("es-BO")}`,
   );
   console.log(`glass/seed: checksum ${checksum}`);
 }

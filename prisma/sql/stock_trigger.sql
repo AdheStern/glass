@@ -9,10 +9,14 @@
 CREATE OR REPLACE FUNCTION glass_apply_stock_movement()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO variant_stock (variant_id, qty, updated_at)
-  VALUES (NEW.variant_id, NEW.qty, now())
+  INSERT INTO variant_stock (variant_id, qty, last_movement_at, updated_at)
+  VALUES (NEW.variant_id, NEW.qty, NEW.occurred_at, now())
   ON CONFLICT (variant_id)
   DO UPDATE SET qty = variant_stock.qty + EXCLUDED.qty,
+                last_movement_at = GREATEST(
+                  COALESCE(variant_stock.last_movement_at, EXCLUDED.last_movement_at),
+                  EXCLUDED.last_movement_at
+                ),
                 updated_at = now();
   RETURN NEW;
 END;
@@ -31,8 +35,8 @@ CREATE OR REPLACE FUNCTION glass_rebuild_variant_stock()
 RETURNS void AS $$
 BEGIN
   DELETE FROM variant_stock;
-  INSERT INTO variant_stock (variant_id, qty, updated_at)
-  SELECT variant_id, COALESCE(SUM(qty), 0), now()
+  INSERT INTO variant_stock (variant_id, qty, last_movement_at, updated_at)
+  SELECT variant_id, COALESCE(SUM(qty), 0), MAX(occurred_at), now()
   FROM stock_movement
   GROUP BY variant_id;
 END;

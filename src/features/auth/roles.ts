@@ -14,7 +14,19 @@ export class AuthError extends Error {
 }
 
 /** Roles con acceso al panel de administración (§6.3). */
-export const PANEL_ROLES: Role[] = ["PROPIETARIO", "ADMINISTRADOR", "EDITOR"];
+export const PANEL_ROLES: Role[] = [
+  "PROPIETARIO",
+  "ADMINISTRADOR",
+  "EDITOR",
+  "ALMACEN",
+];
+
+/** Roles que pueden operar inventario y etiquetas (§14, §6.3). */
+export const INVENTORY_ROLES: Role[] = [
+  "PROPIETARIO",
+  "ADMINISTRADOR",
+  "ALMACEN",
+];
 
 /**
  * Perfil del usuario autenticado. Lo auto-provisiona en el primer acceso
@@ -52,6 +64,11 @@ export async function requirePanel(...allowed: Role[]): Promise<UserProfile> {
   const roles = allowed.length > 0 ? allowed : PANEL_ROLES;
   if (!roles.includes(profile.role)) redirect("/entrar?e=rol");
   return profile;
+}
+
+/** Para páginas de inventario/etiquetas: redirige si el rol no alcanza (§14). */
+export function requireInventory(): Promise<UserProfile> {
+  return requirePanel(...INVENTORY_ROLES);
 }
 
 export function canSeeCosts(role: Role): boolean {
