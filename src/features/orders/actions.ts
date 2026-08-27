@@ -132,9 +132,14 @@ export async function createOrderAction(
     template: settings.orderMessageTemplate,
   });
 
+  // El comprador elige por etiqueta si hay varios (§9.3); si no, se rota por
+  // folio para repartir la carga entre los números cargados.
   const numbers = settings.whatsappNumbers;
+  const folioSeq = Number.parseInt(order.folio.replace(/\D/g, ""), 10) || 0;
   const chosen =
-    numbers.find((n) => n.label === input.whatsappLabel) ?? numbers[0] ?? null;
+    numbers.find((n) => n.label === input.whatsappLabel) ??
+    numbers[folioSeq % Math.max(1, numbers.length)] ??
+    null;
   const waUrl = chosen ? waLink(chosen.e164, message) : undefined;
 
   return { ok: true, folio: order.folio, waUrl, message, warnings };
