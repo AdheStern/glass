@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requirePanel } from "@/features/auth/roles";
+import { ImageManager } from "@/features/media/components/image-manager";
 import { ProductForm } from "@/features/products/components/product-form";
 import {
   getProductForEdit,
@@ -23,8 +25,20 @@ export default async function EditarProductoPage({
   if (!product) notFound();
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-4">
+    <div className="mx-auto flex max-w-3xl flex-col gap-6">
       <h1 className="text-2xl font-bold tracking-tight">{product.name}</h1>
+      <Card>
+        <CardHeader>
+          <CardTitle>Fotos</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ImageManager
+            productId={product.id}
+            productName={product.name}
+            initial={product.images}
+          />
+        </CardContent>
+      </Card>
       <ProductForm categories={categories} initial={product} />
     </div>
   );

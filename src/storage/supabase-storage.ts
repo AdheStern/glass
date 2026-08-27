@@ -3,8 +3,7 @@
 // el cliente y las operaciones básicas de subida/URL.
 import "server-only";
 import { createClient } from "@supabase/supabase-js";
-
-const BUCKET = process.env.SUPABASE_STORAGE_BUCKET ?? "product-images";
+import { PRODUCT_IMAGES_BUCKET as BUCKET } from "./bucket";
 
 function serviceClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -49,4 +48,26 @@ export async function signedUrl(
     .createSignedUrl(path, expiresInSeconds);
   if (error) throw error;
   return data.signedUrl;
+}
+
+/** URL firmada para subir directo desde el navegador (§12.1: el contenedor nunca ve el archivo). */
+export async function createSignedUpload(
+  path: string,
+): Promise<{ path: string; token: string; signedUrl: string }> {
+  const { data, error } = await serviceClient()
+    .storage.from(BUCKET)
+    .createSignedUploadUrl(path);
+  if (error) throw error;
+  return { path, token: data.token, signedUrl: data.signedUrl };
+}
+
+export async function deleteObject(path: string): Promise<void> {
+  const { error } = await serviceClient().storage.from(BUCKET).remove([path]);
+  if (error) throw error;
+}
+
+export async function ensureBucket(): Promise<void> {
+  await serviceClient()
+    .storage.createBucket(BUCKET, { public: true })
+    .catch(() => {});
 }

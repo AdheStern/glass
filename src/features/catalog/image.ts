@@ -1,7 +1,7 @@
 // Glass — URL pública de una imagen de producto. El bucket es público: no se
 // necesita el service key para leer.
 
-const BUCKET = process.env.SUPABASE_STORAGE_BUCKET ?? "product-images";
+import { PRODUCT_IMAGES_BUCKET as BUCKET } from "@/storage/bucket";
 
 export function publicImageUrl(path: string): string {
   if (

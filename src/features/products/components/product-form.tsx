@@ -118,8 +118,13 @@ export function ProductForm({
     start(async () => {
       const r = await saveProductAction(payload);
       if (r.ok) {
-        toast.success(initial ? "Producto guardado" : "Producto creado");
-        router.push("/panel/productos");
+        if (initial) {
+          toast.success("Producto guardado");
+          router.push("/panel/productos");
+        } else {
+          toast.success("Producto creado — agregá sus fotos");
+          router.push(`/panel/productos/${r.id}`);
+        }
         router.refresh();
       } else {
         setErrors(r.fieldErrors ?? {});
