@@ -1,6 +1,7 @@
 // Glass — capa de dominio. Lógica pura compartida servidor ↔ POS local (§24.2 regla 1).
 // Nada aquí importa Prisma, Supabase, React, Next ni toca la red o el reloj.
 
+export * from "./arqueo";
 export * from "./barcode";
 export * from "./inventory";
 export * from "./money";

@@ -130,6 +130,10 @@ model SiteSettings {
   roundingMode         RoundingMode @default(NONE) @map("rounding_mode")
   minOrderBob          Int?         @map("min_order_bob")
   orderMessageTemplate String?      @map("order_message_template")
+  // POS (§16.2, §13.2)
+  cashDifferenceThresholdBob Int    @default(500) @map("cash_difference_threshold_bob")
+  maxCashierDiscountPercent  Int    @default(0) @map("max_cashier_discount_percent")
+  receiptFooter        String?      @map("receipt_footer")
   updatedAt            DateTime     @updatedAt @map("updated_at")
 
   @@map("site_settings")
@@ -155,13 +159,15 @@ model UserProfile {
 
 // Persona que cobra en la caja. Puede o no tener cuenta de usuario.
 model Operator {
-  id         String    @id @default(cuid())
-  name       String
-  pinHash    String    @map("pin_hash")
-  role       Role      @default(CAJERO)
-  userId     String?   @map("user_id")
-  archivedAt DateTime? @map("archived_at")
-  createdAt  DateTime  @default(now()) @map("created_at")
+  id             String    @id @default(cuid())
+  name           String
+  pinHash        String    @map("pin_hash")
+  role           Role      @default(CAJERO)
+  userId         String?   @map("user_id")
+  pinAttempts    Int       @default(0) @map("pin_attempts")
+  pinLockedUntil DateTime? @map("pin_locked_until")
+  archivedAt     DateTime? @map("archived_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
 
   cashSessions       CashSession[]
   salesAsOperator    Sale[]        @relation("SaleOperator")

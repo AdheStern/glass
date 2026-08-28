@@ -12,6 +12,9 @@ export interface SeededConfig {
 
 // PIN fijo para la demo (documentado). El identifica, no autoriza (§6.2).
 const DEMO_PIN = "2468";
+// Código de emparejamiento de larga duración para probar el POS sin pasar por el
+// panel (en producción lo genera el propietario, válido 10 min — §6.2).
+const DEMO_PAIRING_CODE = "424242";
 
 export async function seedConfig(prisma: PrismaClient): Promise<SeededConfig> {
   await prisma.siteSettings.upsert({
@@ -43,7 +46,7 @@ export async function seedConfig(prisma: PrismaClient): Promise<SeededConfig> {
     ["María", "José", "Rosa"].map((name, i) =>
       prisma.operator.upsert({
         where: { id: `op_${i}` },
-        update: {},
+        update: { pinHash, pinAttempts: 0, pinLockedUntil: null },
         create: {
           id: `op_${i}`,
           name,
@@ -63,6 +66,12 @@ export async function seedConfig(prisma: PrismaClient): Promise<SeededConfig> {
       }),
     ),
   );
+
+  await prisma.devicePairingCode.upsert({
+    where: { code: DEMO_PAIRING_CODE },
+    update: { expiresAt: new Date("2099-01-01"), usedAt: null },
+    create: { code: DEMO_PAIRING_CODE, expiresAt: new Date("2099-01-01") },
+  });
 
   const methodDefs = [
     { id: "pm_efectivo", label: "Efectivo", countsInDrawer: true, position: 0 },

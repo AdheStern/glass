@@ -58,7 +58,8 @@ src/app/(shop)    público    · SSR con Cache Components, presupuesto estricto
 src/app/(admin)   panel      · /entrar + /panel/*, gateado por rol, `instant = false`
 src/app/(pos)     caja       · local primero (fases 5-6)
 src/features/     catalog · auth · panel · products · categories · discounts · media · import
-                  cart · orders · settings · inventory · scanner · labels
+                  cart · orders · settings · inventory · scanner · labels · pos
+src/server/       infra transversal de servidor (rate-limit)
 src/components/ui shadcn/ui (radix-nova) — base de todos los componentes; fuera del lint
 src/components/   compartido no-feature (json-ld, breadcrumbs, skeletons)
 src/domain        lógica pura compartida servidor ↔ POS
@@ -91,6 +92,26 @@ pnpm prisma migrate dev --name X      # migración contra Supabase (DIRECT_URL)
 pnpm db:sql                           # aplica prisma/sql/*.sql (triggers, búsqueda)
 pnpm db:seed -- --products=2000 --seed=42
 ```
+
+## Reglas de Fase 5 (POS en línea)
+
+- Identidad del POS = **token de dispositivo** (opaco, `localStorage`) + **PIN de
+  operador** (`argon2id`, validado en el servidor). Nunca Supabase. Toda action del
+  POS empieza con `requireDevice(token)`.
+- La venta trae su identidad del origen: `clientSaleId` (UUID v7 del navegador).
+  `createSaleAction` es **idempotente** sobre `clientSaleId` (reenviar = devolver la
+  existente). Prepara el terreno de la Fase 6.
+- La venta cobrada **nunca se rechaza** por existencias: genera el `StockMovement`
+  `VENTA` y, si queda negativo, es alerta.
+- Orden de cálculo del §13.1 vía `buildSale` (dominio): línea → subtotal → global →
+  redondeo. El `roundingBob` se guarda, no se reparte.
+- Descuento de caja > `settings.maxCashierDiscountPercent` (por defecto 0) exige PIN
+  de rol superior (`requireAuthPin`), registrado en `Sale.authorizedByOperatorId` (§6.4).
+- Arqueo (§16.2): el operador declara el conteo **antes** de ver lo esperado.
+  `computeArqueo` (dominio). Diferencia sobre umbral → nota obligatoria. Sesión
+  cerrada = inmutable.
+- Pedido → venta: `createSaleAction` con `orderId` enlaza `Order.saleId` y pasa a
+  `ENTREGADO`; el `PEDIDO_ENTREGADO` no se duplica (`advanceOrderAction` ya lo evita).
 
 ## Reglas de Fase 4 (inventario y escaneo)
 

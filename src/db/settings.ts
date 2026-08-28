@@ -33,6 +33,9 @@ export interface SiteSettingsView {
   roundingMode: DomainRoundingMode;
   minOrderBob: number | null;
   orderMessageTemplate: string | null;
+  cashDifferenceThresholdBob: number;
+  maxCashierDiscountPercent: number;
+  receiptFooter: string | null;
 }
 
 const DEFAULTS: SiteSettingsView = {
@@ -55,6 +58,9 @@ const DEFAULTS: SiteSettingsView = {
   roundingMode: "NONE",
   minOrderBob: null,
   orderMessageTemplate: null,
+  cashDifferenceThresholdBob: 500,
+  maxCashierDiscountPercent: 0,
+  receiptFooter: null,
 };
 
 export async function getSiteSettings(): Promise<SiteSettingsView> {
@@ -87,5 +93,8 @@ export async function getSiteSettings(): Promise<SiteSettingsView> {
     roundingMode: row.roundingMode as DomainRoundingMode,
     minOrderBob: row.minOrderBob,
     orderMessageTemplate: row.orderMessageTemplate,
+    cashDifferenceThresholdBob: row.cashDifferenceThresholdBob,
+    maxCashierDiscountPercent: row.maxCashierDiscountPercent,
+    receiptFooter: row.receiptFooter,
   };
 }

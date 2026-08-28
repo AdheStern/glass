@@ -5,11 +5,13 @@ import {
   Gauge,
   Inbox,
   LogOut,
+  Monitor,
   Package,
   Settings,
   Tag,
   Tags,
   Upload,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -38,6 +40,8 @@ const ICONS = {
   settings: Settings,
   boxes: Boxes,
   tags: Tags,
+  monitor: Monitor,
+  users: Users,
 } as const;
 
 export function PanelSidebar({

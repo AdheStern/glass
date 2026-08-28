@@ -13,7 +13,9 @@ export interface NavItem {
     | "inbox"
     | "settings"
     | "boxes"
-    | "tags";
+    | "tags"
+    | "monitor"
+    | "users";
   roles?: Role[];
   exact?: boolean;
 }
@@ -60,6 +62,18 @@ export const NAV_ITEMS: NavItem[] = [
     href: "/panel/importar",
     label: "Importar",
     icon: "upload",
+    roles: ["PROPIETARIO", "ADMINISTRADOR"],
+  },
+  {
+    href: "/panel/dispositivos",
+    label: "Dispositivos",
+    icon: "monitor",
+    roles: ["PROPIETARIO", "ADMINISTRADOR"],
+  },
+  {
+    href: "/panel/operadores",
+    label: "Operadores",
+    icon: "users",
     roles: ["PROPIETARIO", "ADMINISTRADOR"],
   },
   {
