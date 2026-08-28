@@ -85,18 +85,18 @@ enum ContentStatus {
   PUBLISHED
 }
 
+// Los 10 bloques de §11.1.
 enum BlockType {
   HERO
-  RICH_TEXT
-  IMAGE
-  GALLERY
   BENTO
   PRODUCT_GRID
-  CATEGORY_CAROUSEL
+  TEXT_MEDIA
+  GALLERY
+  TESTIMONIALS
   FAQ
-  CTA
-  MAP
-  CONTACT
+  MAP_CONTACT
+  CTA_WHATSAPP
+  POSTS
 }
 
 enum CashMovementKind {
@@ -610,8 +610,10 @@ model Page {
   slug        String        @unique
   title       String
   status      ContentStatus @default(DRAFT)
+  isHome      Boolean       @default(false) @map("is_home")
   metaTitle   String?       @map("meta_title")
   metaDesc    String?       @map("meta_desc")
+  draftToken  String?       @unique @map("draft_token") // §11.3 vista previa por testigo
   publishedAt DateTime?     @map("published_at")
   updatedAt   DateTime      @updatedAt @map("updated_at")
 
@@ -627,6 +629,9 @@ model Post {
   excerpt     String?
   coverPath   String?       @map("cover_path")
   status      ContentStatus @default(DRAFT)
+  authorName  String?       @map("author_name")
+  tags        String[]      @default([])
+  draftToken  String?       @unique @map("draft_token")
   publishedAt DateTime?     @map("published_at")
   updatedAt   DateTime      @updatedAt @map("updated_at")
 

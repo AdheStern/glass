@@ -16,7 +16,9 @@ export interface NavItem {
     | "tags"
     | "monitor"
     | "users"
-    | "refresh-cw";
+    | "refresh-cw"
+    | "file-text"
+    | "newspaper";
   roles?: Role[];
   exact?: boolean;
 }
@@ -81,6 +83,18 @@ export const NAV_ITEMS: NavItem[] = [
     href: "/panel/sincronizacion",
     label: "Sincronización",
     icon: "refresh-cw",
+    roles: ["PROPIETARIO", "ADMINISTRADOR"],
+  },
+  {
+    href: "/panel/paginas",
+    label: "Páginas",
+    icon: "file-text",
+    roles: ["PROPIETARIO", "ADMINISTRADOR"],
+  },
+  {
+    href: "/panel/blog",
+    label: "Blog",
+    icon: "newspaper",
     roles: ["PROPIETARIO", "ADMINISTRADOR"],
   },
   {

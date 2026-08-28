@@ -1,11 +1,13 @@
 "use client";
 import {
   Boxes,
+  FileText,
   FolderTree,
   Gauge,
   Inbox,
   LogOut,
   Monitor,
+  Newspaper,
   Package,
   RefreshCw,
   Settings,
@@ -44,6 +46,8 @@ const ICONS = {
   monitor: Monitor,
   users: Users,
   "refresh-cw": RefreshCw,
+  "file-text": FileText,
+  newspaper: Newspaper,
 } as const;
 
 export function PanelSidebar({

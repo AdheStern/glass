@@ -6,6 +6,7 @@ import { PrismaClient } from "@prisma/client";
 import { seedCatalog } from "./catalog";
 import { seedChecksum } from "./checksum";
 import { seedConfig } from "./config";
+import { seedContent } from "./content";
 import { makeUploader } from "./images";
 import { seedInventoryExtras } from "./inventory";
 import { makeRng, parseArgs } from "./lib";
@@ -20,6 +21,9 @@ const prisma = new PrismaClient({
 // Orden inverso a las FK para poder re-sembrar sin borrar volúmenes.
 async function wipe() {
   await prisma.$transaction([
+    prisma.pageBlock.deleteMany(),
+    prisma.page.deleteMany(),
+    prisma.post.deleteMany(),
     prisma.syncCommand.deleteMany(),
     prisma.payment.deleteMany(),
     prisma.saleItem.deleteMany(),
@@ -76,6 +80,10 @@ async function main() {
   const inv = await seedInventoryExtras(prisma, rng, variants);
   console.timeEnd("inventory-extras");
 
+  console.time("content");
+  const content = await seedContent(prisma);
+  console.timeEnd("content");
+
   console.time("rebuild-derived");
   await prisma.$executeRaw`SELECT glass_rebuild_variant_stock()`;
   await prisma.$executeRaw`SELECT glass_rebuild_search()`;
@@ -85,6 +93,7 @@ async function main() {
   console.log(
     `glass/seed: ${variants.length} variantes · ${totals.saleCount} ventas · ` +
       `${totals.orderCount} pedidos · ${inv.mermaCount} mermas · 1 toma aplicada · ` +
+      `${content.publishedPosts} entradas + portada por bloques · ` +
       `total Bs ${(totals.grandTotalBob / 100).toLocaleString("es-BO")}`,
   );
   console.log(`glass/seed: checksum ${checksum}`);

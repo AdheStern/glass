@@ -102,9 +102,11 @@
               "level": "error",
               "options": {
                 "paths": {
-                  "framer-motion": "Sin animación en el catálogo (§8.3). Va solo en la landing, con next/dynamic.",
-                  "motion": "Sin animación en el catálogo (§8.3).",
-                  "motion/react": "Sin animación en el catálogo (§8.3).",
+                  "framer-motion": "Sin animación en el catálogo (§8.3). Va solo en la landing (features/content), con carga diferida.",
+                  "motion": "Sin animación en el catálogo (§8.3). Solo en features/content.",
+                  "motion/react": "Sin animación en el catálogo (§8.3). Solo en features/content.",
+                  "@dnd-kit/core": "El editor con arrastre es del panel (§11). Vive en features/content.",
+                  "@dnd-kit/sortable": "El editor con arrastre es del panel (§11). Vive en features/content.",
                   "@zxing/browser": "El escáner no va en el catálogo (§8.3, §15). Vive en src/features/scanner.",
                   "@zxing/library": "El escáner no va en el catálogo (§8.3, §15). Vive en src/features/scanner.",
                   "dexie": "La base local es solo de la caja (§17). Vive en src/features/pos/offline.",
@@ -112,6 +114,22 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/features/content/components/**"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noArrayIndexKey": "off"
+          },
+          "a11y": {
+            "useSemanticElements": "off",
+            "useMediaCaption": "off",
+            "noStaticElementInteractions": "off",
+            "useFocusableInteractive": "off"
           }
         }
       }

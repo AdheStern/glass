@@ -58,7 +58,7 @@ src/app/(shop)    público    · SSR con Cache Components, presupuesto estricto
 src/app/(admin)   panel      · /entrar + /panel/*, gateado por rol, `instant = false`
 src/app/(pos)     caja       · local primero (fases 5-6)
 src/features/     catalog · auth · panel · products · categories · discounts · media · import
-                  cart · orders · settings · inventory · scanner · labels · pos
+                  cart · orders · settings · inventory · scanner · labels · pos · content
 src/server/       infra transversal de servidor (rate-limit)
 src/components/ui shadcn/ui (radix-nova) — base de todos los componentes; fuera del lint
 src/components/   compartido no-feature (json-ld, breadcrumbs, skeletons)
@@ -92,6 +92,26 @@ pnpm prisma migrate dev --name X      # migración contra Supabase (DIRECT_URL)
 pnpm db:sql                           # aplica prisma/sql/*.sql (triggers, búsqueda)
 pnpm db:seed -- --products=2000 --seed=42
 ```
+
+## Reglas de Fase 7 (contenido y blog)
+
+- CMS propio en la misma base (ADR-10). Cada bloque es un registro `page_block`
+  con `type` + `position` + `data` JSON validado por un zod del registro
+  (`src/features/content/blocks/registry.ts`). Agregar un bloque = un esquema, una
+  entrada y un componente.
+- Los 10 bloques de §11.1: `HERO, BENTO, PRODUCT_GRID, TEXT_MEDIA, GALLERY,
+  TESTIMONIALS, FAQ, MAP_CONTACT, CTA_WHATSAPP, POSTS`.
+- **Ningún bloque ejecuta HTML del cliente.** El texto enriquecido es un AST
+  (`src/domain/rich-text.ts`), se **sanea al guardar** (`sanitizeRichText`) y se
+  renderiza sin `dangerouslySetInnerHTML`. `href` solo `http(s)`/`/`/`mailto:`/`tel:`.
+- La portada `/` es una `Page` con `isHome` publicada; si no hay, va
+  `<DefaultHome>`.
+- Borrador: `Page`/`Post` llevan `draftToken` único; `/borrador/[token]` lo
+  muestra con `noindex`. Publicar invalida `revalidateTag("content", "max")`.
+- `motion` (animación) solo en `src/features/content/components`, en su propio
+  chunk; biome lo prohíbe en `(shop)`, `catalog`, `components`. `@dnd-kit` igual
+  (editor del panel).
+- El blog es opcional (§11.2): va después de "Páginas" en el panel, nunca primero.
 
 ## Reglas de Fase 6 (POS sin conexión)
 

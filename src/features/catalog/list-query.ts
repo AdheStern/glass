@@ -41,10 +41,13 @@ export async function queryCatalogList(opts: {
   page: number;
   pageSize: number;
   search?: string;
+  /** Selección curada (bloque PRODUCT_GRID manual, §11.1). */
+  productIds?: string[];
   stockDisplay: StockDisplay;
   lowStockThreshold: number;
 }): Promise<CatalogPage> {
-  const { categoryIds, filters, sort, page, pageSize, search } = opts;
+  const { categoryIds, filters, sort, page, pageSize, search, productIds } =
+    opts;
   const offset = (page - 1) * pageSize;
   const q = search?.trim();
 
@@ -64,6 +67,9 @@ export async function queryCatalogList(opts: {
     conds.push(
       Prisma.sql`exists (select 1 from product_category pc where pc.product_id = p.id and pc.category_id in (${Prisma.join(categoryIds)}))`,
     );
+  }
+  if (productIds && productIds.length > 0) {
+    conds.push(Prisma.sql`p.id in (${Prisma.join(productIds)})`);
   }
   if (filters.minPriceBob != null)
     conds.push(Prisma.sql`fp.from_price_bob >= ${filters.minPriceBob}`);

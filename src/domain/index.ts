@@ -8,6 +8,7 @@ export * from "./money";
 export * from "./pin";
 export * from "./pricing";
 export * from "./rate-limit";
+export * from "./rich-text";
 export * from "./sale";
 export * from "./stock";
 export * from "./sync";
