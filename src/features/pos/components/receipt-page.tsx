@@ -1,9 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
 import { getReceiptAction } from "../actions";
+import { localReceipt } from "../offline/receipt-local";
 import { posDevice } from "../pos-session";
 import type { ReceiptView } from "../receipt";
 import { Receipt } from "./receipt";
+
+const IS_FOLIO = /^V-\d+$/i;
 
 export function ReceiptPage({ folio }: { folio: string }) {
   const [state, setState] = useState<
@@ -13,13 +16,19 @@ export function ReceiptPage({ folio }: { folio: string }) {
 
   useEffect(() => {
     const device = posDevice.get();
-    if (!device) {
-      setState({ loading: false, receipt: null, token: "" });
-      return;
+    const token = device?.token ?? "";
+
+    async function resolve(): Promise<ReceiptView | null> {
+      // Venta sincronizada: el servidor tiene el detalle completo.
+      if (token && IS_FOLIO.test(folio)) {
+        const server = await getReceiptAction(token, folio).catch(() => null);
+        if (server) return server;
+      }
+      // Venta local (aún sin folio) o sin red: se arma desde Dexie.
+      return localReceipt(folio);
     }
-    getReceiptAction(device.token, folio).then((receipt) =>
-      setState({ loading: false, receipt, token: device.token }),
-    );
+
+    resolve().then((receipt) => setState({ loading: false, receipt, token }));
   }, [folio]);
 
   if (state.loading) return null;

@@ -15,7 +15,8 @@ export interface NavItem {
     | "boxes"
     | "tags"
     | "monitor"
-    | "users";
+    | "users"
+    | "refresh-cw";
   roles?: Role[];
   exact?: boolean;
 }
@@ -74,6 +75,12 @@ export const NAV_ITEMS: NavItem[] = [
     href: "/panel/operadores",
     label: "Operadores",
     icon: "users",
+    roles: ["PROPIETARIO", "ADMINISTRADOR"],
+  },
+  {
+    href: "/panel/sincronizacion",
+    label: "Sincronización",
+    icon: "refresh-cw",
     roles: ["PROPIETARIO", "ADMINISTRADOR"],
   },
   {

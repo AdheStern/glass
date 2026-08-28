@@ -20,6 +20,7 @@ const prisma = new PrismaClient({
 // Orden inverso a las FK para poder re-sembrar sin borrar volúmenes.
 async function wipe() {
   await prisma.$transaction([
+    prisma.syncCommand.deleteMany(),
     prisma.payment.deleteMany(),
     prisma.saleItem.deleteMany(),
     prisma.cashMovement.deleteMany(),

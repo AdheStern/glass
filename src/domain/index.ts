@@ -10,3 +10,4 @@ export * from "./pricing";
 export * from "./rate-limit";
 export * from "./sale";
 export * from "./stock";
+export * from "./sync";

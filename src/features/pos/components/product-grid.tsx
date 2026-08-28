@@ -4,6 +4,11 @@ import { Button } from "@/components/ui/button";
 import { formatBob } from "@/domain/money";
 import { ScanField } from "@/features/scanner/scan-field";
 import { posLookupAction, posSearchAction } from "../actions";
+import {
+  isOffline,
+  lookupOffline,
+  searchOffline,
+} from "../offline/catalog-lookup";
 import type { PosProduct } from "../types";
 
 export function ProductGrid({
@@ -30,15 +35,29 @@ export function ProductGrid({
       return;
     }
     start(async () => {
-      setList(
-        await posSearchAction(token, query, tab === "top" ? undefined : tab),
-      );
+      const categoryId = tab === "top" ? undefined : tab;
+      try {
+        if (isOffline()) {
+          setList(await searchOffline(query));
+        } else {
+          setList(await posSearchAction(token, query, categoryId));
+        }
+      } catch {
+        setList(await searchOffline(query));
+      }
     });
   }, [tab, query, token, topSellers]);
 
   function onScan(code: string) {
     start(async () => {
-      const p = await posLookupAction(token, code);
+      let p: PosProduct | null = null;
+      try {
+        p = isOffline()
+          ? await lookupOffline(code)
+          : await posLookupAction(token, code);
+      } catch {
+        p = await lookupOffline(code);
+      }
       if (p) onPick(p);
       else onMiss(code);
     });

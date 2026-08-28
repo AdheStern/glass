@@ -105,6 +105,12 @@ enum CashMovementKind {
   GASTO
 }
 
+enum SyncCommandStatus {
+  APPLIED
+  QUARANTINED
+  REJECTED
+}
+
 // ===========================================================================
 // Configuración del sitio
 // ===========================================================================
@@ -134,6 +140,9 @@ model SiteSettings {
   cashDifferenceThresholdBob Int    @default(500) @map("cash_difference_threshold_bob")
   maxCashierDiscountPercent  Int    @default(0) @map("max_cashier_discount_percent")
   receiptFooter        String?      @map("receipt_footer")
+  // Caducidad del paquete de la tablet sin conexión (§17.2 regla 6)
+  packageWarnHours     Int          @default(24) @map("package_warn_hours")
+  packageBlockHours    Int          @default(72) @map("package_block_hours")
   updatedAt            DateTime     @updatedAt @map("updated_at")
 
   @@map("site_settings")
@@ -180,16 +189,20 @@ model Operator {
 
 // Tablet o celular autorizado para la caja.
 model Device {
-  id         String    @id @default(cuid())
-  name       String
-  token      String    @unique
-  lastSyncAt DateTime? @map("last_sync_at")
-  revokedAt  DateTime? @map("revoked_at")
-  appVersion String?   @map("app_version")
-  createdAt  DateTime  @default(now()) @map("created_at")
+  id            String    @id @default(cuid())
+  name          String
+  token         String    @unique
+  lastSyncAt    DateTime? @map("last_sync_at")
+  revokedAt     DateTime? @map("revoked_at")
+  appVersion    String?   @map("app_version")
+  // Sincronización sin conexión (§17.2): último seq de comando aplicado en orden.
+  lastAppliedSeq Int      @default(0) @map("last_applied_seq")
+  quarantinedAt DateTime? @map("quarantined_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
 
-  sales        Sale[]
-  cashSessions CashSession[]
+  sales         Sale[]
+  cashSessions  CashSession[]
+  syncCommands  SyncCommand[]
 
   @@map("device")
 }
@@ -555,12 +568,37 @@ model CashMovement {
   reason        String?
   operatorId    String?          @map("operator_id")
   occurredAt    DateTime         @default(now()) @map("occurred_at")
+  // Idempotencia del comando de la cola sin conexión (§17.2 regla 2).
+  clientId      String?          @unique @map("client_id")
 
   cashSession CashSession @relation(fields: [cashSessionId], references: [id])
   operator    Operator?   @relation(fields: [operatorId], references: [id])
 
   @@index([cashSessionId])
   @@map("cash_movement")
+}
+
+// ===========================================================================
+// Sincronización sin conexión (§17) — libro de comandos recibidos por lote
+// ===========================================================================
+
+model SyncCommand {
+  id               String            @id @default(cuid())
+  deviceId         String            @map("device_id")
+  seq              Int
+  kind             String // "SALE" | "VOID" | "CASH_MOVEMENT"
+  clientId         String            @unique @map("client_id") // UUID v7 del navegador
+  payload          Json
+  status           SyncCommandStatus @default(APPLIED)
+  error            String?
+  occurredAtDevice DateTime          @map("occurred_at_device")
+  receivedAtServer DateTime          @default(now()) @map("received_at_server")
+
+  device Device @relation(fields: [deviceId], references: [id])
+
+  @@unique([deviceId, seq])
+  @@index([status])
+  @@map("sync_command")
 }
 
 // ===========================================================================

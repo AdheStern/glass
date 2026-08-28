@@ -7,6 +7,19 @@ const nextConfig: NextConfig = {
   // Shell estático cacheado por etiqueta + precio/existencias en <Suspense> que
   // transmite en cada petición (§7.1). PPR es el comportamiento por defecto.
   cacheComponents: true,
+  async headers() {
+    return [
+      {
+        // El service worker de la caja no se cachea: así una versión nueva del
+        // shell llega en la siguiente carga (§22.8).
+        source: "/pos-sw.js",
+        headers: [
+          { key: "Cache-Control", value: "no-cache" },
+          { key: "Service-Worker-Allowed", value: "/pos" },
+        ],
+      },
+    ];
+  },
   images: {
     // Supabase Storage sirve las imágenes de producto. En Fase 1 son SVG del pool
     // de siembra; las fotos reales llegan en Fase 2.

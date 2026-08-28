@@ -93,6 +93,33 @@ pnpm db:sql                           # aplica prisma/sql/*.sql (triggers, búsq
 pnpm db:seed -- --products=2000 --seed=42
 ```
 
+## Reglas de Fase 6 (POS sin conexión)
+
+- **La ruta de cobro no toca la red.** `recordLocalSale` escribe el ticket y encola
+  el comando `SALE` en **una sola transacción Dexie** (`src/features/pos/offline/`):
+  matar el proceso a mitad deja la venta entera o nada. El vuelto sale local con
+  `changeDue`.
+- Identidad en el origen: cada comando lleva `clientId` (UUID v7), `deviceId` y
+  `seq` **contiguo y creciente** por dispositivo. El servidor (`/api/sync/batch`)
+  es idempotente sobre `clientId` (índice único en `Sale.clientSaleId` y
+  `SyncCommand.clientId`) e impone el orden con `planBatch` (`src/domain/sync.ts`);
+  rechaza huecos.
+- La venta cobrada **nunca se rechaza** por stock: existencia negativa es alerta en
+  `/panel/sincronizacion`, se corrige con `AJUSTE`, nunca a mano.
+- Dispositivo revocado → **cuarentena** (`SyncCommand.status = QUARANTINED`), no
+  descarte. El dueño libera desde el panel (`releaseQuarantineAction`).
+- El folio `V-` lo asigna el servidor; offline la venta se identifica por
+  `clientSaleId` y el comprobante dice "folio pendiente" hasta el acuse.
+- Caducidad del paquete (`packageStatus`, dominio): 24 h aviso ámbar, 72 h bloqueo
+  de ventas nuevas con desbloqueo por PIN del propietario. Umbrales en `SiteSettings`.
+- PIN sin conexión: `hash-wasm` (argon2id WASM) valida contra los hashes del
+  paquete. `dexie` y `hash-wasm` están prohibidos por biome fuera de
+  `src/features/pos`.
+- El núcleo de la venta vive en `src/features/pos/apply-sale.ts`
+  (`applySaleCommand`), reusado por `createSaleAction` (en línea) y por el lote.
+- Abrir/cerrar turno siguen exigiendo red (la `CashSession` es del servidor); el
+  cierre espera a que la cola esté vacía.
+
 ## Reglas de Fase 5 (POS en línea)
 
 - Identidad del POS = **token de dispositivo** (opaco, `localStorage`) + **PIN de

@@ -1,0 +1,14 @@
+{
+  "name": "Glass · Caja",
+  "short_name": "Caja",
+  "description": "Punto de venta de Glass — funciona sin conexión",
+  "start_url": "/pos",
+  "scope": "/pos",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#0b0b0c",
+  "theme_color": "#0b0b0c",
+  "icons": [
+    { "src": "/pos-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

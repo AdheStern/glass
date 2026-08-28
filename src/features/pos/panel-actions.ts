@@ -32,6 +32,39 @@ export async function generatePairingCodeAction(): Promise<PanelResult> {
   return { ok: true, code };
 }
 
+/**
+ * Libera los comandos en cuarentena de un dispositivo (§17.5): reactiva el
+ * dispositivo y los re-aplica en orden en la próxima sincronización.
+ */
+export async function releaseQuarantineAction(
+  deviceId: string,
+): Promise<PanelResult> {
+  const actor = await requireRole(...PANEL);
+  // El dispositivo aún tiene esos comandos en su cola local; al reactivarlo los
+  // reenvía y se aplican en orden. Se limpian los registros en cuarentena para
+  // no bloquear el reenvío por `clientId`.
+  await prisma.$transaction([
+    prisma.device.update({
+      where: { id: deviceId },
+      data: { revokedAt: null, quarantinedAt: null },
+    }),
+    prisma.syncCommand.deleteMany({
+      where: { deviceId, status: "QUARANTINED" },
+    }),
+  ]);
+  await prisma.auditLog.create({
+    data: {
+      action: "device.quarantine.release",
+      entity: "device",
+      entityId: deviceId,
+      actorType: "user",
+      actorId: actor.id,
+    },
+  });
+  revalidateTag("catalog", "max");
+  return { ok: true };
+}
+
 export async function revokeDeviceAction(id: string): Promise<PanelResult> {
   const actor = await requireRole(...PANEL);
   await prisma.device.update({

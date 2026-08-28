@@ -11,9 +11,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cashMovementAction } from "../actions";
+import { isOffline } from "../offline/catalog-lookup";
+import { findAuthorizerOffline } from "../offline/pin-offline";
+import { enqueue } from "../offline/queue";
+import { syncNow } from "../offline/sync";
+import { uuidv7 } from "../uuid";
 import { PinPad } from "./pin-pad";
 
 type Kind = "INGRESO" | "RETIRO" | "GASTO";
+const SUPER_ROLES = ["PROPIETARIO", "ADMINISTRADOR"];
 
 export function CashMovements({
   token,
@@ -34,22 +40,70 @@ export function CashMovements({
       return;
     }
     start(async () => {
-      const r = await cashMovementAction(token, {
-        sessionId,
-        kind,
-        amountBs: amount,
-        reason,
-        authPin,
-      });
-      if (r.ok) {
-        toast.success("Movimiento registrado");
-        setAmount("");
-        setReason("");
-        setAskPin(false);
-      } else {
-        toast.error(r.error ?? "Error");
+      try {
+        if (isOffline()) {
+          await submitOffline(authPin);
+          return;
+        }
+        const r = await cashMovementAction(token, {
+          sessionId,
+          kind,
+          amountBs: amount,
+          reason,
+          authPin,
+        });
+        if (r.ok) {
+          toast.success("Movimiento registrado");
+          setAmount("");
+          setReason("");
+          setAskPin(false);
+        } else {
+          toast.error(r.error ?? "Error");
+        }
+      } catch {
+        toast.error("Sin conexión: probá de nuevo");
       }
     });
+  }
+
+  async function submitOffline(authPin?: string) {
+    const cents = Math.round(Number.parseFloat(amount.replace(",", ".")) * 100);
+    if (!Number.isFinite(cents) || cents <= 0) {
+      toast.error("Monto inválido");
+      return;
+    }
+    let authorizedByOperatorId: string | null = null;
+    if (kind !== "INGRESO") {
+      const op = authPin
+        ? await findAuthorizerOffline(authPin, SUPER_ROLES)
+        : null;
+      if (!op) {
+        toast.error("PIN de un rol superior inválido");
+        return;
+      }
+      authorizedByOperatorId = op.id;
+      if (!reason.trim()) {
+        toast.error("Motivo obligatorio");
+        return;
+      }
+    }
+    await enqueue({
+      clientId: uuidv7(),
+      kind: "CASH_MOVEMENT",
+      occurredAtDevice: new Date().toISOString(),
+      payload: {
+        sessionId,
+        kind,
+        amountBob: cents,
+        reason: reason.trim() || undefined,
+        authorizedByOperatorId,
+      },
+    });
+    toast.success("Movimiento en cola · sincroniza sola");
+    setAmount("");
+    setReason("");
+    setAskPin(false);
+    void syncNow(token);
   }
 
   if (askPin) {

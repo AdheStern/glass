@@ -1,15 +1,12 @@
 "use server";
 // Glass — operaciones del POS (§16). Autorización por token de dispositivo + PIN
 // de operador; nada de Supabase. La venta cobrada nunca se rechaza por stock.
-import { Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import { revalidateTag } from "next/cache";
 import { prisma } from "@/db/client";
 import { getSiteSettings } from "@/db/settings";
-import { changeDue } from "@/domain/arqueo";
-import { buildSale, type RoundingMode } from "@/domain/sale";
-import { getVariantPricing } from "@/features/orders/pricing";
+import { applySaleCommand } from "./apply-sale";
 import { newDeviceToken, requireDevice } from "./device";
-import { nextDeviceSeq, nextSaleFolioNumber } from "./folio";
 import { requireAuthPin, verifyOperatorPin } from "./pin";
 import {
   findOrderForPos,
@@ -220,12 +217,6 @@ export async function closeShiftAction(
 // Venta (§16.1, §13.1) — idempotente sobre clientSaleId (§17.2 regla 1-2)
 // ---------------------------------------------------------------------------
 
-const ROUNDING: Record<string, RoundingMode> = {
-  NONE: "NONE",
-  NEAREST_10: "NEAREST_10",
-  NEAREST_50: "NEAREST_50",
-};
-
 export async function createSaleAction(
   token: string,
   raw: unknown,
@@ -242,167 +233,50 @@ export async function createSaleAction(
   }
   const input = parsed.data;
 
-  const dup = await prisma.sale.findUnique({
-    where: { clientSaleId: input.clientSaleId },
-    select: { id: true, folio: true, totalBob: true },
-  });
-  if (dup) {
-    return {
-      ok: true,
-      saleId: dup.id,
-      folio: dup.folio,
-      changeBob: changeDue(dup.totalBob, input.tenderedBob ?? dup.totalBob),
-    };
-  }
-
-  const session = await prisma.cashSession.findUnique({
-    where: { id: input.sessionId },
-  });
-  if (!session || session.closedAt || session.deviceId !== device.id) {
-    return { ok: false, error: "El turno no está abierto en este dispositivo" };
-  }
-
-  const settings = await getSiteSettings();
-  const pricing = await getVariantPricing(input.lines.map((l) => l.variantId));
-
-  const maxCashier = settings.maxCashierDiscountPercent;
-  const needsAuth =
-    (input.globalDiscountPercent ?? 0) > maxCashier ||
-    input.lines.some((l) => (l.discountPercent ?? 0) > maxCashier);
-  let authorizedBy: string | null = null;
-  if (needsAuth) {
-    if (!input.authPin) {
-      return {
-        ok: false,
-        error: "Ese descuento necesita PIN de un rol superior",
-      };
-    }
-    authorizedBy = (await requireAuthPin(input.authPin, [...SUPER_ROLES])).id;
-  }
-
-  const built = buildSale({
-    lines: input.lines.map((l) => {
-      const p = pricing.get(l.variantId);
-      if (!p) throw new Error(`Variante ${l.variantId} no disponible`);
-      return {
-        variantId: l.variantId,
-        qty: l.qty,
-        baseUnitPriceBob: p.effectiveBob,
-        discount: l.discountPercent
-          ? { percent: l.discountPercent }
-          : undefined,
-      };
-    }),
-    globalDiscountPercent: input.globalDiscountPercent,
-    roundingMode: ROUNDING[settings.roundingMode] ?? "NONE",
-  });
-
-  const paid = input.payments.reduce((s, p) => s + p.amountBob, 0);
-  if (paid !== built.totalBob) {
-    return { ok: false, error: "Los pagos no suman el total" };
-  }
-
-  // Folio y seq se resuelven fuera de la transacción: la latencia de Supabase
-  // agotaba el límite interactivo de 5 s. Una colisión de folio reintenta.
-  const now = new Date();
-  const itemData = built.lines.map((l) => {
-    const p = pricing.get(l.variantId);
-    const listUnit = p?.basePriceBob ?? l.unitPriceBob;
-    return {
+  const r = await applySaleCommand(device, {
+    clientSaleId: input.clientSaleId,
+    occurredAtDevice: input.occurredAtDevice,
+    sessionId: input.sessionId,
+    lines: input.lines.map((l) => ({
       variantId: l.variantId,
       qty: l.qty,
-      unitPriceBob: l.unitPriceBob,
-      discountBob: (listUnit - l.unitPriceBob) * l.qty,
-    };
+      discountPercent: l.discountPercent,
+    })),
+    globalDiscountPercent: input.globalDiscountPercent,
+    payments: input.payments,
+    tenderedBob: input.tenderedBob,
+    orderId: input.orderId,
+    authPin: input.authPin,
   });
+  if (!r.ok) return { ok: false, error: r.error };
 
-  const [baseFolioN, baseSeq] = await Promise.all([
-    nextSaleFolioNumber(prisma),
-    nextDeviceSeq(prisma, device.id),
-  ]);
-
-  let sale: Awaited<ReturnType<typeof prisma.sale.create>> | null = null;
-  for (let attempt = 0; attempt < 8 && !sale; attempt++) {
-    const folio = `V-${String(baseFolioN + attempt).padStart(6, "0")}`;
-    const seq = baseSeq + attempt;
-    try {
-      sale = await prisma.$transaction(
-        async (tx) => {
-          const created = await tx.sale.create({
-            data: {
-              folio,
-              clientSaleId: input.clientSaleId,
-              deviceId: device.id,
-              seq,
-              operatorId: session.operatorId,
-              cashSessionId: session.id,
-              authorizedByOperatorId: authorizedBy,
-              subtotalBob: built.subtotalBob,
-              discountBob: built.discountBob,
-              roundingBob: built.roundingBob,
-              totalBob: built.totalBob,
-              occurredAtDevice: input.occurredAtDevice,
-              priceSnapshotAt: now,
-              items: { create: itemData },
-              payments: {
-                create: input.payments.map((p) => ({
-                  methodId: p.methodId,
-                  amountBob: p.amountBob,
-                })),
-              },
-            },
-          });
-          await tx.stockMovement.createMany({
-            data: built.lines.map((l) => ({
-              variantId: l.variantId,
-              kind: "VENTA" as const,
-              qty: -l.qty,
-              occurredAt: input.occurredAtDevice,
-              sourceType: "sale",
-              sourceId: created.id,
-              operatorId: session.operatorId,
-            })),
-          });
-          if (input.orderId) {
-            await tx.order.update({
-              where: { id: input.orderId },
-              data: {
-                saleId: created.id,
-                status: "ENTREGADO",
-                statusChangedAt: now,
-              },
-            });
-          }
-          return created;
-        },
-        { timeout: 15000 },
-      );
-    } catch (e) {
-      if (
-        e instanceof Prisma.PrismaClientKnownRequestError &&
-        e.code === "P2002" &&
-        attempt < 3
-      ) {
-        continue; // colisión de folio/seq: reintenta
-      }
-      throw e;
-    }
+  if (!r.duplicate) {
+    await audit("sale.create", "sale", r.saleId, null, {
+      folio: r.folio,
+      totalBob: r.totalBob,
+      orderId: input.orderId ?? null,
+    });
+    revalidateTag("catalog", "max");
   }
-  if (!sale) return { ok: false, error: "No se pudo registrar la venta" };
 
-  await audit("sale.create", "sale", sale.id, session.operatorId, {
-    folio: sale.folio,
-    totalBob: sale.totalBob,
-    orderId: input.orderId ?? null,
-  });
-  revalidateTag("catalog", "max");
+  return { ok: true, saleId: r.saleId, folio: r.folio, changeBob: r.changeBob };
+}
 
-  return {
-    ok: true,
-    saleId: sale.id,
-    folio: sale.folio,
-    changeBob: changeDue(sale.totalBob, input.tenderedBob ?? sale.totalBob),
-  };
+/**
+ * Verifica un PIN de rol superior (§6.4) cuando el paquete aún no cargó los
+ * hashes en la tablet. Con el paquete presente, la autorización es local.
+ */
+export async function verifyAuthPinAction(
+  token: string,
+  pin: string,
+): Promise<PosResult & { operatorId?: string }> {
+  await requireDevice(token);
+  try {
+    const op = await requireAuthPin(pin, [...SUPER_ROLES]);
+    return { ok: true, operatorId: op.id };
+  } catch {
+    return { ok: false, error: "PIN de un rol superior inválido" };
+  }
 }
 
 // ---------------------------------------------------------------------------

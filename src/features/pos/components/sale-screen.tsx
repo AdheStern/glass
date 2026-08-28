@@ -12,6 +12,8 @@ import type { PosBootstrap, PosProduct } from "../types";
 import { OrderLookup } from "./order-lookup";
 import { PayDialog } from "./pay-dialog";
 import { ProductGrid } from "./product-grid";
+import { ExpiredBanner, SyncBadge } from "./sync-badge";
+import { useSyncStatus } from "./use-sync-status";
 
 interface Line {
   variantId: string;
@@ -41,6 +43,8 @@ export function SaleScreen({
   const [globalDiscount, setGlobalDiscount] = useState("");
   const [orderId, setOrderId] = useState<string | undefined>();
   const [paying, setPaying] = useState(false);
+  const sync = useSyncStatus();
+  const blocked = sync.packageStatus === "blocked";
 
   const step = STEP[bootstrap.settings.roundingMode] ?? 1;
   const globalPct = Math.max(
@@ -104,9 +108,11 @@ export function SaleScreen({
 
   return (
     <div className="flex h-dvh flex-col">
+      <ExpiredBanner onUnlock={() => setPaying(false)} />
       <header className="flex items-center justify-between border-b px-4 py-2 text-sm">
-        <span className="font-medium">
+        <span className="flex items-center gap-3 font-medium">
           {bootstrap.settings.name} · {bootstrap.device.name}
+          <SyncBadge />
         </span>
         <span className="flex items-center gap-3 text-muted-foreground">
           {session.operatorName}
@@ -245,7 +251,7 @@ export function SaleScreen({
             <Button
               size="lg"
               className="mt-2 h-14 w-full text-lg"
-              disabled={lines.length === 0}
+              disabled={lines.length === 0 || blocked}
               onClick={() => setPaying(true)}
             >
               Cobrar
@@ -267,15 +273,15 @@ export function SaleScreen({
           globalDiscountPercent: globalPct || undefined,
           orderId,
         }}
-        onPaid={(folio) => {
+        onPaid={(ref) => {
           setLines([]);
           setGlobalDiscount("");
           setOrderId(undefined);
-          toast.success(`Ticket ${folio}`, {
+          toast.success("Ticket registrado", {
             action: {
               label: "Ver comprobante",
               onClick: () => {
-                window.location.href = `/pos/comprobante/${folio}`;
+                window.location.href = `/pos/comprobante/${ref}`;
               },
             },
           });

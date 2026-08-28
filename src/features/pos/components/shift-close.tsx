@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { formatBob } from "@/domain/money";
 import { closeShiftAction } from "../actions";
+import { pendingCount } from "../offline/queue";
+import { syncNow } from "../offline/sync";
 import { posOperator } from "../pos-session";
 
 export function ShiftClose({
@@ -25,7 +27,23 @@ export function ShiftClose({
     differenceBob: number;
     needsNote: boolean;
   } | null>(null);
+  // Arranca sin confirmar para no habilitar el cierre antes de sincronizar.
+  const [unsynced, setUnsynced] = useState<number | null>(null);
   const [pending, start] = useTransition();
+
+  useEffect(() => {
+    let alive = true;
+    async function tick() {
+      await syncNow(token).catch(() => undefined);
+      if (alive) setUnsynced(await pendingCount().catch(() => 0));
+    }
+    tick();
+    const id = setInterval(tick, 3000);
+    return () => {
+      alive = false;
+      clearInterval(id);
+    };
+  }, [token]);
 
   function close() {
     start(async () => {
@@ -103,7 +121,21 @@ export function ShiftClose({
         />
       </div>
 
-      <Button size="lg" disabled={pending || !counted} onClick={close}>
+      {unsynced == null && (
+        <p className="text-sm text-muted-foreground">Revisando la cola…</p>
+      )}
+      {unsynced != null && unsynced > 0 && (
+        <p className="text-sm text-amber-600">
+          Sincronizando {unsynced} {unsynced === 1 ? "venta" : "ventas"} antes
+          de cerrar…
+        </p>
+      )}
+
+      <Button
+        size="lg"
+        disabled={pending || !counted || unsynced == null || unsynced > 0}
+        onClick={close}
+      >
         {result ? "Confirmar cierre" : "Cerrar turno"}
       </Button>
     </div>

@@ -35,7 +35,13 @@ export function ShiftOpen({
         operatorId: operator.id,
         pin,
         openingBs,
-      });
+      }).catch(
+        () =>
+          ({
+            ok: false,
+            error: "Abrí el turno con conexión al menos una vez",
+          }) as Awaited<ReturnType<typeof openShiftAction>>,
+      );
       if (r.ok && r.sessionId) {
         const s: OperatorSession = {
           sessionId: r.sessionId,

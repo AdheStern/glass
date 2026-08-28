@@ -106,7 +106,9 @@
                   "motion": "Sin animación en el catálogo (§8.3).",
                   "motion/react": "Sin animación en el catálogo (§8.3).",
                   "@zxing/browser": "El escáner no va en el catálogo (§8.3, §15). Vive en src/features/scanner.",
-                  "@zxing/library": "El escáner no va en el catálogo (§8.3, §15). Vive en src/features/scanner."
+                  "@zxing/library": "El escáner no va en el catálogo (§8.3, §15). Vive en src/features/scanner.",
+                  "dexie": "La base local es solo de la caja (§17). Vive en src/features/pos/offline.",
+                  "hash-wasm": "El argon2 del navegador es solo para el PIN de la caja (§17.3). Vive en src/features/pos/offline."
                 }
               }
             }

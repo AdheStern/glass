@@ -7,6 +7,7 @@ import {
   LogOut,
   Monitor,
   Package,
+  RefreshCw,
   Settings,
   Tag,
   Tags,
@@ -42,6 +43,7 @@ const ICONS = {
   tags: Tags,
   monitor: Monitor,
   users: Users,
+  "refresh-cw": RefreshCw,
 } as const;
 
 export function PanelSidebar({

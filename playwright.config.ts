@@ -23,6 +23,8 @@ export default defineConfig({
         port: PORT,
         reuseExistingServer: !process.env.CI,
         timeout: 180_000,
+        // Habilita /api/sync/inspect para el recorrido 3 (§23.1) sin panel.
+        env: { GLASS_E2E: "1" },
       },
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },

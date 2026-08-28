@@ -36,6 +36,8 @@ export interface SiteSettingsView {
   cashDifferenceThresholdBob: number;
   maxCashierDiscountPercent: number;
   receiptFooter: string | null;
+  packageWarnHours: number;
+  packageBlockHours: number;
 }
 
 const DEFAULTS: SiteSettingsView = {
@@ -61,6 +63,8 @@ const DEFAULTS: SiteSettingsView = {
   cashDifferenceThresholdBob: 500,
   maxCashierDiscountPercent: 0,
   receiptFooter: null,
+  packageWarnHours: 24,
+  packageBlockHours: 72,
 };
 
 export async function getSiteSettings(): Promise<SiteSettingsView> {
@@ -96,5 +100,7 @@ export async function getSiteSettings(): Promise<SiteSettingsView> {
     cashDifferenceThresholdBob: row.cashDifferenceThresholdBob,
     maxCashierDiscountPercent: row.maxCashierDiscountPercent,
     receiptFooter: row.receiptFooter,
+    packageWarnHours: row.packageWarnHours,
+    packageBlockHours: row.packageBlockHours,
   };
 }
