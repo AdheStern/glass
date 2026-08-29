@@ -10,6 +10,7 @@ import { seedContent } from "./content";
 import { makeUploader } from "./images";
 import { seedInventoryExtras } from "./inventory";
 import { makeRng, parseArgs } from "./lib";
+import { seedOwner } from "./owner";
 import { seedSales } from "./sales";
 
 // La siembra escribe decenas de miles de filas: va por la conexión directa
@@ -60,6 +61,10 @@ async function main() {
   console.time("config");
   const cfg = await seedConfig(prisma);
   console.timeEnd("config");
+
+  console.time("owner");
+  await seedOwner(prisma); // idempotente: no toca al propietario si ya existe
+  console.timeEnd("owner");
 
   console.time("catalog");
   const uploader = await makeUploader();

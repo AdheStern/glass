@@ -1,21 +1,24 @@
 import { expect, test } from "@playwright/test";
+import { loginAsOwner } from "./helpers";
 
-// Fase 7 — editor de bloques en el panel (§11). El panel está detrás de sesión
-// de Supabase; sin claves configuradas la prueba se salta (misma limitación que
-// inventario y la bandeja de pedidos).
+// Fase 7 — editor de bloques en el panel (§11). Requiere sesión del panel
+// (Better Auth); si no hay propietario sembrado, `loginAsOwner` salta.
 
-test("editor: agregar bloques, publicar y ver en la portada", async ({
-  page,
-}) => {
+test("editor: agregar un bloque y publicar la página", async ({ page }) => {
+  test.setTimeout(120_000);
+  await loginAsOwner(page);
   await page.goto("/panel/paginas/nueva");
-  if (new URL(page.url()).pathname.startsWith("/entrar")) {
-    test.skip(true, "El panel necesita una sesión de Supabase.");
-    return;
-  }
+  await expect(
+    page.getByRole("heading", { name: "Nueva página" }),
+  ).toBeVisible();
 
-  await page.getByLabel("Título").first().fill("Página de prueba e2e");
+  // El primer campo de texto del formulario es el título.
+  await page.getByRole("textbox").first().fill(`Página e2e ${Date.now()}`);
   await page.getByRole("button", { name: "Agregar bloque" }).click();
   await page.getByRole("menuitem", { name: "Portada" }).click();
   await page.getByRole("button", { name: "Publicar" }).click();
-  await expect(page.getByText("publicada", { exact: false })).toBeVisible();
+  await expect(page.getByText("Página publicada")).toBeVisible({
+    timeout: 30_000,
+  });
+  await expect(page.getByRole("button", { name: "Despublicar" })).toBeVisible();
 });

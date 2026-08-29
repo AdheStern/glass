@@ -14,6 +14,7 @@ import {
   Tag,
   Tags,
   Upload,
+  UserCog,
   Users,
 } from "lucide-react";
 import Link from "next/link";
@@ -48,6 +49,7 @@ const ICONS = {
   "refresh-cw": RefreshCw,
   "file-text": FileText,
   newspaper: Newspaper,
+  "user-cog": UserCog,
 } as const;
 
 export function PanelSidebar({

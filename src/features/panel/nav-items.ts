@@ -18,7 +18,8 @@ export interface NavItem {
     | "users"
     | "refresh-cw"
     | "file-text"
-    | "newspaper";
+    | "newspaper"
+    | "user-cog";
   roles?: Role[];
   exact?: boolean;
 }
@@ -77,6 +78,12 @@ export const NAV_ITEMS: NavItem[] = [
     href: "/panel/operadores",
     label: "Operadores",
     icon: "users",
+    roles: ["PROPIETARIO", "ADMINISTRADOR"],
+  },
+  {
+    href: "/panel/usuarios",
+    label: "Usuarios",
+    icon: "user-cog",
     roles: ["PROPIETARIO", "ADMINISTRADOR"],
   },
   {

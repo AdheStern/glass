@@ -7,6 +7,16 @@ const nextConfig: NextConfig = {
   // Shell estático cacheado por etiqueta + precio/existencias en <Suspense> que
   // transmite en cada petición (§7.1). PPR es el comportamiento por defecto.
   cacheComponents: true,
+  async rewrites() {
+    return [
+      {
+        // Metadata RFC 9728 del recurso protegido MCP (Next ignora las carpetas
+        // que empiezan con punto, así que el route handler vive en /api).
+        source: "/.well-known/oauth-protected-resource/api/mcp",
+        destination: "/api/mcp-metadata",
+      },
+    ];
+  },
   async headers() {
     return [
       {

@@ -9,9 +9,7 @@ import {
 import Image from "next/image";
 import { useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { createSupabaseBrowserClient } from "@/features/auth/supabase-client";
 import { publicImageUrl } from "@/features/catalog/image";
-import { PRODUCT_IMAGES_BUCKET } from "@/storage/bucket";
 import {
   attachImageAction,
   createUploadUrlAction,
@@ -40,7 +38,6 @@ export function ImageManager({
   const [busy, setBusy] = useState(false);
   const [, start] = useTransition();
   const inputRef = useRef<HTMLInputElement>(null);
-  const supabase = createSupabaseBrowserClient();
 
   async function handleFiles(files: FileList) {
     setBusy(true);
@@ -50,12 +47,17 @@ export function ImageManager({
         const resized = await resizeImage(file);
         const target = await createUploadUrlAction(productId, resized.ext);
 
-        const { error } = await supabase.storage
-          .from(PRODUCT_IMAGES_BUCKET)
-          .uploadToSignedUrl(target.path, target.token, resized.blob, {
-            contentType: resized.contentType,
-          });
-        if (error) throw error;
+        // Sube directo a la URL firmada de Supabase Storage (§12.1): el
+        // contenedor nunca ve el archivo.
+        const up = await fetch(target.signedUrl, {
+          method: "PUT",
+          body: resized.blob,
+          headers: {
+            "content-type": resized.contentType,
+            "x-upsert": "true",
+          },
+        });
+        if (!up.ok) throw new Error("No se pudo subir la foto");
 
         const r = await attachImageAction({
           productId,

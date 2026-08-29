@@ -149,21 +149,233 @@ model SiteSettings {
 }
 
 // ===========================================================================
-// Identidad
+// Identidad — auth del panel con Better Auth (ADR-04) sobre este mismo Postgres.
+// Estas tablas conservan el naming de la librería (excepción a §24.1): Better
+// Auth habla con el cliente Prisma por nombre de campo, no de columna, y
+// mantenerlas idénticas al generador evita deriva. El POS no pasa por acá.
 // ===========================================================================
 
-// Perfil de la aplicación ligado a un usuario de Supabase Auth (auth.users.id).
-// Sin FK al schema `auth`: solo se guarda el uuid.
-model UserProfile {
-  id         String    @id @default(cuid())
-  authUserId String    @unique @map("auth_user_id")
-  email      String    @unique
-  name       String?
-  role       Role      @default(CAJERO)
-  archivedAt DateTime? @map("archived_at")
-  createdAt  DateTime  @default(now()) @map("created_at")
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  role          String?   @default("CAJERO") // valores del enum Role (§6.3)
+  archivedAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-  @@map("user_profile")
+  sessions Session[]
+  accounts Account[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  issuer                String    @default("")
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+model Jwks {
+  id         String    @id @default(cuid())
+  publicKey  String
+  privateKey String
+  createdAt  DateTime  @default(now())
+  expiresAt  DateTime?
+  alg        String?
+  crv        String?
+
+  @@map("jwks")
+}
+
+// --- Servidor de autorización MCP (plugin mcp + cimd) ---------------------
+
+model OauthClient {
+  id                               String   @id @default(cuid())
+  clientId                         String   @unique
+  clientSecret                     String?
+  clientDiscoveryId                String?
+  disabled                         Boolean?
+  skipConsent                      Boolean?
+  enableEndSession                 Boolean?
+  subjectType                      String?
+  scopes                           Json?
+  clientCredentialsScopes          Json?
+  userId                           String?
+  name                             String?
+  uri                              String?
+  icon                             String?
+  contacts                         Json?
+  tos                              String?
+  policy                           String?
+  softwareId                       String?
+  softwareVersion                  String?
+  softwareStatement                String?
+  redirectUris                     Json?
+  postLogoutRedirectUris           Json?
+  backchannelLogoutUri             String?
+  backchannelLogoutSessionRequired Boolean?
+  tokenEndpointAuthMethod          String?
+  applicationType                  String?
+  jwks                             String?
+  jwksUri                          String?
+  grantTypes                       Json?
+  responseTypes                    Json?
+  requirePKCE                      Boolean?
+  dpopBoundAccessTokens            Boolean?
+  referenceId                      String?
+  metadata                         Json?
+  createdAt                        DateTime? @default(now())
+  updatedAt                        DateTime?
+
+  @@map("oauth_client")
+}
+
+model OauthResource {
+  id                            String   @id @default(cuid())
+  identifier                    String   @unique
+  name                          String
+  accessTokenTtl                Int?
+  refreshTokenTtl               Int?
+  signingAlgorithm              String?
+  signingKeyId                  String?
+  allowedScopes                 Json?
+  customClaims                  Json?
+  dpopBoundAccessTokensRequired Boolean?
+  disabled                      Boolean?
+  policyVersion                 Int?
+  metadata                      Json?
+  createdAt                     DateTime? @default(now())
+  updatedAt                     DateTime?
+
+  @@map("oauth_resource")
+}
+
+model OauthClientResource {
+  id         String    @id @default(cuid())
+  clientId   String
+  resourceId String
+  metadata   Json?
+  createdAt  DateTime? @default(now())
+
+  @@index([clientId])
+  @@index([resourceId])
+  @@map("oauth_client_resource")
+}
+
+model OauthRefreshToken {
+  id                        String    @id @default(cuid())
+  token                     String    @unique
+  clientId                  String
+  sessionId                 String?
+  userId                    String
+  referenceId               String?
+  authorizationCodeId       String?
+  resources                 Json?
+  requestedUserInfoClaims   Json?
+  scopes                    Json?
+  expiresAt                 DateTime?
+  revoked                   DateTime?
+  rotatedAt                 DateTime?
+  rotationReplayResponse    String?
+  rotationReplayExpiresAt   DateTime?
+  authTime                  DateTime?
+  confirmation              Json?
+  createdAt                 DateTime? @default(now())
+
+  @@index([clientId])
+  @@index([userId])
+  @@map("oauth_refresh_token")
+}
+
+model OauthAccessToken {
+  id                      String    @id @default(cuid())
+  token                   String?   @unique
+  clientId                String
+  sessionId               String?
+  userId                  String?
+  referenceId             String?
+  authorizationCodeId     String?
+  refreshId               String?
+  resources               Json?
+  requestedUserInfoClaims Json?
+  scopes                  Json?
+  expiresAt               DateTime?
+  revoked                 DateTime?
+  confirmation            Json?
+  createdAt               DateTime? @default(now())
+
+  @@index([clientId])
+  @@map("oauth_access_token")
+}
+
+model OauthConsent {
+  id                      String    @id @default(cuid())
+  clientId                String
+  userId                  String?
+  referenceId             String?
+  resources               Json?
+  requestedUserInfoClaims Json?
+  scopes                  Json?
+  createdAt               DateTime? @default(now())
+  updatedAt               DateTime?
+
+  @@index([clientId])
+  @@index([userId])
+  @@map("oauth_consent")
+}
+
+model OauthClientAssertion {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+
+  @@map("oauth_client_assertion")
 }
 
 // Persona que cobra en la caja. Puede o no tener cuenta de usuario.

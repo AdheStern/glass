@@ -13,12 +13,19 @@ son lo mismo.
 
 ## Desviaciones acordadas respecto al plan maestro
 
-- **Base de datos, almacenamiento y auth del panel: Supabase** (Postgres gestionado,
-  Supabase Storage, Supabase Auth). El plan maestro describía Postgres compartido con rol
-  por cliente (ADR-03), MinIO (ADR-09) y Better Auth (ADR-04). El aislamiento entre
-  comercios pasa a ser **un proyecto Supabase por comercio**.
-- **La identidad del POS no cambia**: sesión de dispositivo + PIN de operador (`argon2id`)
-  validado localmente. Supabase Auth es solo para el panel.
+- **Base de datos y almacenamiento: Supabase** (Postgres gestionado, Supabase Storage).
+  El plan maestro describía Postgres compartido con rol por cliente (ADR-03) y MinIO
+  (ADR-09). El aislamiento entre comercios pasa a ser **un proyecto Supabase por comercio**.
+- **Auth del panel: Better Auth (ADR-04)**, sobre el **mismo Postgres** que Prisma
+  (`src/lib/auth.ts`). Correo/contraseña; registro cerrado (`disableSignUp`); el
+  propietario se siembra desde `OWNER_EMAIL`/`OWNER_PASSWORD` y el resto se crea en
+  `/panel/usuarios`. El rol vive en `user.role` (valores del enum `Role`). El chokepoint
+  sigue siendo `src/features/auth/roles.ts` (`requireRole`/`requirePanel`).
+  Better Auth además es **servidor de autorización MCP** (`jwt()` + `mcp()` + `cimd()`):
+  `/api/mcp` publica herramientas de **solo lectura** sobre los datos del comercio.
+  Las tablas de Better Auth conservan el naming de la librería (excepción a §24.1).
+- **La identidad del POS no cambia**: token de dispositivo + PIN de operador (`argon2id`)
+  validado localmente. Nunca pasa por Better Auth.
 - **Sin monorepo**: un solo `package.json`. Las capas puras viven en `src/domain`,
   `src/theme`, `src/db`.
 - **Next.js 16** (el plan dice 15).

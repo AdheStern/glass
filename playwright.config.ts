@@ -1,6 +1,23 @@
+import { readFileSync } from "node:fs";
 import { defineConfig, devices } from "@playwright/test";
 
 const PORT = 3000;
+
+// El proceso de tests necesita OWNER_EMAIL/OWNER_PASSWORD para loguear en el
+// panel; los lee de .env (Next ya lo carga para el servidor, Playwright no).
+function loadEnv() {
+  try {
+    for (const line of readFileSync(".env", "utf8").split("\n")) {
+      const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
+      if (m && !process.env[m[1]]) {
+        process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
+      }
+    }
+  } catch {
+    /* sin .env: los tests del panel se saltan solos */
+  }
+}
+loadEnv();
 
 export default defineConfig({
   testDir: "./e2e",
@@ -23,8 +40,12 @@ export default defineConfig({
         port: PORT,
         reuseExistingServer: !process.env.CI,
         timeout: 180_000,
-        // Habilita /api/sync/inspect para el recorrido 3 (§23.1) sin panel.
-        env: { GLASS_E2E: "1" },
+        env: {
+          // Habilita /api/sync/inspect para el recorrido 3 (§23.1) sin panel.
+          GLASS_E2E: "1",
+          BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET ?? "",
+          OWNER_EMAIL: process.env.OWNER_EMAIL ?? "",
+        },
       },
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
