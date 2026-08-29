@@ -10,6 +10,8 @@ import {
 } from "@/features/products/queries";
 
 export const metadata: Metadata = { title: "Editar producto" };
+// Detrás de sesión y con datos en vivo (producto + fotos): no se prerenderiza.
+export const instant = false;
 
 export default async function EditarProductoPage({
   params,

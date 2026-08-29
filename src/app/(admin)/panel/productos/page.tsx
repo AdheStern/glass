@@ -17,6 +17,8 @@ import { ProductRowActions } from "@/features/products/components/product-row-ac
 import { listProducts } from "@/features/products/queries";
 
 export const metadata: Metadata = { title: "Productos" };
+// Detrás de sesión y con datos en vivo (lista con búsqueda): no se prerenderiza.
+export const instant = false;
 
 export default async function ProductosPage({
   searchParams,

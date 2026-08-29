@@ -23,6 +23,41 @@ export interface ActionResult {
   id?: string;
 }
 
+/** `true` si el error de Prisma es una violación de índice único (opcionalmente en un campo dado). */
+function isUniqueViolation(e: unknown, field?: string): boolean {
+  const err = e as { code?: string; meta?: { target?: string[] | string } };
+  if (err?.code !== "P2002") return false;
+  if (!field) return true;
+  const target = err.meta?.target;
+  return Array.isArray(target)
+    ? target.includes(field)
+    : String(target ?? "").includes(field);
+}
+
+function createWithSlug(
+  slug: string,
+  name: string,
+  barcode: string,
+  priceBob: number,
+) {
+  return prisma.product.create({
+    data: {
+      slug,
+      name,
+      isActive: true,
+      trackStock: true,
+      variants: {
+        create: {
+          barcode: barcode || null,
+          basePriceBob: priceBob,
+          position: 0,
+        },
+      },
+    },
+    include: { variants: { select: { id: true } } },
+  });
+}
+
 async function revalidateFor(variantIds: string[]) {
   revalidateTag("catalog", "max");
   revalidateTag("featured", "max");
@@ -387,33 +422,24 @@ export async function quickCreateFromScanAction(input: {
     if (dupe) return { ok: false, error: "Ese código ya existe" };
   }
 
-  let slug = slugify(name) || "producto";
-  for (
-    let n = 1;
-    await prisma.product.findUnique({ where: { slug }, select: { id: true } });
-    n++
-  ) {
-    slug = `${slugify(name) || "producto"}-${n}`;
+  // Se intenta crear con el slug base; si choca (slug único), se reintenta con
+  // sufijo. Evita un ida y vuelta de pre-chequeo en el caso normal (escaneo).
+  const base = slugify(name) || "producto";
+  let product: Awaited<ReturnType<typeof createWithSlug>> | null = null;
+  let slug = base;
+  for (let attempt = 0; attempt < 20 && !product; attempt++) {
+    slug = attempt === 0 ? base : `${base}-${attempt}`;
+    try {
+      product = await createWithSlug(slug, name, barcode, priceBob);
+    } catch (e) {
+      if (isUniqueViolation(e, "slug")) continue;
+      console.error("glass/quickCreateFromScan:", e);
+      return { ok: false, error: "No se pudo crear el producto" };
+    }
   }
+  if (!product) return { ok: false, error: "No se pudo crear el producto" };
 
-  const product = await prisma.product.create({
-    data: {
-      slug,
-      name,
-      isActive: true,
-      trackStock: true,
-      variants: {
-        create: {
-          barcode: barcode || null,
-          basePriceBob: priceBob,
-          position: 0,
-        },
-      },
-    },
-    include: { variants: { select: { id: true } } },
-  });
   const variantId = product.variants[0].id;
-
   await prisma.auditLog.create({
     data: {
       action: "product.quick_create",
