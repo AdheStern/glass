@@ -5,8 +5,9 @@ empaquetado: una instancia por cliente. El plan maestro manda: [`docs/plan-maest
 
 ## Estado
 
-**Fase 1 — Catálogo público** (en curso). Portada, catálogo, categorías, ficha de producto,
-búsqueda, filtros, SEO. El roadmap completo está en el §25 del plan maestro.
+**Fase 8 — completa.** El roadmap del §25 está terminado: catálogo público, panel
+y CMS, inventario y escaneo, POS en línea y sin conexión, personalización con
+editor de apariencia, tablero y reportes, PWA y respaldos.
 
 ## Requisitos
 
@@ -23,10 +24,16 @@ cp .env.example .env                      # DATABASE_URL/DIRECT_URL, BETTER_AUTH
                                           #   OWNER_EMAIL, OWNER_PASSWORD
 pnpm install
 pnpm prisma migrate deploy                # esquema → Postgres
-pnpm db:sql                               # triggers de stock + búsqueda
+pnpm db:sql                               # triggers de stock + búsqueda + rollup
 pnpm db:seed -- --products=2000 --seed=42 # catálogo + ventas + propietario del panel
 pnpm dev                                  # http://localhost:3000
 ```
+
+Los reportes (§18) se calculan sobre tablas de agregado diario que refresca un
+trabajo nocturno: `POST /api/cron/rollup` con `Authorization: Bearer $CRON_SECRET`
+(cron de Coolify). `pnpm db:rollup` rehace el historial a mano. El catálogo es
+una PWA instalable (solo cachea assets, sin modo sin conexión); el POS tiene su
+propio manifiesto. Respaldos: `docs/respaldos.md`.
 
 Entrá al panel en `/entrar` con `OWNER_EMAIL` + `OWNER_PASSWORD`; cambiá la
 contraseña y creá al resto del equipo en `/panel/usuarios`.

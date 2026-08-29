@@ -100,6 +100,33 @@ pnpm db:sql                           # aplica prisma/sql/*.sql (triggers, búsq
 pnpm db:seed -- --products=2000 --seed=42
 ```
 
+## Reglas de Fase 8 (personalización, tablero, reportes, PWA)
+
+- **8 presets de tema** en `src/theme/presets.ts` (§10.1). El "tema base" fija de
+  una vez el par tipográfico, la escala, la densidad, la forma de tarjeta y la
+  disposición de portada. Agregar un preset = una entrada en `PRESETS`.
+- **Tipografías locales** (`src/theme/fonts.ts`, `next/font/local`, woff2 OFL en
+  `src/theme/fonts/`, `preload: false`): nunca `next/font/google` para la tienda.
+  6 pares curados; el catálogo solo descarga el par activo.
+- `deriveTokens` sigue **puro y probado**; el editor lo usa en cliente para la
+  vista previa. El editor de apariencia manda a `saveAppearanceAction` solo al
+  pulsar Guardar; la vista previa es un iframe a `/apariencia-preview` +
+  `postMessage` (único `"use client"` de `(shop)` junto al SW).
+- **Reportes sobre agregados** (§18.3): `daily_sales_rollup` /
+  `daily_product_rollup` / `daily_payment_rollup`, rehechas por
+  `glass_refresh_rollup(from,to)` (`prisma/sql/rollup.sql`). El trabajo nocturno
+  es `POST /api/cron/rollup` (`CRON_SECRET`, comparación en tiempo constante);
+  las lecturas refrescan los últimos 3 días al vuelo (`ensureFreshRollup`).
+  Nunca recorrer `sale`/`stock_movement` entero para un reporte.
+- Los 7 reportes viven en `src/features/reports/registry.ts` (`ReportDef`): una
+  entrada declara columnas + filtros + `run(filters)`. `margen` es solo
+  `PROPIETARIO`. Exportan CSV y PDF con la marca del comercio (`pdf.ts`).
+- **PWA del catálogo** (§22.8): `src/app/manifest.ts` dinámico + `public/catalogo-sw.js`
+  que **solo cachea `/_next/static/` e imágenes** — sin fallback offline. El POS
+  conserva `/pos.webmanifest`.
+- Respaldos: `deploy/backup.sh` / `deploy/restore-test.sh`, doc en
+  `docs/respaldos.md`. Cifrado `age`, la clave privada nunca en el VPS.
+
 ## Reglas de Fase 7 (contenido y blog)
 
 - CMS propio en la misma base (ADR-10). Cada bloque es un registro `page_block`

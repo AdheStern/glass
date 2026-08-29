@@ -18,14 +18,33 @@ const nextConfig: NextConfig = {
     ];
   },
   async headers() {
+    const noCacheSw = [{ key: "Cache-Control", value: "no-cache" }];
     return [
       {
-        // El service worker de la caja no se cachea: así una versión nueva del
-        // shell llega en la siguiente carga (§22.8).
+        // Los service workers no se cachean: una versión nueva del shell llega
+        // en la siguiente carga (§22.8).
         source: "/pos-sw.js",
         headers: [
-          { key: "Cache-Control", value: "no-cache" },
+          ...noCacheSw,
           { key: "Service-Worker-Allowed", value: "/pos" },
+        ],
+      },
+      { source: "/catalogo-sw.js", headers: noCacheSw },
+      {
+        // Endurecimiento básico (§21). La CSP completa queda pendiente: rompería
+        // el <style> de tokens y el iframe de la vista previa.
+        source: "/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          {
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
+          },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains",
+          },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
         ],
       },
     ];
