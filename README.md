@@ -9,6 +9,9 @@ empaquetado: una instancia por cliente. El plan maestro manda: [`docs/plan-maest
 y CMS, inventario y escaneo, POS en línea y sin conexión, personalización con
 editor de apariencia, tablero y reportes, PWA y respaldos.
 
+Lo que quedó fuera de alcance está en [`docs/deudas-tecnicas.md`](docs/deudas-tecnicas.md)
+(implementación) y en el §28 del plan maestro (decisiones de producto).
+
 ## Requisitos
 
 - **Node 22+** y **Corepack** (`corepack enable` → pnpm 11) en el host.
