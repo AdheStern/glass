@@ -49,4 +49,13 @@ describe("deriveTokens", () => {
     expect(tokens["--radius-card"]).toBe("10px");
     expect(tokens["--ratio-media"]).toBe("1 / 1");
   });
+
+  it("son los 8 presets de §10.1 y cada uno emite su par tipográfico", () => {
+    expect(PRESET_NAMES).toHaveLength(8);
+    for (const preset of PRESET_NAMES) {
+      const tokens = deriveTokens(SAMPLE_BRANDS[0], preset);
+      expect(tokens["--font-display"]).toContain("var(--font-");
+      expect(tokens["--font-body"]).toContain("var(--font-");
+    }
+  });
 });

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getSiteSettings } from "@/db/settings";
 import { requirePanel } from "@/features/auth/roles";
 import { SettingsForm } from "@/features/settings/components/settings-form";
@@ -13,7 +14,11 @@ export default async function AjustesPage() {
     <div className="mx-auto flex max-w-3xl flex-col gap-4">
       <h1 className="text-2xl font-bold tracking-tight">Ajustes</h1>
       <p className="text-sm text-muted-foreground">
-        La apariencia (colores, tipografía) se configura en una fase posterior.
+        Los colores, el tema y la tipografía se configuran en{" "}
+        <Link href="/panel/apariencia" className="underline">
+          Apariencia
+        </Link>
+        .
       </p>
       <SettingsForm
         initial={{

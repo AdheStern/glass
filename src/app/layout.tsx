@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { getSiteSettings } from "@/db/settings";
 import { deriveTokens, parseBrandColor, tokensToCss } from "@/theme/derive";
-import type { PresetName } from "@/theme/presets";
+import { allFontVariables } from "@/theme/fonts";
+import { resolvePresetName } from "@/theme/presets";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -21,21 +22,16 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-function resolvePreset(name: string): PresetName {
-  return name === "NOCTURNO" ? "NOCTURNO" : "MERCADO";
-}
-
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const settings = await getSiteSettings();
-  const tokens = deriveTokens(
-    parseBrandColor(settings.brandColor),
-    resolvePreset(settings.themePreset),
-  );
+  const preset = resolvePresetName(settings.themePreset);
+  const tokens = deriveTokens(parseBrandColor(settings.brandColor), preset);
 
   return (
     <html
       lang={settings.locale}
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      data-density={settings.density}
+      className={`${geistSans.variable} ${geistMono.variable} ${allFontVariables()} h-full antialiased`}
     >
       <head>
         {/* Tokens derivados del color de marca (§10.2). Sin compilación por cliente. */}

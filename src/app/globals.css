@@ -17,6 +17,14 @@
   --ink: oklch(0.2 0.03 25);
   --radius-card: 16px;
   --ratio-media: 4 / 5;
+  /* Los sobrescribe el layout raíz con el par tipográfico del preset (§10.1). */
+  --font-display: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  --font-body: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  /* Densidad de la grilla del catálogo (§10.1). */
+  --grid-gap: 1rem;
+  --grid-cols: 2;
+  --grid-cols-sm: 3;
+  --grid-cols-lg: 4;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -60,6 +68,8 @@
   --color-brand-6: var(--brand-6);
   --color-brand-7: var(--brand-7);
   --color-brand-11: var(--brand-11);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
   --radius-card: var(--radius-card);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -115,6 +125,33 @@
 .shop-surface {
   background: var(--surface);
   color: var(--ink);
+  font-family: var(--font-body);
+}
+.shop-surface :is(h1, h2, h3) {
+  font-family: var(--font-display);
+}
+
+/* Densidad compacta: grilla más apretada y una columna más en escritorio. */
+:root[data-density="COMPACTA"] {
+  --grid-gap: 0.5rem;
+  --grid-cols-lg: 5;
+}
+
+/* Grilla uniforme del catálogo (§8.1). Columnas y separación por densidad. */
+.catalog-grid {
+  display: grid;
+  gap: var(--grid-gap);
+  grid-template-columns: repeat(var(--grid-cols), minmax(0, 1fr));
+}
+@media (min-width: 640px) {
+  .catalog-grid {
+    grid-template-columns: repeat(var(--grid-cols-sm), minmax(0, 1fr));
+  }
+}
+@media (min-width: 1024px) {
+  .catalog-grid {
+    grid-template-columns: repeat(var(--grid-cols-lg), minmax(0, 1fr));
+  }
 }
 
 .dark {

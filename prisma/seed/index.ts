@@ -92,6 +92,8 @@ async function main() {
   console.time("rebuild-derived");
   await prisma.$executeRaw`SELECT glass_rebuild_variant_stock()`;
   await prisma.$executeRaw`SELECT glass_rebuild_search()`;
+  // Agregados diarios del tablero y los reportes (§18.3): todo el historial.
+  await prisma.$executeRaw`SELECT glass_refresh_rollup((now() - interval '200 days')::date, now()::date)`;
   console.timeEnd("rebuild-derived");
 
   const checksum = await seedChecksum(prisma);

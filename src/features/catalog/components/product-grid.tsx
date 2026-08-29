@@ -18,13 +18,20 @@ export function ProductGrid({
     );
   }
 
-  const cols =
-    preset === "COMPACTA"
-      ? "grid-cols-1 sm:grid-cols-2"
-      : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4";
+  // La tarjeta COMPACTA es una fila horizontal: menos columnas. El resto sigue
+  // la densidad del sitio (variables CSS, §10.1).
+  if (preset === "COMPACTA") {
+    return (
+      <div className="grid grid-cols-1 gap-[var(--grid-gap)] sm:grid-cols-2">
+        {products.map((p) => (
+          <ProductCard key={p.id} product={p} preset={preset} />
+        ))}
+      </div>
+    );
+  }
 
   return (
-    <div className={`grid gap-4 ${cols}`}>
+    <div className="catalog-grid">
       {products.map((p) => (
         <ProductCard key={p.id} product={p} preset={preset} />
       ))}

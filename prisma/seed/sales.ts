@@ -7,7 +7,14 @@ import type { SeededConfig } from "./config";
 import { folio, idFactory, inBatches, type Rng } from "./lib";
 
 const DAYS = 180;
-const ANCHOR_END = Date.UTC(2026, 5, 30); // 30-jun-2026, fijo para determinismo
+// Termina "hoy" (medianoche UTC) para que el tablero y los reportes tengan datos
+// del día en curso. Sigue siendo determinista dentro de una misma corrida.
+const now = new Date();
+const ANCHOR_END = Date.UTC(
+  now.getUTCFullYear(),
+  now.getUTCMonth(),
+  now.getUTCDate(),
+);
 
 function fakeUuidV7(n: number): string {
   const h = n.toString(16).padStart(12, "0");

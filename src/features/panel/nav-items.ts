@@ -19,7 +19,9 @@ export interface NavItem {
     | "refresh-cw"
     | "file-text"
     | "newspaper"
-    | "user-cog";
+    | "user-cog"
+    | "palette"
+    | "bar-chart-3";
   roles?: Role[];
   exact?: boolean;
 }
@@ -93,6 +95,12 @@ export const NAV_ITEMS: NavItem[] = [
     roles: ["PROPIETARIO", "ADMINISTRADOR"],
   },
   {
+    href: "/panel/reportes",
+    label: "Reportes",
+    icon: "bar-chart-3",
+    roles: ["PROPIETARIO", "ADMINISTRADOR"],
+  },
+  {
     href: "/panel/paginas",
     label: "Páginas",
     icon: "file-text",
@@ -102,6 +110,12 @@ export const NAV_ITEMS: NavItem[] = [
     href: "/panel/blog",
     label: "Blog",
     icon: "newspaper",
+    roles: ["PROPIETARIO", "ADMINISTRADOR"],
+  },
+  {
+    href: "/panel/apariencia",
+    label: "Apariencia",
+    icon: "palette",
     roles: ["PROPIETARIO", "ADMINISTRADOR"],
   },
   {

@@ -748,6 +748,49 @@ model Payment {
 }
 
 // ===========================================================================
+// Agregados diarios para el tablero y los reportes (§18.3). No son fuente de
+// verdad: los rehace `glass_refresh_rollup(from, to)` (prisma/sql/rollup.sql),
+// llamado por el trabajo nocturno `/api/cron/rollup` más el día en curso al
+// vuelo. Sin FK: un operador o una variante archivada sigue contando.
+// ===========================================================================
+
+model DailySalesRollup {
+  day         DateTime @db.Date
+  operatorId  String   @map("operator_id")
+  channel     String // MOSTRADOR | PEDIDO
+  salesCount  Int      @map("sales_count")
+  grossBob    Int      @map("gross_bob")
+  discountBob Int      @map("discount_bob")
+  roundingBob Int      @map("rounding_bob")
+  netBob      Int      @map("net_bob")
+  cogsBob     Int      @map("cogs_bob")
+
+  @@id([day, operatorId, channel])
+  @@map("daily_sales_rollup")
+}
+
+model DailyPaymentRollup {
+  day             DateTime @db.Date
+  paymentMethodId String   @map("payment_method_id")
+  amountBob       Int      @map("amount_bob")
+  paymentCount    Int      @map("payment_count")
+
+  @@id([day, paymentMethodId])
+  @@map("daily_payment_rollup")
+}
+
+model DailyProductRollup {
+  day       DateTime @db.Date
+  variantId String   @map("variant_id")
+  qty       Int
+  netBob    Int      @map("net_bob")
+  cogsBob   Int      @map("cogs_bob")
+
+  @@id([day, variantId])
+  @@map("daily_product_rollup")
+}
+
+// ===========================================================================
 // Caja
 // ===========================================================================
 

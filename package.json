@@ -20,6 +20,7 @@
     "db:deploy": "prisma migrate deploy",
     "db:sql": "node prisma/sql/apply.mjs",
     "db:seed": "tsx prisma/seed/index.ts",
+    "db:rollup": "tsx prisma/seed/rollup-backfill.ts",
     "db:studio": "prisma studio"
   },
   "prisma": {

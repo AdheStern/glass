@@ -1,5 +1,6 @@
 "use client";
 import {
+  BarChart3,
   Boxes,
   FileText,
   FolderTree,
@@ -9,6 +10,7 @@ import {
   Monitor,
   Newspaper,
   Package,
+  Palette,
   RefreshCw,
   Settings,
   Tag,
@@ -50,6 +52,8 @@ const ICONS = {
   "file-text": FileText,
   newspaper: Newspaper,
   "user-cog": UserCog,
+  palette: Palette,
+  "bar-chart-3": BarChart3,
 } as const;
 
 export function PanelSidebar({
