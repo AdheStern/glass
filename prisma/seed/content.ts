@@ -14,11 +14,8 @@ export async function seedContent(prisma: PrismaClient) {
       orderBy: { position: "asc" },
       select: { slug: true },
     }),
-    Promise.resolve([
-      "pool/gradient-01",
-      "pool/gradient-02",
-      "pool/gradient-03",
-    ]),
+    // Del pool que sube `seedImagePool` (pool/0.svg … pool/12.svg).
+    Promise.resolve(["pool/0.svg", "pool/1.svg", "pool/2.svg"]),
   ]);
 
   // --- Portada ---

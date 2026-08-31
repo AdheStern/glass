@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { BarcodeInput } from "@/features/scanner/barcode-input";
 import { saveProductAction } from "../actions";
 import type { ProductInput } from "../schemas";
 
@@ -284,11 +285,9 @@ export function ProductForm({
               </div>
               <div className="flex flex-col gap-1.5">
                 <Label>Código de barras</Label>
-                <Input
+                <BarcodeInput
                   value={v.barcode}
-                  onChange={(e) =>
-                    patchVariant(v.key, { barcode: e.target.value })
-                  }
+                  onChange={(val) => patchVariant(v.key, { barcode: val })}
                 />
               </div>
               <div className="flex flex-col gap-1.5">
