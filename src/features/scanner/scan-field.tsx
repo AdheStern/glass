@@ -16,10 +16,13 @@ import { useHidScanner } from "./use-hid-scanner";
 
 export function ScanField({
   onScan,
+  onType,
   placeholder = "Escaneá o escribí el código",
   autoFocus = true,
 }: {
   onScan: (code: string) => void;
+  /** Se llama en cada tecla; el POS lo usa para buscar por nombre en vivo. */
+  onType?: (value: string) => void;
   placeholder?: string;
   autoFocus?: boolean;
 }) {
@@ -29,6 +32,7 @@ export function ScanField({
   useHidScanner((code) => {
     onScan(code);
     setValue("");
+    onType?.("");
   });
 
   function submit() {
@@ -36,6 +40,7 @@ export function ScanField({
     if (!code) return;
     onScan(code);
     setValue("");
+    onType?.("");
   }
 
   return (
@@ -45,7 +50,10 @@ export function ScanField({
         value={value}
         autoFocus={autoFocus}
         placeholder={placeholder}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={(e) => {
+          setValue(e.target.value);
+          onType?.(e.target.value);
+        }}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             e.preventDefault();

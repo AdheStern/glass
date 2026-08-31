@@ -1,15 +1,16 @@
 "use client";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { formatBob } from "@/domain/money";
 import { ScanField } from "@/features/scanner/scan-field";
 import { posLookupAction, posSearchAction } from "../actions";
-import {
-  isOffline,
-  lookupOffline,
-  searchOffline,
-} from "../offline/catalog-lookup";
+import { lookupOffline, searchOffline } from "../offline/catalog-lookup";
 import type { PosProduct } from "../types";
+
+/** ¿Parece un código de barras (solo dígitos, largo de EAN/UPC/interno)? */
+function looksLikeBarcode(s: string): boolean {
+  return /^\d{6,14}$/.test(s.trim());
+}
 
 export function ProductGrid({
   token,
@@ -27,52 +28,73 @@ export function ProductGrid({
   const [tab, setTab] = useState<string>("top");
   const [query, setQuery] = useState("");
   const [list, setList] = useState<PosProduct[]>(topSellers);
-  const [pending, start] = useTransition();
+  const [loading, setLoading] = useState(false);
+  const [, start] = useTransition();
+  const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reqId = useRef(0);
 
   useEffect(() => {
-    if (tab === "top" && !query) {
+    if (tab === "top" && !query.trim()) {
       setList(topSellers);
       return;
     }
+    const mine = ++reqId.current;
+    const apply = (r: PosProduct[]) => {
+      if (mine === reqId.current) setList(r); // ignora respuestas viejas
+    };
+    setLoading(true);
     start(async () => {
       const categoryId = tab === "top" ? undefined : tab;
+      const q = query.trim();
       try {
-        if (isOffline()) {
-          setList(await searchOffline(query));
-        } else {
-          setList(await posSearchAction(token, query, categoryId));
-        }
+        // Se intenta en línea siempre; si el servidor no responde, el paquete
+        // local de Dexie (§17). `navigator.onLine` no es de fiar.
+        apply(await posSearchAction(token, q, categoryId));
       } catch {
-        setList(await searchOffline(query));
+        apply(await searchOffline(q));
       }
+      if (mine === reqId.current) setLoading(false);
     });
   }, [tab, query, token, topSellers]);
+
+  function onType(value: string) {
+    if (debounce.current) clearTimeout(debounce.current);
+    debounce.current = setTimeout(() => setQuery(value), 200);
+  }
 
   function onScan(code: string) {
     start(async () => {
       let p: PosProduct | null = null;
       try {
-        p = isOffline()
-          ? await lookupOffline(code)
-          : await posLookupAction(token, code);
+        p = await posLookupAction(token, code);
       } catch {
         p = await lookupOffline(code);
       }
-      if (p) onPick(p);
-      else onMiss(code);
+      if (p) {
+        onPick(p);
+        setQuery("");
+      } else if (looksLikeBarcode(code)) {
+        onMiss(code); // código real desconocido → alta rápida
+      } else {
+        setQuery(code); // era una búsqueda por nombre
+      }
     });
   }
 
+  const showingSearch = query.trim().length > 0;
+
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
-      <div className="flex gap-2">
-        <ScanField onScan={onScan} placeholder="Escaneá o buscá un producto" />
-      </div>
+      <ScanField
+        onScan={onScan}
+        onType={onType}
+        placeholder="Escaneá un código o buscá por nombre"
+      />
 
       <div className="flex flex-wrap gap-1">
         <Button
           size="sm"
-          variant={tab === "top" ? "default" : "outline"}
+          variant={tab === "top" && !showingSearch ? "default" : "outline"}
           onClick={() => {
             setTab("top");
             setQuery("");
@@ -85,17 +107,44 @@ export function ProductGrid({
             key={c.id}
             size="sm"
             variant={tab === c.id ? "default" : "outline"}
-            onClick={() => setTab(c.id)}
+            onClick={() => {
+              setTab(c.id);
+              setQuery("");
+            }}
           >
             {c.name}
           </Button>
         ))}
       </div>
 
-      <div className="grid min-h-0 flex-1 grid-cols-2 gap-2 overflow-y-auto sm:grid-cols-3 lg:grid-cols-4">
-        {list.length === 0 && (
+      <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <span>
+          {loading
+            ? "Buscando…"
+            : showingSearch
+              ? `${list.length} resultado(s) para "${query.trim()}"`
+              : `${list.length} producto(s)`}
+        </span>
+        {showingSearch && (
+          <button
+            type="button"
+            className="underline"
+            onClick={() => setQuery("")}
+          >
+            Limpiar
+          </button>
+        )}
+      </div>
+
+      <div className="relative grid min-h-0 flex-1 grid-cols-2 gap-2 overflow-y-auto pr-1 sm:grid-cols-3 lg:grid-cols-4">
+        {loading && (
+          <div className="absolute inset-0 z-10 flex items-start justify-center bg-background/70 pt-10 text-sm text-muted-foreground">
+            Buscando…
+          </div>
+        )}
+        {!loading && list.length === 0 && (
           <p className="col-span-full p-4 text-sm text-muted-foreground">
-            {pending ? "Buscando…" : "Sin resultados."}
+            Sin resultados.
           </p>
         )}
         {list.map((p) => (

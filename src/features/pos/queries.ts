@@ -3,6 +3,10 @@ import { prisma } from "@/db/client";
 import { getSiteSettings } from "@/db/settings";
 import { computeArqueo } from "@/domain/arqueo";
 import {
+  type DiscountInput,
+  resolveBestPrice,
+} from "@/features/catalog/discount";
+import {
   getVariantPricing,
   type VariantPricing,
 } from "@/features/orders/pricing";
@@ -121,33 +125,107 @@ export async function searchPosProducts(
 ): Promise<PosProduct[]> {
   await requireDevice(token);
   const term = q.trim();
-  const variants = await prisma.variant.findMany({
-    where: {
-      archivedAt: null,
-      product: {
-        isActive: true,
+
+  // Una sola consulta con todo lo que hace falta para el precio (evita 3 idas y
+  // vueltas contra la BD remota, que en la caja se notan).
+  const [variants, discounts] = await Promise.all([
+    prisma.variant.findMany({
+      where: {
         archivedAt: null,
-        ...(categoryId ? { categories: { some: { categoryId } } } : {}),
+        product: {
+          isActive: true,
+          archivedAt: null,
+          // La categoría puede ser una marca (padre): incluye sus subcategorías.
+          ...(categoryId
+            ? {
+                categories: {
+                  some: {
+                    category: {
+                      OR: [{ id: categoryId }, { parentId: categoryId }],
+                    },
+                  },
+                },
+              }
+            : {}),
+        },
         ...(term
-          ? { name: { contains: term, mode: "insensitive" as const } }
+          ? {
+              OR: [
+                {
+                  product: {
+                    name: { contains: term, mode: "insensitive" as const },
+                  },
+                },
+                { barcode: term },
+                { sku: term },
+              ],
+            }
           : {}),
       },
-    },
-    take: 60,
-    select: { id: true },
+      take: 200,
+      orderBy: { product: { name: "asc" } },
+      select: {
+        id: true,
+        basePriceBob: true,
+        attributes: true,
+        barcode: true,
+        product: {
+          select: {
+            id: true,
+            name: true,
+            categories: { select: { categoryId: true } },
+          },
+        },
+        stock: { select: { qty: true } },
+      },
+    }),
+    prisma.$queryRaw<
+      {
+        product_id: string | null;
+        category_id: string | null;
+        scope: string;
+        percent: number | null;
+        amount_bob: number | null;
+      }[]
+    >`
+      select dp."B" as product_id, d.category_id, d.scope, d.percent, d.amount_bob
+      from discount d
+      left join "_DiscountToProduct" dp on dp."A" = d.id
+      where d.is_active = true and d.archived_at is null
+        and (d.starts_at is null or d.starts_at <= now())
+        and (d.ends_at is null or d.ends_at >= now())`,
+  ]);
+
+  // El código exacto va primero.
+  variants.sort((a, b) => {
+    const ae = a.barcode === term || false;
+    const be = b.barcode === term || false;
+    return ae === be ? 0 : ae ? -1 : 1;
   });
-  // Búsqueda directa por código también.
-  if (term) {
-    const byCode = await prisma.variant.findFirst({
-      where: { OR: [{ barcode: term }, { sku: term }], archivedAt: null },
-      select: { id: true },
-    });
-    if (byCode && !variants.some((v) => v.id === byCode.id)) {
-      variants.unshift(byCode);
-    }
-  }
-  const pricing = await getVariantPricing(variants.map((v) => v.id));
-  return [...pricing.values()].map(toPosProduct);
+
+  return variants.map((v) => {
+    const catIds = new Set(v.product.categories.map((c) => c.categoryId));
+    const applicable: DiscountInput[] = discounts
+      .filter(
+        (d) =>
+          d.scope === "GLOBAL" ||
+          (d.scope === "PRODUCT" && d.product_id === v.product.id) ||
+          (d.scope === "CATEGORY" &&
+            d.category_id &&
+            catIds.has(d.category_id)),
+      )
+      .map((d) => ({ percent: d.percent, amountBob: d.amount_bob }));
+    const best = resolveBestPrice(v.basePriceBob, applicable);
+    const attrs = (v.attributes as Record<string, string> | null) ?? null;
+    return {
+      variantId: v.id,
+      productName: v.product.name,
+      variantLabel: attrs?.variante ?? null,
+      basePriceBob: v.basePriceBob,
+      effectiveBob: best.effectiveBob,
+      stockQty: v.stock?.qty ?? 0,
+    };
+  });
 }
 
 export async function lookupPosVariant(
