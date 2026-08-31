@@ -1,7 +1,8 @@
-/* Glass — service worker de la caja (§22.8). App-shell cache-first para navegar
- * a /pos sin red; stale-while-revalidate para los assets de Next. Nunca cachea
+/* Glass — service worker de la caja (§22.8). Navegar a /pos es network-first
+ * (el shell siempre fresco cuando hay red; la caché es solo el respaldo sin
+ * conexión); stale-while-revalidate para los assets de Next. Nunca cachea
  * /api/* (la sincronización tiene que ir a la red o fallar de verdad). */
-const CACHE = "glass-pos-v1";
+const CACHE = "glass-pos-v2";
 const SHELL = ["/pos", "/pos/turno/cerrar"];
 
 self.addEventListener("install", (event) => {
@@ -41,20 +42,21 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
   if (url.pathname.startsWith("/api/")) return;
 
-  // Navegaciones a la caja: cache-first, con red como respaldo.
+  // Navegaciones a la caja: network-first. Así un despliegue nuevo llega al
+  // instante; la caché solo entra si la red falla (modo sin conexión).
   if (request.mode === "navigate" && url.pathname.startsWith("/pos")) {
     event.respondWith(
-      caches.match(request).then(
-        (hit) =>
-          hit ||
-          fetch(request)
-            .then((res) => {
-              const copy = res.clone();
-              caches.open(CACHE).then((c) => c.put(request, copy));
-              return res;
-            })
-            .catch(() => caches.match("/pos")),
-      ),
+      fetch(request)
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put(request, copy));
+          return res;
+        })
+        .catch(() =>
+          caches
+            .match(request)
+            .then((hit) => hit || caches.match("/pos")),
+        ),
     );
     return;
   }
