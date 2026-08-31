@@ -21,8 +21,10 @@ export async function seedConfig(prisma: PrismaClient): Promise<SeededConfig> {
     name: "Celulares Demo",
     currency: process.env.DEFAULT_CURRENCY ?? "BOB",
     locale: process.env.DEFAULT_LOCALE ?? "es-BO",
-    themePreset: "NOCTURNO",
-    brandColor: "oklch(0.6 0.19 255)",
+    // Preset claro: los bloques del CMS todavía asumen superficie clara (ver
+    // docs/deudas-tecnicas.md T-11).
+    themePreset: "ESTUDIO",
+    brandColor: "oklch(0.55 0.2 265)",
     cardPreset: "SUAVE",
     density: "COMODA",
     homeLayout: "HERO",
