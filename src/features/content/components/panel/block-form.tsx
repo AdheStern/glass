@@ -3,6 +3,8 @@
 // enriquecido usa el editor con barra. Las imágenes aceptan un `path`/URL
 // (subida real: Fase 2).
 import { Plus, X } from "lucide-react";
+import { useId } from "react";
+import { Field } from "@/components/field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,10 +37,12 @@ function Text({
   onChange: (v: string) => void;
   placeholder?: string;
 }) {
+  const id = useId();
   return (
     <div className="flex flex-col gap-1.5">
-      <Label>{label}</Label>
+      <Label htmlFor={id}>{label}</Label>
       <Input
+        id={id}
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
@@ -62,7 +66,8 @@ function Repeater<T>({
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <Label>{label}</Label>
+      {/* Etiqueta de grupo, no de un control: no lleva htmlFor. */}
+      <p className="text-sm font-medium leading-none">{label}</p>
       {items.map((it, i) => (
         <div
           key={i}
@@ -271,13 +276,12 @@ export function BlockForm({
         onChange={(v) => set({ items: v })}
         render={(it, s) => (
           <>
-            <div className="flex flex-col gap-1.5">
-              <Label>Cita</Label>
+            <Field label="Cita">
               <Textarea
                 value={it.quote}
                 onChange={(e) => s({ ...it, quote: e.target.value })}
               />
-            </div>
+            </Field>
             <Text
               label="Nombre"
               value={it.name}
@@ -476,11 +480,12 @@ function Pick({
   options: string[];
   onChange: (v: string) => void;
 }) {
+  const id = useId();
   return (
     <div className="flex flex-col gap-1.5">
-      <Label>{label}</Label>
+      <Label htmlFor={id}>{label}</Label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger>
+        <SelectTrigger id={id}>
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

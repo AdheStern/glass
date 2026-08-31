@@ -2,9 +2,9 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
+import { Field } from "@/components/field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   publishPageAction,
@@ -123,32 +123,28 @@ export function PageEditor({ page }: { page: PanelPage | null }) {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="flex flex-col gap-1.5">
-          <Label>Título</Label>
+        <Field label="Título">
           <Input value={title} onChange={(e) => setTitle(e.target.value)} />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <Label>Slug (opcional)</Label>
+        </Field>
+        <Field label="Slug (opcional)">
           <Input
             value={slug}
             placeholder="se genera del título"
             onChange={(e) => setSlug(e.target.value)}
           />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <Label>Título SEO</Label>
+        </Field>
+        <Field label="Título SEO">
           <Input
             value={metaTitle}
             onChange={(e) => setMetaTitle(e.target.value)}
           />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <Label>Descripción SEO</Label>
+        </Field>
+        <Field label="Descripción SEO">
           <Textarea
             value={metaDesc}
             onChange={(e) => setMetaDesc(e.target.value)}
           />
-        </div>
+        </Field>
       </div>
 
       <label className="flex items-center gap-2 text-sm">

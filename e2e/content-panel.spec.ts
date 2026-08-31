@@ -12,8 +12,9 @@ test("editor: agregar un bloque y publicar la página", async ({ page }) => {
     page.getByRole("heading", { name: "Nueva página" }),
   ).toBeVisible();
 
-  // El primer campo de texto del formulario es el título.
-  await page.getByRole("textbox").first().fill(`Página e2e ${Date.now()}`);
+  await page
+    .getByLabel("Título", { exact: true })
+    .fill(`Página e2e ${Date.now()}`);
   await page.getByRole("button", { name: "Agregar bloque" }).click();
   await page.getByRole("menuitem", { name: "Portada" }).click();
   await page.getByRole("button", { name: "Publicar" }).click();

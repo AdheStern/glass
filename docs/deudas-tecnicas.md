@@ -27,13 +27,13 @@ Ninguno de estos ítems impide el funcionamiento del sistema entregado.
 
 | # | Deuda | Detalle |
 |---|---|---|
-| T-07 | **`<Label>` sin `htmlFor`/`id`** | En el editor de contenido (`page-editor.tsx`, `post-editor.tsx`, `block-form.tsx`) los `<Label>` no están asociados a su input. Funciona, pero un lector de pantalla no anuncia el campo y los tests e2e tienen que usar `getByRole("textbox")` en vez de `getByLabel`. |
+| ~~T-07~~ | **`<Label>` sin `htmlFor`/`id`** — **resuelto** | Nuevo `src/components/field.tsx` (`Field`, con `useId`) y los helpers de `block-form.tsx` cablean `htmlFor`/`id`. Los tests vuelven a usar `getByLabel`. |
 
 ## Comportamiento de Next 16
 
 | # | Deuda | Detalle |
 |---|---|---|
-| T-08 | **Rutas dinámicas que transmiten 200 antes de `notFound()`** | `/pedido/[folio]`, `/pos/comprobante/[folio]`, `/[pagina]`, `/borrador/[token]` pueden empezar a transmitir la respuesta con 200 antes de que se resuelva el `notFound()` para un recurso inexistente. Es un efecto del streaming de Cache Components; el usuario ve la página de "no encontrado" igual, pero el status HTTP no es 404. |
+| T-08 | **Rutas dinámicas devuelven 200 en vez de 404** | Confirmado en el servidor `standalone` de producción: `/pedido/<folio-inexistente>`, `/producto/<slug-inexistente>`, `/<pagina-inexistente>`, `/borrador/<token-falso>` responden **200** con la página de "no encontrado" en el cuerpo. Todas esas rutas son PPR (`◐`): el shell estático del `(shop)/layout.tsx` se transmite con 200 antes de que el `notFound()` de la página (que sí corre `await connection()` + `instant = false`) llegue. **Probado sin éxito**: llamar `notFound()` desde `generateMetadata` — el shell PPR ya salió con 200 igual. Arreglarlo "de verdad" exige o volver dinámico el layout de la tienda —y perder el prerender del shell del catálogo (§7.1, no negociable)— o un pre-chequeo de existencia en `proxy.ts` (consulta a BD por request en el middleware, p. ej. contra un set de slugs cacheado). `/pedido` y `/borrador` llevan `robots: noindex`, así que el impacto SEO real es sobre `/producto/[slug]` y `/[pagina]` (soft-404). Pendiente de decisión. |
 
 ## Funcionalidad diferida
 
