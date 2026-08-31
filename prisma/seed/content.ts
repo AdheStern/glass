@@ -28,8 +28,8 @@ export async function seedContent(prisma: PrismaClient) {
       title: "Inicio",
       status: "PUBLISHED",
       isHome: true,
-      metaTitle: "Ferretería a un mensaje de distancia",
-      metaDesc: "Todo para tu obra y tu casa. Pedí por WhatsApp.",
+      metaTitle: "Celulares nuevos con garantía, a un mensaje",
+      metaDesc: "Xiaomi, Samsung, Honor y Apple. Pedí por WhatsApp.",
       publishedAt: new Date(),
       draftToken: "demo-portada-000000000000000000",
       blocks: {
@@ -38,8 +38,9 @@ export async function seedContent(prisma: PrismaClient) {
             type: "HERO",
             position: 0,
             data: {
-              title: "Todo para tu obra y tu casa",
-              subtitle: "Elegí, armá tu pedido y confirmá por WhatsApp.",
+              title: "El celular que querés, a un mensaje",
+              subtitle:
+                "Elegí modelo, color y almacenamiento. Coordinás por WhatsApp.",
               variant: "center",
               mediaKind: "image",
               mediaPath: poolImages[0],
@@ -49,7 +50,7 @@ export async function seedContent(prisma: PrismaClient) {
           {
             type: "PRODUCT_GRID",
             position: 1,
-            data: { mode: "featured", limit: 8, title: "Lo más pedido" },
+            data: { mode: "featured", limit: 8, title: "Los más buscados" },
           },
           {
             type: "TEXT_MEDIA",
@@ -58,7 +59,7 @@ export async function seedContent(prisma: PrismaClient) {
               layout: "media-right",
               imagePath: poolImages[1],
               body: p(
-                "Atendemos en el barrio desde 2004. Lo que no está en la vitrina, lo conseguimos.",
+                "Trabajamos con equipos nuevos, sellados y con garantía. Lo que no está en vitrina, lo traemos.",
               ),
             },
           },
@@ -68,12 +69,14 @@ export async function seedContent(prisma: PrismaClient) {
             data: {
               items: [
                 {
-                  q: "¿Hacen envíos?",
-                  a: p("Sí, dentro de la ciudad. Coordinás por WhatsApp."),
+                  q: "¿Los equipos son nuevos?",
+                  a: p("Sí, todos sellados y con garantía de la tienda."),
                 },
                 {
-                  q: "¿Puedo pagar con QR?",
-                  a: p("Sí, aceptamos QR y efectivo."),
+                  q: "¿Puedo pagar en cuotas?",
+                  a: p(
+                    "Sí, financiamos con tarjeta o plan propio. Consultá por WhatsApp.",
+                  ),
                 },
               ],
             },
@@ -82,9 +85,9 @@ export async function seedContent(prisma: PrismaClient) {
             type: "CTA_WHATSAPP",
             position: 4,
             data: {
-              heading: "¿Necesitás algo puntual?",
+              heading: "¿Buscás un modelo puntual?",
               buttonLabel: "Escribinos",
-              prefilledMessage: "Hola! Estoy buscando…",
+              prefilledMessage: "Hola! Estoy buscando el…",
             },
           },
         ],
@@ -109,7 +112,7 @@ export async function seedContent(prisma: PrismaClient) {
               layout: "media-left",
               imagePath: poolImages[2],
               body: p(
-                "Somos un negocio familiar. Nos conocés por nombre y sabemos qué taladro te sirve.",
+                "Somos un negocio familiar. Nos conocés por nombre y te decimos sin vueltas qué equipo te conviene.",
               ),
             },
           },
@@ -134,15 +137,15 @@ export async function seedContent(prisma: PrismaClient) {
   // --- Blog ---
   const published = [
     {
-      slug: "como-elegir-brocas",
-      title: "Cómo elegir la broca correcta",
-      excerpt: "Metal, madera, concreto: cada material pide su punta.",
+      slug: "como-elegir-tu-celular",
+      title: "Cómo elegir tu próximo celular",
+      excerpt: "Batería, cámara y almacenamiento: en qué fijarte primero.",
       author: "El equipo",
     },
     {
-      slug: "novedades-del-taller",
-      title: "Novedades del taller",
-      excerpt: "Sumamos línea de pintura y ampliamos el horario del sábado.",
+      slug: "novedades-de-la-tienda",
+      title: "Novedades de la tienda",
+      excerpt: "Llegaron los Galaxy S24 y ampliamos el horario del sábado.",
       author: "Rosa",
     },
   ];

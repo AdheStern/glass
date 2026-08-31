@@ -7,7 +7,7 @@ test("comprar: agregar al carrito y crear el pedido", async ({
   page,
   context,
 }) => {
-  await page.goto("/producto/juego-destornilladores-stanley-12");
+  await page.goto("/producto/cargador-rapido-33w");
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 
   const addBtn = page.getByRole("button", { name: /Agregar al pedido/i });
@@ -16,9 +16,7 @@ test("comprar: agregar al carrito y crear el pedido", async ({
 
   await page.goto("/carrito");
   await expect(
-    page
-      .getByRole("main")
-      .getByText("Juego de destornilladores Stanley 12 piezas"),
+    page.getByRole("main").getByText("Cargador rápido 33 W"),
   ).toBeVisible();
   // La cantidad de la línea (el "2" del contador del encabezado también existe).
   await expect(

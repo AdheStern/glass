@@ -11,6 +11,7 @@ import { makeUploader } from "./images";
 import { seedInventoryExtras } from "./inventory";
 import { makeRng, parseArgs } from "./lib";
 import { seedOwner } from "./owner";
+import { seedPanelUsers } from "./panel-users";
 import { seedSales } from "./sales";
 
 // La siembra escribe decenas de miles de filas: va por la conexión directa
@@ -64,6 +65,7 @@ async function main() {
 
   console.time("owner");
   await seedOwner(prisma); // idempotente: no toca al propietario si ya existe
+  await seedPanelUsers(prisma); // ADMINISTRADOR de demo con credenciales conocidas
   console.timeEnd("owner");
 
   console.time("catalog");

@@ -11,10 +11,10 @@ test("recorrido: catálogo → categoría → ficha con precio y disponibilidad"
   await expect(page.getByRole("heading", { name: "Catálogo" })).toBeVisible();
 
   // Filtrar por una categoría
-  await page.getByRole("link", { name: "Herramientas" }).first().click();
-  await expect(page).toHaveURL(/\/catalogo\/herramientas/);
+  await page.getByRole("link", { name: "Samsung" }).first().click();
+  await expect(page).toHaveURL(/\/catalogo\/samsung/);
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "Herramientas",
+    "Samsung",
   );
 
   // Abrir la primera ficha de producto visible
@@ -30,11 +30,9 @@ test("recorrido: catálogo → categoría → ficha con precio y disponibilidad"
   ).toBeVisible();
 });
 
-test("búsqueda tolera errores de tipeo", async ({ page }) => {
-  await page.goto("/buscar?q=destornilador");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "destornilador",
-  );
+test("búsqueda tolera consultas parciales", async ({ page }) => {
+  await page.goto("/buscar?q=iphon");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("iphon");
   await expect(page.locator('a[href^="/producto/"]').first()).toBeVisible();
 });
 

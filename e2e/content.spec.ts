@@ -9,10 +9,10 @@ const DRAFT_TOKEN = "demo-borrador-0000000000000000";
 test("la portada se arma con bloques", async ({ page }) => {
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: "Todo para tu obra y tu casa" }),
+    page.getByRole("heading", { name: "El celular que querés, a un mensaje" }),
   ).toBeVisible();
-  await expect(page.getByText("Lo más pedido")).toBeVisible();
-  await expect(page.getByText("¿Hacen envíos?")).toBeVisible();
+  await expect(page.getByText("Los más buscados")).toBeVisible();
+  await expect(page.getByText("¿Los equipos son nuevos?")).toBeVisible();
 });
 
 test("el bloque FAQ emite FAQPage en JSON-LD", async ({ page }) => {
@@ -32,7 +32,7 @@ test("una página del CMS renderiza por slug", async ({ page }) => {
 test("el blog lista las publicadas y no el borrador", async ({ page }) => {
   await page.goto("/blog");
   await expect(
-    page.getByRole("link", { name: "Cómo elegir la broca correcta" }),
+    page.getByRole("link", { name: "Cómo elegir tu próximo celular" }),
   ).toBeVisible();
   await expect(
     page.getByText("Una entrada que todavía no publicamos"),
@@ -40,9 +40,9 @@ test("el blog lista las publicadas y no el borrador", async ({ page }) => {
 });
 
 test("una entrada del blog renderiza con Article JSON-LD", async ({ page }) => {
-  await page.goto("/blog/como-elegir-brocas");
+  await page.goto("/blog/como-elegir-tu-celular");
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "Cómo elegir la broca correcta",
+    "Cómo elegir tu próximo celular",
   );
   const blobs = await page
     .locator('script[type="application/ld+json"]')
@@ -55,8 +55,8 @@ test("el RSS trae las entradas publicadas", async ({ request }) => {
   expect(res.ok()).toBeTruthy();
   expect(res.headers()["content-type"]).toContain("xml");
   const xml = await res.text();
-  expect(xml).toContain("Cómo elegir la broca correcta");
-  expect(xml).toContain("Novedades del taller");
+  expect(xml).toContain("Cómo elegir tu próximo celular");
+  expect(xml).toContain("Novedades de la tienda");
   expect(xml).not.toContain("Una entrada que todavía no publicamos");
 });
 

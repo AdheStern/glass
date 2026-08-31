@@ -5,41 +5,23 @@ import { gradientDataUri, type ImageUploader, seedImagePool } from "./images";
 import { idFactory, inBatches, type Rng } from "./lib";
 import { HERO_PRODUCTS, productDescription, productName } from "./names";
 
-const PARENTS = [
-  "Herramientas",
-  "Electricidad",
-  "Plomería",
-  "Pinturas",
-  "Ferretería general",
-  "Jardín",
-  "Construcción",
-  "Seguridad",
-];
+const PARENTS = ["Xiaomi", "Samsung", "Honor", "Apple", "Accesorios"];
 
 const SUBCATS: Record<string, string[]> = {
-  Herramientas: ["Eléctricas", "Manuales", "Medición", "Accesorios"],
-  Electricidad: ["Iluminación", "Cables", "Tableros", "Tomas e interruptores"],
-  Plomería: ["Tuberías", "Grifería", "Accesorios", "Riego"],
-  Pinturas: ["Interiores", "Exteriores", "Accesorios", "Preparación"],
-  "Ferretería general": [
-    "Fijaciones",
-    "Adhesivos",
-    "Candados y cadenas",
-    "Varios",
-  ],
-  Jardín: [
-    "Herramientas de jardín",
-    "Riego",
-    "Macetas y sustrato",
-    "Protección",
-  ],
-  Construcción: [
-    "Aglomerantes",
-    "Áridos y bloques",
-    "Hierro y malla",
-    "Auxiliares",
-  ],
-  Seguridad: ["Protección personal", "Señalización", "Emergencia", "Altura"],
+  Xiaomi: ["Redmi", "Redmi Note", "POCO", "Serie Xiaomi"],
+  Samsung: ["Galaxy S", "Galaxy A", "Galaxy M", "Galaxy Z"],
+  Honor: ["Magic", "Serie X", "Serie N"],
+  Apple: ["iPhone 15", "iPhone 14", "iPhone 13", "iPhone SE y anteriores"],
+  Accesorios: ["Fundas y micas", "Cargadores y cables", "Audio", "Otros"],
+};
+
+/** Rango de precio (centavos BOB) para los productos generados por marca. */
+const PRICE_RANGE_BOB: Record<string, [number, number]> = {
+  Xiaomi: [90_000, 320_000],
+  Samsung: [130_000, 1_300_000],
+  Honor: [110_000, 850_000],
+  Apple: [420_000, 1_400_000],
+  Accesorios: [2_000, 30_000],
 };
 
 export interface SeededVariant {
@@ -144,6 +126,7 @@ export async function seedCatalog(
     categoryIds: string[];
     variantCount: number;
     fixedPriceBob?: number;
+    priceRangeBob?: [number, number];
   }) => {
     const id = prodId();
     const i = productIndex++;
@@ -160,12 +143,14 @@ export async function seedCatalog(
     for (const categoryId of opts.categoryIds) {
       productCategories.push({ productId: id, categoryId });
     }
+    const [lo, hi] = opts.priceRangeBob ?? [500, 80_000];
     for (let v = 0; v < opts.variantCount; v++) {
       const vid = varId();
       const base =
         opts.fixedPriceBob && v === 0
           ? opts.fixedPriceBob
-          : rng.int(10, 1600) * 50; // centavos, múltiplos de 0,50
+          : // Cada variante (128/256/512 GB) sube un escalón sobre la base.
+            (Math.round(rng.int(lo, hi) / 5000) + v * 4) * 5000;
       variants.push({
         id: vid,
         productId: id,
@@ -204,15 +189,18 @@ export async function seedCatalog(
 
   // Resto del catálogo.
   for (let i = HERO_PRODUCTS.length; i < productCount; i++) {
-    const categoryIds = rng.sample(childIds, rng.int(1, 2));
-    const parentName = parentNameByChild.get(categoryIds[0]) ?? "Herramientas";
+    const categoryIds = rng.sample(childIds, 1);
+    const parentName = parentNameByChild.get(categoryIds[0]) ?? "Xiaomi";
     const name = productName(rng, parentName);
+    const isPhone = parentName !== "Accesorios";
     addProduct({
       name,
       slug: slugify(name),
       description: productDescription(rng, name),
       categoryIds,
-      variantCount: rng.int(1, 4),
+      // Celulares: 1–3 opciones de almacenamiento. Accesorios: 1–2.
+      variantCount: isPhone ? rng.int(1, 3) : rng.int(1, 2),
+      priceRangeBob: PRICE_RANGE_BOB[parentName] ?? PRICE_RANGE_BOB.Xiaomi,
     });
   }
 

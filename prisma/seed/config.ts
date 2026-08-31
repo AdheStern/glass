@@ -17,27 +17,30 @@ const DEMO_PIN = "2468";
 const DEMO_PAIRING_CODE = "424242";
 
 export async function seedConfig(prisma: PrismaClient): Promise<SeededConfig> {
+  const settings = {
+    name: "Celulares Demo",
+    currency: process.env.DEFAULT_CURRENCY ?? "BOB",
+    locale: process.env.DEFAULT_LOCALE ?? "es-BO",
+    themePreset: "NOCTURNO",
+    brandColor: "oklch(0.6 0.19 255)",
+    cardPreset: "SUAVE",
+    density: "COMODA",
+    homeLayout: "HERO",
+    whatsappNumbers: [
+      { label: "Ventas", e164: "+59170000000" },
+      { label: "Soporte", e164: "+59171111111" },
+    ],
+    socials: { instagram: "celulares.demo", tiktok: "celulares.demo" },
+    hours: { mon: "09:00-19:00", sat: "09:00-13:00" },
+    stockDisplay: "UMBRAL" as const,
+    lowStockThreshold: 3,
+    roundingMode: "NEAREST_10" as const,
+    minOrderBob: 5000,
+  };
   await prisma.siteSettings.upsert({
     where: { id: "singleton" },
-    update: {},
-    create: {
-      id: "singleton",
-      name: "Ferretería Demo",
-      currency: process.env.DEFAULT_CURRENCY ?? "BOB",
-      locale: process.env.DEFAULT_LOCALE ?? "es-BO",
-      themePreset: "MERCADO",
-      brandColor: "oklch(0.62 0.17 25)",
-      cardPreset: "SUAVE",
-      density: "COMODA",
-      homeLayout: "HERO",
-      whatsappNumbers: [{ label: "Ventas", e164: "+59170000000" }],
-      socials: { instagram: "ferreteria.demo" },
-      hours: { mon: "08:00-18:30", sat: "08:00-13:00" },
-      stockDisplay: "UMBRAL",
-      lowStockThreshold: 5,
-      roundingMode: "NEAREST_10",
-      minOrderBob: 5000,
-    },
+    update: settings,
+    create: { id: "singleton", ...settings },
   });
 
   const pinHash = await hash(DEMO_PIN);
