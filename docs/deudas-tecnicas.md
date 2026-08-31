@@ -29,6 +29,12 @@ Ninguno de estos ítems impide el funcionamiento del sistema entregado.
 |---|---|---|
 | ~~T-07~~ | **`<Label>` sin `htmlFor`/`id`** — **resuelto** | Nuevo `src/components/field.tsx` (`Field`, con `useId`) y los helpers de `block-form.tsx` cablean `htmlFor`/`id`. Los tests vuelven a usar `getByLabel`. |
 
+## Tema
+
+| # | Deuda | Detalle |
+|---|---|---|
+| T-11 | **Bloques del CMS no se adaptan al tema** | `src/features/content/components/blocks/*` usan `text-black/60`, `border-black/10`, etc. en vez de `var(--ink)` / tokens de tema. Con un preset oscuro (`NOCTURNO`) el texto de la portada queda negro sobre fondo oscuro. Por eso la siembra de demo usa `ESTUDIO` (claro). Hay que pasar los bloques a tokens. |
+
 ## Comportamiento de Next 16
 
 | # | Deuda | Detalle |
