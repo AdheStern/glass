@@ -13,7 +13,7 @@ Ninguno de estos ítems impide el funcionamiento del sistema entregado.
 |---|---|---|
 | T-01 | **Presupuesto de rendimiento sin verificar en CI** (§20) | `pnpm perf` (Lighthouse CI) necesita Chrome/Edge, que no está en el entorno de desarrollo actual. El límite de <120 KB de JS del catálogo no se comprueba automáticamente. Se verifica a ojo con el bundle de `pnpm build`. |
 | T-02 | **Prueba visual de los 8 presets** (§23) | `e2e/appearance.spec.ts` valida que cada preset renderiza y emite sus tokens, pero no compara capturas (`toHaveScreenshot`). Falta generar y versionar los baselines para detectar regresiones visuales finas. |
-| T-03 | **GitHub Actions + despliegue** (§4.4) — **parcial** | `.github/workflows/ci.yml` (verify + build con Postgres efímero, siembra de 12 productos porque `cacheComponents` exige que `generateStaticParams` devuelva ≥1) y `release.yml` (etiqueta `v*` → imagen a GHCR). El `docker/Dockerfile` ahora corre `migrate deploy` + `db:sql` + siembra en el stage `build`. **Sin probar todavía**: no hay forma de ejecutar Actions ni el daemon de Docker desde el entorno de desarrollo; el primer `push`/tag seguramente pida ajustes. Falta el flujo de despliegue por tandas en Coolify. |
+| T-03 | **GitHub Actions + despliegue** (§4.4) — **CI en verde** | `.github/workflows/ci.yml` (Postgres efímero + `migrate deploy` + `db:sql` + siembra de 12 + `pnpm verify` + `pnpm build`) **pasa en cada push** — verificado en el primer run. `release.yml` (etiqueta `v*` → imagen `runner` a GHCR, `docker build` alcanza el Postgres por `network: host`) **aún sin probar**: no se puede tirar un tag ni levantar Docker desde el entorno de desarrollo. Falta el flujo de despliegue por tandas en Coolify. |
 
 ## Endurecimiento
 
