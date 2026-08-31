@@ -8,11 +8,11 @@ const DRAFT_TOKEN = "demo-borrador-0000000000000000";
 
 test("la portada se arma con bloques", async ({ page }) => {
   await page.goto("/");
-  await expect(
-    page.getByRole("heading", { name: "El celular que querés, a un mensaje" }),
-  ).toBeVisible();
+  // El título del héroe lo edita cada comercio; basta con que haya un h1.
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Ver catálogo" })).toBeVisible();
   await expect(page.getByText("Los más buscados")).toBeVisible();
-  await expect(page.getByText("¿Los equipos son nuevos?")).toBeVisible();
+  await expect(page.getByText(/¿.*\?/).first()).toBeVisible(); // bloque FAQ
 });
 
 test("el bloque FAQ emite FAQPage en JSON-LD", async ({ page }) => {
