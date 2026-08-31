@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: glass
+          POSTGRES_DB: postgres-test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:glass@localhost:5432/postgres-test
+      DIRECT_URL: postgresql://postgres:glass@localhost:5432/postgres-test
+      # Solo para que la compilación no falle; nunca se usa en producción.
+      BETTER_AUTH_SECRET: ci-build-only-secret-not-for-production
+      SITE_URL: http://localhost:3000
+      OWNER_EMAIL: ci@example.com
+      OWNER_PASSWORD: ci-only
+      NEXT_TELEMETRY_DISABLED: "1"
+      GLASS_E2E: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Esquema + SQL idempotente + siembra mínima
+        # `cacheComponents` exige que `generateStaticParams` devuelva ≥1 fila, así
+        # que la compilación necesita un catálogo con datos.
+        run: |
+          pnpm prisma migrate deploy
+          pnpm db:sql
+          pnpm db:seed -- --products=12 --seed=1
+
+      - name: Verificación (typegen + biome + tsc + vitest)
+        run: pnpm verify
+
+      - name: Compilación de producción
+        run: pnpm build

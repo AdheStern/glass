@@ -1,0 +1,66 @@
+name: Release
+
+# Etiqueta v1.4.0 → construye la imagen y la publica en GHCR (§4.4). Coolify solo
+# la descarga y la levanta; nunca se compila en el VPS.
+#
+# `cacheComponents` obliga a que la compilación tenga BD: se levanta un Postgres
+# efímero y el `docker build` lo alcanza por `network: host` (localhost:5432).
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: glass
+          POSTGRES_DB: glass
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: network=host
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile
+          target: runner
+          push: true
+          network: host
+          build-args: |
+            DATABASE_URL=postgresql://postgres:glass@localhost:5432/glass
+            DIRECT_URL=postgresql://postgres:glass@localhost:5432/glass
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

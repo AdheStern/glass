@@ -30,12 +30,30 @@ ENTRYPOINT ["dev-entrypoint"]
 CMD ["pnpm", "dev"]
 
 # ---------------------------------------------------------------------------
-# build — compila la salida standalone de Next
+# build — compila la salida standalone de Next.
+# `cacheComponents` obliga a que `generateStaticParams` consulte la BD en build
+# (§4.4: la compilación corre en CI con un Postgres efímero, nunca en el VPS).
+# `BETTER_AUTH_SECRET` de build es un valor de descarte; el real lo pone Coolify
+# en runtime.
 # ---------------------------------------------------------------------------
 FROM deps AS build
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN pnpm db:generate && pnpm build
+ARG DATABASE_URL
+ARG DIRECT_URL
+ARG BETTER_AUTH_SECRET=build-only-not-used-at-runtime
+ARG SITE_URL=http://localhost:3000
+ARG OWNER_EMAIL=build@example.com
+ENV DATABASE_URL=$DATABASE_URL \
+    DIRECT_URL=$DIRECT_URL \
+    BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET \
+    SITE_URL=$SITE_URL \
+    OWNER_EMAIL=$OWNER_EMAIL
+RUN pnpm db:generate \
+ && pnpm prisma migrate deploy \
+ && pnpm db:sql \
+ && pnpm db:seed -- --products=12 --seed=1 \
+ && pnpm build
 
 # ---------------------------------------------------------------------------
 # runner — lo que corre en Coolify. Objetivo < 250 MB.
