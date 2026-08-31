@@ -19,7 +19,7 @@ Ninguno de estos ítems impide el funcionamiento del sistema entregado.
 
 | # | Deuda | Detalle |
 |---|---|---|
-| T-04 | **CSP completa** (§21) | `next.config.ts` pone solo cabeceras básicas (`nosniff`, HSTS, `Referrer-Policy`, `X-Frame-Options`). Una `Content-Security-Policy` estricta rompería el `<style>` de tokens del layout y el iframe de la vista previa del editor; hay que redactarla con `nonce`/`strict-dynamic` y probarla contra esas dos superficies. |
+| ~~T-04~~ | **CSP** (§21) — **hecha (pragmática)** | `next.config.ts` emite una `Content-Security-Policy` global. Sin `nonce` (incompatible con el cacheo de `cacheComponents`): `script-src`/`style-src` llevan `'unsafe-inline'` — aceptable porque el contenido de usuario nunca se inyecta como HTML (texto enriquecido = AST saneado, §11.1). `script-src` incluye `'wasm-unsafe-eval'` (argon2id del PIN sin conexión). Bloquea scripts/estilos externos, plugins, clickjacking, `<base>` y secuestro de formularios. Una CSP con `nonce`/`strict-dynamic` sigue pendiente y exige renunciar al cacheo de respuestas. |
 | T-05 | **Verificación de correo / SMTP** | Better Auth corre con `requireEmailVerification: false`. Falta cablear el envío (Mailpit en dev, SMTP real en prod) y activar la verificación para altas de equipo. |
 | T-06 | **Proveedor Google (OAuth)** | Pospuesto por decisión: sólo correo/contraseña. Better Auth ya soporta añadirlo; falta la credencial de DIMA con URI de retorno por dominio (§4.3 menciona `GOOGLE_CLIENT_ID`). |
 
